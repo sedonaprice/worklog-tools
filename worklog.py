@@ -409,11 +409,15 @@ def canonicalize_name (name):
             if char.isupper () or char == '-':
                 abbrev.append (char)
 
-    return ''.join (abbrev) + nbsp + surname
+    #return ''.join (abbrev) + nbsp + surname
+    return surname +',' + nbsp + '. '.join (abbrev)+'.'
 
 
 def surname (name):
     return name.strip ().split ()[-1].replace ('_', ' ')
+
+def not_surname (name):
+    return " ".join(name.strip ().split ()[:-1]).replace ('_', ' ')
 
 
 def best_url (item):
@@ -456,22 +460,35 @@ def cite_info (oitem, context):
     aitem.full_authors = MupJoin (', ', cauths)
 
     # Short list of authors, possibly abbreviating my name.
-    sauths = [surname (a) for a in oitem.authors.split (';')]
+    #sauths = [surname (a)+", "+not_surname(a) for a in oitem.authors.split (';')]
+    sauths = [surname (a)  for a in oitem.authors.split (';')]
     if context.my_abbrev_name is not None:
         sauths[myidx] = context.my_abbrev_name
+        
+    #print "sauths:", sauths
 
     if len (advposlist):
         for i in [int (x) - 1 for x in advposlist.split (',')]:
             sauths[i] = MupUnderline (sauths[i])
 
     if len (sauths) == 1:
-        aitem.short_authors = sauths[0]
+        aitem.short_authors = cauths[0] #sauths[0]
     elif len (sauths) == 2:
-        aitem.short_authors = MupJoin (' & ', sauths)
+        aitem.short_authors = MupJoin (' & ', cauths) #sauths)
     elif len (sauths) == 3:
-        aitem.short_authors = MupJoin (', ', sauths)
+        aitem.short_authors = MupJoin (', ', cauths) #sauths)
     else:
-        aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
+        #aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
+        sauthsstr = MupJoin (', ', cauths[0:3])
+        aitem.short_authors = MupJoin (' ', [sauthsstr, 'et' + nbsp + 'al.'])
+        
+        
+        if ((context.my_abbrev_name is not None) & (myidx > 2)):
+            sauths[myidx] = MupBold(sauths[myidx])
+            sauthsstr = aitem.short_authors
+            aitem.short_authors = MupJoin (' ', [sauthsstr, 'including '])
+            sauthsstr = aitem.short_authors
+            aitem.short_authors = MupJoin (' ', [sauthsstr, sauths[myidx]])
 
     if oitem.refereed == 'y':
         aitem.refereed_mark = u'»'
@@ -481,6 +498,8 @@ def cite_info (oitem, context):
     # Title with replaced quotes, for nesting in double-quotes, and
     # optionally-bolded for first authorship.
     aitem.quotable_title = oitem.title.replace (u'“', u'‘').replace (u'”', u'’')
+    #words_title = aitem.quotable_title.split(' ')
+    #aitem.quotable_title = MupJoin (' ', words_title)
 
     if myidx == 0:
         aitem.bold_if_first_title = MupBold (oitem.title)
@@ -497,6 +516,10 @@ def cite_info (oitem, context):
         aitem.citecountnote = u' [%d]' % citeinfo.cites
     else:
         aitem.citecountnote = u''
+ 
+    # Make citation to have commas:
+    citetmp = aitem.cite.split(' ')
+    aitem.cite = MupJoin (', ', citetmp)
 
     # Citation text with link
     url = best_url (oitem)
@@ -590,14 +613,29 @@ def partition_pubs (pubs):
     groups.all_formal = []
     groups.all_non_refereed = []
     groups.informal = []
+    
+    groups.first = []
+    groups.contrib = []
 
     for pub in pubs:
         refereed = (pub.refereed == 'y')
         refpreprint = (pub.get ('refpreprint', 'n') == 'y')
         formal = (pub.get ('informal', 'n') == 'n')
         # we assume refereed implies formal.
+        
+        first = (pub.mypos == '1')
+        
+        #print pub.mypos
 
         groups.all.append (pub)
+        
+        if first:
+            #print "is first"
+            groups.first.append (pub)
+        else:
+            #print "is contrib"
+            groups.contrib.append (pub)
+        
         if formal:
             groups.all_formal.append (pub)
 
@@ -618,6 +656,9 @@ def partition_pubs (pubs):
     groups.refpreprint_rev = groups.refpreprint[::-1]
     groups.non_refereed_rev = groups.non_refereed[::-1]
     groups.informal_rev = groups.informal[::-1]
+    
+    groups.first = groups.first[::-1]
+    groups.contrib = groups.contrib[::-1]
     return groups
 
 
@@ -838,10 +879,10 @@ def get_ads_cite_count (bibcode):
         raise ADSCountError ('received bad HTTP status: %r', e)
     except URLError as e:
         raise ADSCountError (str (e))
-
+    
     if lastnonempty is None:
         raise ADSCountError ('got only empty lines')
-
+    
     if lastnonempty.startswith ('Retrieved 0 abstracts'):
         raise ADSCountError ('no such bibcode')
 

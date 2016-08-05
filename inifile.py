@@ -264,6 +264,7 @@ def mutateStream (instream, outstream):
                 chunk.data.setone (key, data.strip ().decode ('utf8'))
             key = m.group (1)
             data = m.group (2)
+            print "data = ", data
             if not data[-1].isspace ():
                 data += ' '
             chunk._addLine (fullline, key)
