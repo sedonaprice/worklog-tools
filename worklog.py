@@ -410,7 +410,12 @@ def canonicalize_name (name):
                 abbrev.append (char)
 
     #return ''.join (abbrev) + nbsp + surname
-    return surname +',' + nbsp + '. '.join (abbrev)+'.'
+    nameout = surname +',' + nbsp + '. '.join (abbrev)+'.'
+    # Clean up case of someone having a hyphenated first name:
+    bits = nameout.strip ().split ('. -. ')
+    nameout = '.-'.join(bits)
+    
+    return nameout
 
 
 def surname (name):
@@ -458,19 +463,33 @@ def cite_info (oitem, context):
             cauths[i] = MupUnderline (cauths[i])
 
     aitem.full_authors = MupJoin (', ', cauths)
+    
+    # --------------------------------------------------------------
+    # Make a full authors list with semicolons and & at end:
+    if len(cauths) == 1:
+        aitem.full_authors_semi = cauths[0]
+    if len(cauths) == 2:
+        aitem.full_authors_semi = MupJoin (' & ', cauths)
+    else:
+        aitem.full_authors_semi = MupJoin('; ', cauths[:-1])
+        aitem.full_authors_semi = MupJoin('; & ', [aitem.full_authors_semi, cauths[-1]])
+    
+    
+    # --------------------------------------------------------------
 
     # Short list of authors, possibly abbreviating my name.
     #sauths = [surname (a)+", "+not_surname(a) for a in oitem.authors.split (';')]
     sauths = [surname (a)  for a in oitem.authors.split (';')]
     if context.my_abbrev_name is not None:
         sauths[myidx] = context.my_abbrev_name
-        
+    
     #print "sauths:", sauths
-
+    
     if len (advposlist):
         for i in [int (x) - 1 for x in advposlist.split (',')]:
             sauths[i] = MupUnderline (sauths[i])
-
+            
+    # Like canonicalized name scheme instead:
     if len (sauths) == 1:
         aitem.short_authors = cauths[0] #sauths[0]
     elif len (sauths) == 2:
@@ -519,7 +538,11 @@ def cite_info (oitem, context):
  
     # Make citation to have commas:
     citetmp = aitem.cite.split(' ')
-    aitem.cite = MupJoin (', ', citetmp)
+    citetmp2 = ', '.join(citetmp)
+    #aitem.cite = MupJoin (', ', citetmp)
+    # Clean up any underscores to force spaces:
+    citetmp = citetmp2.split('_')
+    aitem.cite = MupJoin(' ', citetmp)
 
     # Citation text with link
     url = best_url (oitem)
@@ -527,7 +550,13 @@ def cite_info (oitem, context):
         aitem.lcite = aitem.cite
     else:
         aitem.lcite = MupLink (url, aitem.cite)
-
+    
+    # Title with link
+    if url is None:
+        aitem.title_link = aitem.title
+    else:
+        aitem.title_link = MupLink (url, aitem.title)
+    
     # Other links for the web pub list
     from urllib2 import quote as urlquote
 
