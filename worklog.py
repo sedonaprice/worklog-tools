@@ -852,6 +852,15 @@ def cmd_today (context):
     yr, mo, dy = localtime (time ())[:3]
     text = '%s%s%d,%s%d.' % (months[mo - 1], nbsp, dy, nbsp, yr)
     return context.render (text)
+    
+def cmd_today_invert (context):
+    """No trailing period in the output, DD MM YYYY"""
+    from time import time, localtime
+
+    # This is a little bit gross.
+    yr, mo, dy = localtime (time ())[:3]
+    text = '%d %s %d' % (dy, months[mo - 1], yr)
+    return context.render (text)
 
 
 def setup_processing (render, datadir):
@@ -877,6 +886,7 @@ def setup_processing (render, datadir):
     commands['RMISCLIST_IF_NOT'] = cmd_rev_misc_list_if_not
     commands['RREPOLIST'] = cmd_rev_repo_list
     commands['TODAY.'] = cmd_today
+    commands['TODAY'] = cmd_today_invert
 
     return context, commands
 
