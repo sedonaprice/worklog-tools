@@ -494,8 +494,9 @@ def cite_info (oitem, context):
         aitem.short_authors = cauths[0] #sauths[0]
     elif len (sauths) == 2:
         aitem.short_authors = MupJoin (' & ', cauths) #sauths)
-    elif len (sauths) == 3:
-        aitem.short_authors = MupJoin (', ', cauths) #sauths)
+    elif (len (sauths) >= 3) & (len (sauths) <= 5):
+        aitem.short_authors = MupJoin (', ', cauths[:-1]) #sauths)
+        aitem.short_authors = MupJoin(', & ', [aitem.short_authors, cauths[-1]])
     else:
         #aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
         sauthsstr = MupJoin (', ', cauths[0:3])
