@@ -998,7 +998,7 @@ def _bib_cite (rec):
         return u'proceedings of “%s”, %s' % (rec['booktitle'], rec['pages'])
 
     if rec.get ('journal') == u'ArXiv e-prints' and 'eprint' in rec:
-        return u'arxiv:' + rec['eprint']
+        return u'arXiv:' + rec['eprint']
 
     return None
 
