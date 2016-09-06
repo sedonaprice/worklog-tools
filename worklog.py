@@ -500,13 +500,13 @@ def cite_info (oitem, context):
     else:
         #aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
         sauthsstr = MupJoin (', ', cauths[0:3])
-        aitem.short_authors = MupJoin (' ', [sauthsstr, 'et' + nbsp + 'al.'])
+        aitem.short_authors = MupJoin (', ', [sauthsstr, 'et' + nbsp + 'al.'])
         
         
         if ((context.my_abbrev_name is not None) & (myidx > 2)):
             sauths[myidx] = MupBold(sauths[myidx])
             sauthsstr = aitem.short_authors
-            aitem.short_authors = MupJoin (' ', [sauthsstr, 'including '])
+            aitem.short_authors = MupJoin (', ', [sauthsstr, 'including '])
             sauthsstr = aitem.short_authors
             aitem.short_authors = MupJoin (' ', [sauthsstr, sauths[myidx]])
 
@@ -517,10 +517,15 @@ def cite_info (oitem, context):
 
     # Title with replaced quotes, for nesting in double-quotes, and
     # optionally-bolded for first authorship.
-    aitem.quotable_title = oitem.title.replace (u'“', u'‘').replace (u'”', u'’')
+    aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
     #words_title = aitem.quotable_title.split(' ')
     #aitem.quotable_title = MupJoin (' ', words_title)
-
+    
+    
+    #print "aitem.title=", aitem.title
+    #print "aitem.quotable_title=", aitem.quotable_title
+    
+    
     if myidx == 0:
         aitem.bold_if_first_title = MupBold (oitem.title)
     else:
@@ -789,6 +794,8 @@ def cmd_pub_list (context, group):
 
     pubs = context.pubgroups.get (group)
     npubs = len (pubs)
+    
+    # Put something in here to sort by pub year/month?
 
     for num, pub in enumerate (pubs):
         info = cite_info (pub, context)
@@ -1059,7 +1066,7 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
         if year in byyear:
             outfile = byyear[year]
         else:
-            outfile = open (os.path.join (outdir, year + '.txt'), 'w')
+            outfile = open (os.path.join (outdir, year + 'p.txt'), 'w')
             byyear[year] = outfile
             print >>outfile, '# -*- conf -*-'
             print >>outfile, '# XXX for all records, refereed status is guessed crudely'
