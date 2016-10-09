@@ -69,7 +69,7 @@ def process_template (stream, commands, context):
     callable is invoked, with `context` and the remaining words in the line as
     arguments. Its return value is either a string or an iterable, with each
     iterate being yielded to the caller in the latter case."""
-
+    
     for line in stream:
         line = line.decode ('utf8').rstrip ()
         a = line.split ()
@@ -510,6 +510,39 @@ def cite_info (oitem, context):
             sauthsstr = aitem.short_authors
             aitem.short_authors = MupJoin (' ', [sauthsstr, sauths[myidx]])
 
+
+    # --------------------------------------------------------------
+
+    # Short list of authors, for IN PREP PUBLICATIONS: possibly abbreviating my name.
+    sprepauths = [surname (a)  for a in oitem.authors.split (';')]
+    if context.my_abbrev_name is not None:
+        sprepauths[myidx] = context.my_abbrev_name
+    
+    if len (advposlist):
+        for i in [int (x) - 1 for x in advposlist.split (',')]:
+            sprepauths[i] = MupUnderline (sprepauths[i])
+            
+    # Like canonicalized name scheme instead:
+    if len (sprepauths) == 1:
+        sprepauthsstr = cauths[0]
+        aitem.short_prep_authors =  MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
+    elif len (sprepauths) == 2:
+        sprepauthsstr = MupJoin (', ', cauths[0:2]) 
+        aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
+    elif (len (sprepauths) >= 3):
+        sprepauthsstr = MupJoin (', ', cauths[0:3])
+        aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
+        
+        
+        if ((context.my_abbrev_name is not None) & (myidx > 2)):
+            sprepauths[myidx] = MupBold(sprepauths[myidx])
+            sprepauthsstr = aitem.short_prep_authors
+            aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'including '])
+            sprepauthsstr = aitem.short_prep_authors
+            aitem.short_prep_authors = MupJoin (' ', [sprepauthsstr, sauths[myidx]])
+            
+    # --------------------------------------------------------------
+    
     if oitem.refereed == 'y':
         aitem.refereed_mark = u'»'
     else:
@@ -639,6 +672,7 @@ def compute_cite_stats (pubs):
     return stats
 
 
+
 def partition_pubs (pubs):
     groups = Holder ()
     groups.all = []
@@ -651,22 +685,38 @@ def partition_pubs (pubs):
     
     groups.first = []
     groups.contrib = []
-
+    
+    groups.prep = []
+    groups.prepsub = []
+    
     for pub in pubs:
         refereed = (pub.refereed == 'y')
         refpreprint = (pub.get ('refpreprint', 'n') == 'y')
         formal = (pub.get ('informal', 'n') == 'n')
         # we assume refereed implies formal.
         
+        try:
+            prep = (pub.get ('prep', 'n') == 'y')
+            prepsub = (pub.get ('prepsub', 'n') == 'y')
+        except:
+            prep = False
+            prepsub = False
+        
+        
         first = (pub.mypos == '1')
         
         #print pub.mypos
-
-        groups.all.append (pub)
         
-        if first:
+        if ((not prep) & (not prepsub)):
+            groups.all.append (pub)
+        
+        if first & (not prep) & (not prepsub):
             #print "is first"
             groups.first.append (pub)
+        elif prep:
+            groups.prep.append (pub)
+        elif prepsub:
+            groups.prepsub.append (pub)
         else:
             #print "is contrib"
             groups.contrib.append (pub)
@@ -696,6 +746,41 @@ def partition_pubs (pubs):
     groups.contrib = groups.contrib[::-1]
     return groups
 
+
+# 
+def compute_team_talks (talks):
+    
+    collabs = {}
+
+    for talk in talks:
+        
+
+        try:
+            team = talk.collab
+            quantity = 1
+            year = talk.year
+        except Exception as e:
+            die ('error processing outcome of team talk <%s>: %s', talk, e)
+
+        if team not in collabs:
+            unit = 'talk'
+            meeting_unit = 'meeting'
+            lastyear = year
+            collabs[team] = (quantity, unit, meeting_unit, lastyear)
+        else:
+            q0, unit, meeting_unit, lastyear = collabs[team]
+            if q0 >= 1:
+                unit = 'talks'
+                meeting_unit = 'meetings'
+            if year > lastyear:
+                lastyear = year
+            collabs[team] = (q0 + quantity, unit, meeting_unit, lastyear)
+
+    return sorted((Holder (collab=k, unit=v[1], collab_meet_unit=v[2], 
+                        total=unicode (v[0]), lastyear=v[3])
+                    for (k, v) in collabs.iteritems ()), 
+                        key=lambda h: h.lastyear, reverse=True)
+    
 
 # Utilities for dealing with allocated observing time. Namely, we total up the
 # time allocated for each telescope as PI.
@@ -811,6 +896,23 @@ def cmd_talloc_list (context):
     for info in context.time_allocs:
         yield context.cur_formatter (info)
 
+def cmd_team_talk_list (context, sections):
+    if context.cur_formatter is None:
+        die ('cannot use TEAMTALKLIST command before using FORMAT')
+        
+    num = 0
+    for info in context.team_talks_counts:
+        num += 1
+        
+    #num = 2
+    for i,info in enumerate(context.team_talks_counts):
+        if i < num-1:
+            end=';'
+        else:
+            end=''
+        info.end = end
+        yield context.cur_formatter (info)
+
 
 def _rev_misc_list (context, sections, gate):
     if context.cur_formatter is None:
@@ -839,6 +941,14 @@ def cmd_rev_misc_list_if (context, sections, gatefield):
 def cmd_rev_misc_list_if_not (context, sections, gatefield):
     return _rev_misc_list (context, sections,
                            lambda i: i.get (gatefield, 'n') != 'y')
+                           
+#
+def cmd_rev_misc_list_switch (context, sections, gatefield, case):
+    """Same a RMISCLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_misc_list (context, sections,
+                           lambda i: i.get (gatefield, 'n') == case)
 
 def cmd_rev_repo_list (context, sections):
     if context.cur_formatter is None:
@@ -879,6 +989,14 @@ def setup_processing (render, datadir):
     context.pubgroups = partition_pubs (context.pubs)
     context.props = [i for i in context.items if i.section == 'prop']
     context.time_allocs = compute_time_allocations (context.props)
+    
+    
+    
+    context.team_talks = [i for i in context.items if ((i.section == 'talk') & \
+                    (i.get ('venue', 'n') == 'team'))]
+    context.team_talks_counts = compute_team_talks (context.team_talks)
+    
+    
     context.repos = process_repositories (context.items)
     context.cur_formatter = None
     context.my_abbrev_name = None
@@ -889,9 +1007,13 @@ def setup_processing (render, datadir):
     commands['MYABBREVNAME'] = cmd_my_abbrev_name
     commands['PUBLIST'] = cmd_pub_list
     commands['TALLOCLIST'] = cmd_talloc_list
+    
+    commands['TEAMTALKLIST'] = cmd_team_talk_list
+    
     commands['RMISCLIST'] = cmd_rev_misc_list
     commands['RMISCLIST_IF'] = cmd_rev_misc_list_if
     commands['RMISCLIST_IF_NOT'] = cmd_rev_misc_list_if_not
+    commands['RMISCLIST_CASE'] = cmd_rev_misc_list_switch
     commands['RREPOLIST'] = cmd_rev_repo_list
     commands['TODAY.'] = cmd_today
     commands['TODAY'] = cmd_today_invert

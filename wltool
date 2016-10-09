@@ -157,7 +157,8 @@ The output will be formatted for inclusion in a LaTeX document.
 
     import time
     cutoff_year, cutoff_month = time.localtime ()[:2]
-    cutoff_year -= 4
+    cutoff_year -= 2 #4
+    print "cutoff_year=", cutoff_year
 
     # Load up those names
 
@@ -169,9 +170,10 @@ The output will be formatted for inclusion in a LaTeX document.
 
         dbits = i.pubdate.split ('/')
         iyear, imonth = map (int, dbits[:2])
-        if iyear < cutoff_year or imonth < cutoff_month:
+        if iyear < cutoff_year or ((iyear == cutoff_year) & (imonth < cutoff_month)):
             continue
-
+        
+        print "dbits=", dbits
         for aubase in i.authors.split (';'):
             bits = aubase.strip ().split ()
             surname = bits[-1].replace ('_', ' ')
