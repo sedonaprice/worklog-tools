@@ -157,7 +157,7 @@ The output will be formatted for inclusion in a LaTeX document.
 
     import time
     cutoff_year, cutoff_month = time.localtime ()[:2]
-    cutoff_year -= 2 #4
+    cutoff_year -= 4
     print "cutoff_year=", cutoff_year
 
     # Load up those names
