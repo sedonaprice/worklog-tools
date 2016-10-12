@@ -12,7 +12,7 @@ __all__ = b'''nbsp months Holder die warn open_template slurp_template
               MupLink MupJoin MupList render_latex render_html Formatter
               ADSCountError parse_ads_cites canonicalize_name surname best_url
               cite_info compute_cite_stats partition_pubs setup_processing
-              get_ads_cite_count bootstrap_bibtex'''.split ()
+              get_ads_cite_count bootstrap_bibtex bootstrap_bibtex_alphabetical'''.split ()
 
 nbsp = u'\u00a0'
 months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split ()
@@ -453,7 +453,9 @@ def cite_info (oitem, context):
 
     # Canonicalized authors with bolding of self and underlining of advisees.
     cauths = [canonicalize_name (a) for a in oitem.authors.split (';')]
-
+    
+    aitem.nsf_full_authors = MupJoin (', ', cauths)
+    
     myidx = int (oitem.mypos) - 1
     cauths[myidx] = MupBold (cauths[myidx])
 
@@ -565,8 +567,14 @@ def cite_info (oitem, context):
         aitem.bold_if_first_title = oitem.title
 
     # Pub year and nicely-formatted date
-    aitem.year, aitem.month = map (int, oitem.pubdate.split ('/'))
-    aitem.pubdate = u'%d%s%s' % (aitem.year, nbsp, months[aitem.month - 1])
+    try:
+        aitem.year, aitem.month = map (int, oitem.pubdate.split ('/'))
+        aitem.pubdate = u'%d%s%s' % (aitem.year, nbsp, months[aitem.month - 1])
+    except:
+        tmp = oitem.pubdate.split ('/')
+        aitem.year = tmp[0]
+        aitem.month = int(tmp[1])
+        aitem.pubdate = u'%s%s%s' % (aitem.year, nbsp, months[aitem.month - 1])
 
     # Template-friendly citation count
     citeinfo = parse_ads_cites (oitem)
@@ -577,14 +585,54 @@ def cite_info (oitem, context):
  
     # Make citation to have commas:
     citetmp = aitem.cite.split(' ')
+    citetmp_orig = citetmp
     citetmp2 = ', '.join(citetmp)
     #aitem.cite = MupJoin (', ', citetmp)
     # Clean up any underscores to force spaces:
     citetmp = citetmp2.split('_')
     aitem.cite = MupJoin(' ', citetmp)
+    
+    # Chunk the cite to get stuff:
+    citetmp = citetmp_orig
+    try:
+        tmpjourn = ' '.join(citetmp[0].split("_"))
+        if tmpjourn.lower() == 'apj':
+            fulljourn = 'The Astrophysical Journal'
+        elif tmpjourn.lower() == 'apjs':
+            fulljourn = 'The Astrophysical Journal Supplementary Series'
+        #
+        elif tmpjourn.lower() == 'apjl':
+            fulljourn = 'The Astrophysical Journal Letters'
+        elif tmpjourn.lower() == 'mnras':
+            fulljourn = 'The Monthly Notices of the Royal Astronomical Society'
+        #
+        elif tmpjourn.lower() == 'araa':
+            fulljourn = 'Annual Review of Astronomy \& Astrophysics,'
+        #
+        elif tmpjourn.lower() == 'aj':
+            fulljourn = 'The Astronomical Journal'
+        #
+        elif (tmpjourn.lower() == 'pasp') | (tmpjourn.lower() == '\pasp'):
+            fulljourn = 'The Publications of the Astronomical Society of the Pacific'
+        elif (tmpjourn.lower() == '\procspie') | (tmpjourn.lower() == 'procspie'):
+            fulljourn = 'Proceedings of SPIE'
+
+        else:
+            fulljourn = tmpjourn
+        fulljournal = fulljourn
+        volume = 'v. '+citetmp[1]
+        pages = 'p. '+citetmp[2]
+        nsfcite = fulljournal+', '+volume+', '+pages
+        
+        aitem.nsfcite = nsfcite
+    except:
+        tmpjourn = ''.join(citetmp[0].split("arXiv:"))
+        aitem.nsfcite = 'ArXiv e-prints: '+tmpjourn
+    
 
     # Citation text with link
     url = best_url (oitem)
+    aitem.adsurl = url
     if url is None:
         aitem.lcite = aitem.cite
     else:
@@ -1193,6 +1241,76 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
             print >>outfile, '# -*- conf -*-'
             print >>outfile, '# XXX for all records, refereed status is guessed crudely'
 
+        print >>outfile, '\n[pub]'
+
+        if 'title' in rec:
+            _write_with_wrapping (outfile, 'title', rec['title'])
+        else:
+            print >>outfile, 'title = ? # XXX no title for this record'
+
+        if 'author' in rec:
+            _write_with_wrapping (outfile, 'authors', rec['author'])
+        else:
+            print >>outfile, 'authors = ? # XXX no authors for this record'
+
+        if 'wl_mypos' in rec:
+            _write_with_wrapping (outfile, 'mypos', rec['wl_mypos'])
+        else:
+            print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
+
+        if 'year' in rec and 'month' in rec:
+            _write_with_wrapping (outfile, 'pubdate',
+                                  rec['year'] + '/' +
+                                  _bib_months.get (rec['month'].lower (),
+                                                   rec['month']))
+        elif 'year' in rec:
+            print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
+        else:
+            print >>outfile, 'pubdate = ? # XXX no year and month for this record'
+
+        if 'id' in rec:
+            _write_with_wrapping (outfile, 'bibcode', rec['id'])
+
+        if 'eprint' in rec:
+            _write_with_wrapping (outfile, 'arxiv', rec['eprint'])
+
+        if 'doi' in rec:
+            _write_with_wrapping (outfile, 'doi', rec['doi'])
+
+        refereed = 'journal' in rec
+        print >>outfile, 'refereed = %s' % 'ny'[refereed]
+
+        cite = _bib_cite (rec)
+        if cite is not None:
+            _write_with_wrapping (outfile, 'cite', cite)
+        else:
+            print >>outfile, 'cite = ? # XXX cannot infer citation text'
+
+    for f in byyear.itervalues ():
+        f.close ()
+
+#
+def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
+    import os.path
+
+    # XXX we assume heavily that we're dealing with ADS bibtex.
+
+    from bibtexparser.bparser import BibTexParser
+    bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
+    byyear = {}
+    
+    
+    outfile = open (os.path.join (outdir,  'nsf_pub_log.txt'), 'w')
+    
+    print >>outfile, '# -*- conf -*-'
+    print >>outfile, '# XXX for all records, refereed status is guessed crudely'
+
+    
+    
+    for rec in bp.get_entry_list ():
+        
+        year = rec.get ('year', 'noyear')
+        
         print >>outfile, '\n[pub]'
 
         if 'title' in rec:

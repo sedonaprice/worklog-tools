@@ -20,6 +20,10 @@ def string_to_latex(string):
     """
     escape = [' ', '{', '}']
 
+    # First get rid of the stupid \~{}
+    strtmp = string.split('\~{}')
+    string = '~'.join(strtmp)
+
     new = []
     for char in string:
         if char in escape:

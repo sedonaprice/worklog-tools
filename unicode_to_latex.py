@@ -25,6 +25,7 @@ That is,
 # so far, the source table is far from perfect.
 
 unicode_to_latex_table_base = {
+    u"\u003C": r"$<$", 
     u"\u0023": r"\#",
     u"\u0024": r"\$",
     u"\u0025": r"\%",
@@ -38,7 +39,7 @@ unicode_to_latex_table_base = {
     u"\u007B": r"\{",
     u"\u007C": r"\vert{}",
     u"\u007D": r"\}",
-    u"\u007E": r"\textasciitilde{}",
+    u"\u007E": r"$\sim$",
     u"\u00A0": r"~",
     u"\u00A1": r"\textexclamdown{}",
     u"\u00A2": r"\textcent{}",
@@ -324,7 +325,7 @@ unicode_to_latex_table_base = {
     u"\u02D9": r"\textperiodcentered{}",
     u"\u02DA": r"\r{}",
     u"\u02DB": r"\k{}",
-    u"\u02DC": r"\texttildelow{}",
+    u"\u02DC": r"$\sim$",
     u"\u02DD": r"\H{}",
     u"\u02E5": r"\tone{55}",
     u"\u02E6": r"\tone{44}",

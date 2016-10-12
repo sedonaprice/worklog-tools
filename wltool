@@ -8,6 +8,7 @@
 workog commands are:
 
   bootstrap-bibtex  Stub publication records from an ADS BibTeX file
+  bootstrap-bibtex-alphabetical Stub pub records from ADS BibTeX: all at once
   extract           Print out worklog records of a specific type
   github-repos      Print list of GitHub repositories contributed to
   html              Fill in an HTML-formatted template
@@ -59,6 +60,42 @@ Parsing files from other origins will probably fail."""
     with open (bibpath) as bibfile:
         bootstrap_bibtex (bibfile, outdir, mysurname)
 
+#
+def cli_bootstrap_bibtex_alphabetical (argv):
+    """usage: wltool bootstrap-bibtex-alphabetical <bibtex-file> <your-surname> <output-dir>
+
+Create a new set of worklog files, seeding them with publication information
+gathered from from <bibtex-file>. Specify <your-surname> to assist in guessing
+of the "mypos" field (your position in the author list). The output directory
+<output-dir> must not exist when you run the program; this is to avoid
+accidental overwriting of existing files.
+
+Search the output files for "XXX" to find issues that need manual attention.
+
+WARNING: the current implementation assumes that the file is one from ADS.
+Parsing files from other origins will probably fail."""
+
+    import os.path
+
+    # note: we'll leave the output directory lying around if we die. I figure
+    # that could be helpful for debugging.
+
+    if len (argv) != 4 or '--help' in argv:
+        print cli_bootstrap_bibtex_alphabetical.__doc__
+        raise SystemExit (1)
+
+    bibpath = argv[1]
+    mysurname = argv[2]
+    outdir = argv[3]
+
+    try:
+        os.mkdir (outdir)
+    except Exception as e:
+        die ('cannot create output directory "%s": %s (%s)', outdir,
+             e, e.__class__.__name__)
+
+    with open (bibpath) as bibfile:
+        bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname)
 
 def cli_extract (argv):
     """usage: wltool extract <section-name> [datadir]

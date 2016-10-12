@@ -233,6 +233,7 @@ class BibTexParser(object):
             logger.debug('Apply customizations and return dict')
             return customization(d)
 
+
     def _strip_quotes(self, val):
         """Strip double quotes enclosing string
 
