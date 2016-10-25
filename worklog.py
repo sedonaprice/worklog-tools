@@ -678,6 +678,7 @@ def compute_cite_stats (pubs):
     stats.refpubs = 0
     stats.refcites = 0
     stats.reffirstauth = 0
+    stats.reffirstauthcites = 0
     cites = []
     dates = []
 
@@ -698,6 +699,10 @@ def compute_cite_stats (pubs):
 
         if pub.refereed == 'y':
             stats.refcites += citeinfo.cites
+            
+            if int (pub.mypos) == 1:
+                stats.reffirstauthcites += citeinfo.cites
+            
 
     if not len (cites):
         stats.meddate = 0
@@ -909,6 +914,10 @@ def cmd_cite_stats (context, template):
     info = compute_cite_stats (context.pubgroups.all_formal)
     return Formatter (context.render, False, slurp_template (template)) (info)
 
+#
+def cmd_cite_stats_tex (context, template):
+    info = compute_cite_stats (context.pubgroups.all_formal)
+    return Formatter (context.render, True, slurp_template (template)) (info)
 
 def cmd_format (context, *inline_template):
     inline_template = ' '.join (inline_template)
@@ -1051,6 +1060,7 @@ def setup_processing (render, datadir):
 
     commands = {}
     commands['CITESTATS'] = cmd_cite_stats
+    commands['CITESTATS_TEX'] = cmd_cite_stats_tex
     commands['FORMAT'] = cmd_format
     commands['MYABBREVNAME'] = cmd_my_abbrev_name
     commands['PUBLIST'] = cmd_pub_list
@@ -1086,27 +1096,30 @@ def get_ads_cite_count (bibcode):
     from urllib2 import urlopen, quote, URLError
     url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
     lastnonempty = None
-
-    try:
-        for line in urlopen (url):
-            line = line.strip ()
-            if len (line):
-                lastnonempty = line
-    except httplib.BadStatusLine as e:
-        raise ADSCountError ('received bad HTTP status: %r', e)
-    except URLError as e:
-        raise ADSCountError (str (e))
     
-    if lastnonempty is None:
-        raise ADSCountError ('got only empty lines')
+    if bibcode != '':    
+        try:
+            for line in urlopen (url):
+                line = line.strip ()
+                if len (line):
+                    lastnonempty = line
+        except httplib.BadStatusLine as e:
+            raise ADSCountError ('received bad HTTP status: %r', e)
+        except URLError as e:
+            raise ADSCountError (str (e))
     
-    if lastnonempty.startswith ('Retrieved 0 abstracts'):
-        raise ADSCountError ('no such bibcode')
+        if lastnonempty is None:
+            raise ADSCountError ('got only empty lines')
+    
+        if lastnonempty.startswith ('Retrieved 0 abstracts'):
+            raise ADSCountError ('no such bibcode')
 
-    try:
-        count = int (lastnonempty)
-    except Exception:
-        raise ADSCountError ('got unexpected final line %r', lastnonempty)
+        try:
+            count = int (lastnonempty)
+        except Exception:
+            raise ADSCountError ('got unexpected final line %r', lastnonempty)
+    else:
+        count = 0
 
     return count
 

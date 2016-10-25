@@ -1,0 +1,4 @@
+\begin{itemize}
+\item |reffirstauth| first-author refereed publications -- |reffirstauthcites| citations
+\item |refpubs| total refereed publications -- |refcites| citations
+\end{itemize}
