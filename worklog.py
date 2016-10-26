@@ -580,8 +580,10 @@ def cite_info (oitem, context):
     citeinfo = parse_ads_cites (oitem)
     if citeinfo is not None and citeinfo.cites > 0:
         aitem.citecountnote = u' [%d]' % citeinfo.cites
+        aitem.citecountnotelonger = u' [citations: %d]' % citeinfo.cites
     else:
         aitem.citecountnote = u''
+        aitem.citecountnotelonger = u''
  
     # Make citation to have commas:
     citetmp = aitem.cite.split(' ')
