@@ -840,6 +840,65 @@ def compute_team_talks (talks):
 # Utilities for dealing with allocated observing time. Namely, we total up the
 # time allocated for each telescope as PI.
 
+def compute_observing_experience (observing):
+    allocs = {}
+    facil_inst_list = []
+    
+    for obs in observing:
+
+        amount = obs.get ('time')
+        if amount is None:
+            die ('no "nights" for obs %s', obs)
+
+        try:
+            facil = obs.facil
+            facil_desc = obs.facil_desc
+            inst = obs.inst
+            facil_inst = facil+': '+inst
+            quantity, units = amount.split ()
+            quantity = float (quantity)
+        except Exception as e:
+            die ('error processing outcome of obs <%s>: %s', obs, e)
+
+        if facil_inst not in allocs:
+                allocs[facil_inst] = (facil, facil_desc, inst, quantity, units)
+                facil_inst_list.append(facil_inst)
+        else:
+            facil, facil_desc, inst, q0, u0 = allocs[facil_inst]
+            if u0 != units:
+                die ('disagreeing time units for %s: both "%s" and "%s"',
+                     facil_inst, u0, units)
+            allocs[facil_inst] = (facil, facil_desc, inst, q0 + quantity, u0)
+            
+    #print "allocs=", allocs
+    
+    allocs_out = {}
+    for facil_inst in facil_inst_list:
+        facil, facil_desc, inst, quantity, units = allocs[facil_inst]
+        if (quantity).is_integer():
+            quantity = int(quantity)
+        
+        if units == 'nght':
+            if quantity > 1:
+                units = 'nights'
+            else:
+                units = 'night'
+        
+        
+        if facil not in allocs_out:
+            inst_list = inst+' ('+unicode(quantity)+' '+units+')'
+            allocs_out[facil] = (facil_desc, inst_list)
+        else:
+            facil_desc, inst_list = allocs_out[facil]
+            inst_list_new = inst+' ('+unicode(quantity)+' '+units+')'
+            allocs_out[facil] = (facil_desc, inst_list+', '+inst_list_new)
+        
+    
+    return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
+                    for (k, v) in allocs_out.iteritems ()),
+                   key=lambda h: h.facil)
+
+
 def compute_time_allocations (props):
     allocs = {}
 
@@ -947,7 +1006,14 @@ def cmd_pub_list (context, group):
         info.rev_number = npubs - num
         yield context.cur_formatter (info)
 
-
+def cmd_obsexp_list(context, sections):
+    if context.cur_formatter is None:
+        die ('cannot use OBSEXPLIST command before using FORMAT')
+    
+    for info in context.obs_exp:
+        yield context.cur_formatter (info)
+        
+        
 def cmd_talloc_list (context):
     if context.cur_formatter is None:
         die ('cannot use TALLOCLIST command before using FORMAT')
@@ -1050,11 +1116,12 @@ def setup_processing (render, datadir):
     context.time_allocs = compute_time_allocations (context.props)
     
     
-    
     context.team_talks = [i for i in context.items if ((i.section == 'talk') & \
                     (i.get ('venue', 'n') == 'team'))]
     context.team_talks_counts = compute_team_talks (context.team_talks)
     
+    context.observing = [i for i in context.items if i.section == 'obs']
+    context.obs_exp = compute_observing_experience (context.observing)
     
     context.repos = process_repositories (context.items)
     context.cur_formatter = None
@@ -1067,6 +1134,9 @@ def setup_processing (render, datadir):
     commands['MYABBREVNAME'] = cmd_my_abbrev_name
     commands['PUBLIST'] = cmd_pub_list
     commands['TALLOCLIST'] = cmd_talloc_list
+    
+    
+    commands['OBSEXPLIST'] = cmd_obsexp_list
     
     commands['TEAMTALKLIST'] = cmd_team_talk_list
     
