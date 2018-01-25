@@ -130,7 +130,8 @@ def html_escape (text):
             .replace ('<', '&lt;')
             .replace ('>', '&gt;')
             .replace ('"', '&quot;')
-            .replace ("'", '&apos;'))
+            .replace ("'", '&apos;')
+            .replace (u"\u0303", "~"))
 
 
 class Markup (object):
@@ -159,10 +160,144 @@ class MupText (Markup):
         self.text = unicode (text)
 
     def _latex (self):
-        return [unicode_to_latex (self.text)]
+        arr = [unicode_to_latex (self.text)]
+        for i, t in enumerate(arr):
+            if "\$" in t:
+                tmp = t.split("\$")
+                out = r"$".join(tmp)
+                arr[i] = out
+                t = out
+                
+            if r"\_\{" in t:
+                tmp = t.split(r"\_\{")
+                out = ''
+                pre = tmp[0]
+                for j in xrange(len(tmp)):
+                    if j < len(tmp)-1:
+                        subs = tmp[j+1].split("\}")[0]
+                        out += pre+r"\ensuremath{_{\mathrm{"+subs+r"}}}"
+                        try:
+                            pre = "}".join(tmp[j+1].split("\}")[1:])
+                        except:
+                            pre = ""
+                    else:
+                        out += pre
+                arr[i] = out
+                t = out
+            
+            if "\~" in t:
+                tmp = t.split("\~")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+                
+            if r"\textbackslash{}sim" in t:
+                tmp = t.split(r"\textbackslash{}sim")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+                
+            
+            if "\{sim\}" in t:
+                tmp = t.split("\{sim\}")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+                
+            if " sim " in t:
+                tmp = t.split(" sim ")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"\{\textbackslash{}tilde\}" in t:
+                tmp = t.split(r"\{\textbackslash{}tilde\}")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+                
+            #
+            
+            if r"\textbackslash{}tilde" in t:
+                tmp = t.split(r"\textbackslash{}tilde")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+                
+            if r"\{\}" in t:
+                out = "".join(t.split(r"\{\}"))
+                arr[i] = out
+                t = out
+            
+                
+        return arr
+        #return [unicode_to_latex (self.text)]
 
     def _html (self):
-        return [html_escape (self.text)]
+        arr = [html_escape (self.text)]
+        # for i, t in enumerate(arr):
+        #     if "_{" in t:
+        #         tmp = t.split('_{')
+        #         out = tmp[0]+r"<sub>"+''.join(tmp.split("}"))+r"</sub>"
+        #         arr[i] = out
+        
+        for i, t in enumerate(arr):
+            if r"_{" in t:
+                tmp = t.split(r'_{')
+                out = ''
+                pre = tmp[0]
+                for j in xrange(len(tmp)):
+                    if j < len(tmp)-1:
+                        subs = tmp[j+1].split("}")[0]
+                        #''.join(tmp[j+1].split("}"))
+                        out += pre+r"<sub>"+subs+r"</sub>"
+                        try:
+                            pre = "}".join(tmp[j+1].split("}")[1:])
+                        except:
+                            pre = ""
+                    else:
+                        out += pre
+                arr[i] = out
+                t = out
+            #
+            
+            if "$" in t:
+                tmp = t.split("$")
+                out = r"".join(tmp)
+                arr[i] = out
+                t = out
+                
+            if r"\sim" in t:
+                tmp = t.split(r"\sim")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
+                
+            if r"sim" in t:
+                tmp = t.split(r"sim")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
+            if r"{\tilde}" in t:
+                    tmp = t.split(r"{\tilde}")
+                    out = r"~".join(tmp)
+                    arr[i] = out
+                    t = out
+            if r"\tilde" in t:
+                tmp = t.split(r"\tilde")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
+
+                
+            if r"{}" in t:
+                out = "".join(t.split(r"{}"))
+                arr[i] = out
+                t = out
+        
+        
+        return arr
+        #return [html_escape (self.text)]
 
 
 class MupItalics (Markup):
@@ -557,9 +692,14 @@ def cite_info (oitem, context):
     #aitem.quotable_title = MupJoin (' ', words_title)
     
     
-    #print "aitem.title=", aitem.title
-    #print "aitem.quotable_title=", aitem.quotable_title
-    
+    # try:
+    #     print "aitem.title=", aitem.title
+    # except:
+    #     pass
+    # try:
+    #     print "aitem.quotable_title=", aitem.quotable_title
+    # except:
+    #     pass
     
     if myidx == 0:
         aitem.bold_if_first_title = MupBold (oitem.title)
@@ -765,16 +905,18 @@ def partition_pubs (pubs):
         if ((not prep) & (not prepsub)):
             groups.all.append (pub)
         
-        if first & (not prep) & (not prepsub):
+        if first & (not prep) & (not prepsub) & (refereed):
             #print "is first"
             groups.first.append (pub)
+        elif (not first) & (not prep) & (not prepsub) & (refereed):    
+            #print "is contrib"
+            groups.contrib.append (pub)
         elif prep:
             groups.prep.append (pub)
         elif prepsub:
             groups.prepsub.append (pub)
-        else:
-            #print "is contrib"
-            groups.contrib.append (pub)
+        # else:
+        #     #
         
         if formal:
             groups.all_formal.append (pub)
