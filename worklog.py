@@ -905,10 +905,10 @@ def partition_pubs (pubs):
         if ((not prep) & (not prepsub)):
             groups.all.append (pub)
         
-        if first & (not prep) & (not prepsub) & (refereed):
+        if first & (not prep) & (not prepsub) & (refereed | refpreprint):
             #print "is first"
             groups.first.append (pub)
-        elif (not first) & (not prep) & (not prepsub) & (refereed):    
+        elif (not first) & (not prep) & (not prepsub) & (refereed | refpreprint):    
             #print "is contrib"
             groups.contrib.append (pub)
         elif prep:
