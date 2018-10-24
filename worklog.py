@@ -1125,8 +1125,28 @@ def cmd_cite_stats_tex (context, template):
 def cmd_format (context, *inline_template):
     inline_template = ' '.join (inline_template)
     context.cur_formatter = Formatter (context.render, True, inline_template)
+    
+    # Every time reset alt, flag check:
+    context.cur_formatter_alt = None
+    context.format_alt_flag_check = None
     return ''
 
+def cmd_format_alt (context, *inline_template):
+    inline_template = ' '.join (inline_template)
+    context.cur_formatter_alt = Formatter (context.render, True, inline_template)
+    
+    if inline_template.strip() == 'None':
+        context.cur_formatter_alt = None
+        
+    return ''
+
+def cmd_format_alt_flag_check (context, flag_to_check):
+    context.format_alt_flag_check = flag_to_check
+    
+    if flag_to_check.strip() == 'None':
+        context.format_alt_flag_check = None
+        
+    return ''
 
 def cmd_my_abbrev_name (context, *text):
     context.my_abbrev_name = ' '.join (text)
@@ -1186,13 +1206,21 @@ def _rev_misc_list (context, sections, gate):
         die ('cannot use RMISCLIST* command before using FORMAT')
 
     sections = frozenset (sections.split (','))
-
+    
     for item in context.items[::-1]:
         if item.section not in sections:
             continue
         if not gate (item):
             continue
-        yield context.cur_formatter (item)
+            
+        if context.format_alt_flag_check is not None:
+            if item.__dict__[context.format_alt_flag_check].strip() == '':
+                yield context.cur_formatter_alt (item)
+            else:
+                yield context.cur_formatter (item)
+        else:
+            yield context.cur_formatter (item)
+        
 
 
 def cmd_rev_misc_list (context, sections):
@@ -1267,12 +1295,19 @@ def setup_processing (render, datadir):
     
     context.repos = process_repositories (context.items)
     context.cur_formatter = None
+    context.cur_formatter_alt = None
+    context.format_alt_flag_check = None
+    
     context.my_abbrev_name = None
 
     commands = {}
     commands['CITESTATS'] = cmd_cite_stats
     commands['CITESTATS_TEX'] = cmd_cite_stats_tex
+    
     commands['FORMAT'] = cmd_format
+    commands['FORMAT_ALT'] = cmd_format_alt
+    commands['FORMAT_ALT_FLAG_CHECK'] = cmd_format_alt_flag_check
+    
     commands['MYABBREVNAME'] = cmd_my_abbrev_name
     commands['PUBLIST'] = cmd_pub_list
     commands['TALLOCLIST'] = cmd_talloc_list
