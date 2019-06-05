@@ -564,7 +564,7 @@ def best_url (item):
     from urllib2 import quote
 
     if item.has ('bibcode'):
-        return 'http://adsabs.harvard.edu/abs/' + quote (item.bibcode)
+        return 'http://ui.adsabs.harvard.edu/abs/' + quote (item.bibcode)
     if item.has ('doi'):
         return 'http://dx.doi.org/' + quote (item.doi)
     if item.has ('url'):
@@ -795,7 +795,7 @@ def cite_info (oitem, context):
     aitem.other_link = u''
 
     if oitem.has ('bibcode'):
-        aitem.abstract_link = MupLink ('http://adsabs.harvard.edu/abs/' + urlquote (oitem.bibcode),
+        aitem.abstract_link = MupLink ('http://ui.adsabs.harvard.edu/abs/' + urlquote (oitem.bibcode),
                                       'abstract')
 
     if oitem.has ('arxiv'):
