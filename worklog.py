@@ -1340,7 +1340,7 @@ class ADSCountError (Exception):
         super (ADSCountError, self).__init__ (fmt % args)
 
 
-def get_ads_cite_count (bibcode):
+def get_ads_cite_count_OLD (bibcode):
     import httplib
     from urllib2 import urlopen, quote, URLError
     url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
@@ -1371,6 +1371,51 @@ def get_ads_cite_count (bibcode):
         count = 0
 
     return count
+    
+    
+#
+def get_ads_cite_count (bibcode):
+    
+    import json
+    import requests 
+    import os.path
+    
+    mod_path = os.path.abspath(os.path.dirname(__file__))
+    token_file = os.path.join(mod_path, "adsabs_token.txt")
+    with open(token_file) as f:
+        token=f.readline()
+    
+    import httplib
+    from urllib2 import urlopen, quote, URLError
+    url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
+    n_cites = None
+    
+    if bibcode != '':   
+        try:
+            # to pass a dictionary in the request payload, convert it to a string first using the json package
+            bibcode = {"bibcodes":[bibcode]}
+            r = requests.post("https://api.adsabs.harvard.edu/v1/metrics", \
+                             headers={"Authorization": "Bearer " + token, "Content-type": "application/json"}, \
+                             data=json.dumps(bibcode))
+
+            n_cites = r.json()['citation stats']['total number of citations']
+        except URLError as e:
+            raise ADSCountError (str (e))
+    
+        if n_cites is None:
+            raise ADSCountError ('got only empty lines')
+
+        try:
+            count = int (n_cites)
+        except Exception:
+            raise ADSCountError ('got unexpected final line %r', n_cites)
+    else:
+        count = 0
+
+    return count
+
+
+
 
 
 # Bootstrapping from a BibTeX file. This is currently aimed 100% at
