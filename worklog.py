@@ -162,6 +162,15 @@ class MupText (Markup):
     def _latex (self):
         arr = [unicode_to_latex (self.text)]
         for i, t in enumerate(arr):
+            if "KMOS3D" in t:
+                k3d_orig = "KMOS3D"
+                k3d = r"KMOS$^{3D}$"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+            
+            
             if "\$" in t:
                 tmp = t.split("\$")
                 out = r"$".join(tmp)
@@ -224,6 +233,12 @@ class MupText (Markup):
                 arr[i] = out
                 t = out
                 
+            if r"{\ensuremath{\sim}}" in t:
+                tmp = t.split(r"{\ensuremath{\sim}}")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+                
             if r"\{\}" in t:
                 out = "".join(t.split(r"\{\}"))
                 arr[i] = out
@@ -242,6 +257,14 @@ class MupText (Markup):
         #         arr[i] = out
         
         for i, t in enumerate(arr):
+            if r"KMOS3D" in t:
+                k3d_orig = "KMOS3D"
+                k3d = r"KMOS<sup>3D</sup>$"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+                
             if r"_{" in t:
                 tmp = t.split(r'_{')
                 out = ''
