@@ -1421,8 +1421,12 @@ def get_ads_cite_count (bibcode):
             r = requests.post("https://api.adsabs.harvard.edu/v1/metrics", \
                              headers={"Authorization": "Bearer " + token, "Content-type": "application/json"}, \
                              data=json.dumps(bibcode))
-
-            n_cites = r.json()['citation stats']['total number of citations']
+            try:
+                n_cites = r.json()['citation stats']['total number of citations']
+            except:
+                print(r.json())
+                #raise ValueError
+                n_cites = 0
         except URLError as e:
             raise ADSCountError (str (e))
     
