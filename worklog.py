@@ -164,7 +164,8 @@ class MupText (Markup):
         for i, t in enumerate(arr):
             if "KMOS3D" in t:
                 k3d_orig = "KMOS3D"
-                k3d = r"KMOS$^{3D}$"
+                #k3d = r"KMOS$^{3D}$"
+                k3d = r"KMOS$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
                 tmp = t.split(k3d_orig)
                 out = k3d.join(tmp)
                 arr[i] = out
@@ -174,6 +175,33 @@ class MupText (Markup):
             if "\$" in t:
                 tmp = t.split("\$")
                 out = r"$".join(tmp)
+                arr[i] = out
+                t = out
+                
+            #
+            #
+            if r"{\alpha}" in t:
+                tmp = t.split(r"{\alpha}")
+                out = r"{\ensuremath{\alpha}}".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            #
+            if r"\{\textbackslash{}alpha\}" in t:
+                tmp = t.split(r"\{\textbackslash{}alpha\}")
+                out = r"{\ensuremath{\alpha}}".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            if r"{\lesssim}" in t:
+                tmp = t.split(r"{\lesssim}")
+                out = r"{\ensuremath{\lesssim}}".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            if r"\{\textbackslash{}lesssim\}" in t:
+                tmp = t.split(r"\{\textbackslash{}lesssim\}")
+                out = r"{\ensuremath{\lesssim}}".join(tmp)
                 arr[i] = out
                 t = out
                 
@@ -243,6 +271,7 @@ class MupText (Markup):
                 out = "".join(t.split(r"\{\}"))
                 arr[i] = out
                 t = out
+
             
                 
         return arr
@@ -283,6 +312,25 @@ class MupText (Markup):
                 arr[i] = out
                 t = out
             #
+            #
+            if r"{\alpha}" in t:
+                tmp = t.split(r"{\alpha}")
+                out = u"\u03B1".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            if r"{\lesssim}" in t:
+                tmp = t.split(r"{\lesssim}")
+                out = u"\u2272".join(tmp)
+                arr[i] = out
+                t = out
+                #
+            #
+            if r"--" in t:
+                tmp = t.split(r"--")
+                out = r"-".join(tmp)
+                arr[i] = out
+                t = out
             
             if "$" in t:
                 tmp = t.split("$")
@@ -317,8 +365,10 @@ class MupText (Markup):
                 out = "".join(t.split(r"{}"))
                 arr[i] = out
                 t = out
-        
-        
+            
+
+            
+            
         return arr
         #return [html_escape (self.text)]
 
