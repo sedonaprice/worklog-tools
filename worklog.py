@@ -638,9 +638,13 @@ def canonicalize_name (name):
     abbrev = []
 
     for item in rest:
-        for char in item:
+        for j,char in enumerate(item):
             if char.isupper () or char == '-':
                 abbrev.append (char)
+            #Handle uncapitalized hyphenated names:
+            elif j > 0:
+                if item[j-1] == '-' and (not char.isupper()):
+                    abbrev.append (char) #char.upper())
 
     #return ''.join (abbrev) + nbsp + surname
     nameout = surname +',' + nbsp + '. '.join (abbrev)+'.'
