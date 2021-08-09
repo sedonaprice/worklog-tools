@@ -43,6 +43,10 @@ def getnames(names):
         for item in firsts:
             if item in ['ben', 'van', 'der', 'de', 'la', 'le']:
                 last = firsts.pop() + ' ' + last
+            elif (item in ['Forster', 'Förster', 'Foerster']) and (last == 'Schreiber'):
+                # NMFS exception
+                _ = firsts.pop()
+                last = 'Förster ' + last
         tidynames.append(last + ", " + ' '.join(firsts))
     return tidynames
 

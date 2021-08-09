@@ -6,7 +6,14 @@
 Shared routines for my worklog tools.
 """
 
-__all__ = b'''nbsp months Holder die warn open_template slurp_template
+# __all__ = b'''nbsp months Holder die warn open_template slurp_template
+#               process_template list_data_files load unicode_to_latex
+#               html_escape Markup MupText MupItalics MupBold MupUnderline
+#               MupLink MupJoin MupList render_latex render_html Formatter
+#               ADSCountError parse_ads_cites canonicalize_name surname best_url
+#               cite_info compute_cite_stats partition_pubs setup_processing
+#               get_ads_cite_count bootstrap_bibtex bootstrap_bibtex_alphabetical'''.split ()
+__all__ = r'''nbsp months Holder die warn open_template slurp_template
               process_template list_data_files load unicode_to_latex
               html_escape Markup MupText MupItalics MupBold MupUnderline
               MupLink MupJoin MupList render_latex render_html Formatter
@@ -59,7 +66,8 @@ def open_template (stem):
 
 def slurp_template (stem):
     with open_template (stem) as f:
-        return f.read ().decode ('utf8')
+        #return f.read ().decode ('utf8')
+        return f.read ()
 
 
 def process_template (stream, commands, context):
@@ -69,16 +77,18 @@ def process_template (stream, commands, context):
     callable is invoked, with `context` and the remaining words in the line as
     arguments. Its return value is either a string or an iterable, with each
     iterate being yielded to the caller in the latter case."""
-    
+
     for line in stream:
-        line = line.decode ('utf8').rstrip ()
+        #line = line.decode ('utf8').rstrip ()
+        line = line.rstrip ()
         a = line.split ()
 
         if not len (a) or a[0] not in commands:
             yield line
         else:
             result = commands[a[0]] (context, *a[1:])
-            if isinstance (result, basestring):
+            #if isinstance (result, basestring):
+            if isinstance (result, str):
                 yield result
             else:
                 for subline in result:
@@ -125,14 +135,20 @@ from unicode_to_latex import unicode_to_latex
 def html_escape (text):
     """Escape special characters for our dumb subset of HTML."""
 
-    return (unicode (text)
+    # return (unicode (text)
+    #         .replace ('&', '&amp;')
+    #         .replace ('<', '&lt;')
+    #         .replace ('>', '&gt;')
+    #         .replace ('"', '&quot;')
+    #         .replace ("'", '&apos;')
+    #         .replace (u"\u0303", "~"))
+    return (str (text)
             .replace ('&', '&amp;')
             .replace ('<', '&lt;')
             .replace ('>', '&gt;')
             .replace ('"', '&quot;')
             .replace ("'", '&apos;')
             .replace (u"\u0303", "~"))
-
 
 class Markup (object):
     def _latex (self):
@@ -157,7 +173,8 @@ def _maybe_wrap_text (thing):
 
 class MupText (Markup):
     def __init__ (self, text):
-        self.text = unicode (text)
+        #self.text = unicode (text)
+        self.text = str (text)
 
     def _latex (self):
         arr = [unicode_to_latex (self.text)]
@@ -170,14 +187,14 @@ class MupText (Markup):
                 out = k3d.join(tmp)
                 arr[i] = out
                 t = out
-            
-            
+
+
             if "\$" in t:
                 tmp = t.split("\$")
                 out = r"$".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             #
             #
             if r"{\alpha}" in t:
@@ -204,12 +221,12 @@ class MupText (Markup):
                 out = r"{\ensuremath{\lesssim}}".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if r"\_\{" in t:
                 tmp = t.split(r"\_\{")
                 out = ''
                 pre = tmp[0]
-                for j in xrange(len(tmp)):
+                for j in range(len(tmp)):
                     if j < len(tmp)-1:
                         subs = tmp[j+1].split("\}")[0]
                         out += pre+r"\ensuremath{_{\mathrm{"+subs+r"}}}"
@@ -221,26 +238,26 @@ class MupText (Markup):
                         out += pre
                 arr[i] = out
                 t = out
-            
+
             if "\~" in t:
                 tmp = t.split("\~")
                 out = r"\ensuremath{\sim}".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if r"\textbackslash{}sim" in t:
                 tmp = t.split(r"\textbackslash{}sim")
                 out = r"\ensuremath{\sim}".join(tmp)
                 arr[i] = out
                 t = out
-                
-            
+
+
             if "\{sim\}" in t:
                 tmp = t.split("\{sim\}")
                 out = r"\ensuremath{\sim}".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if " sim " in t:
                 tmp = t.split(" sim ")
                 out = r"\ensuremath{\sim}".join(tmp)
@@ -252,28 +269,28 @@ class MupText (Markup):
                 out = r"\ensuremath{\sim}".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             #
-            
+
             if r"\textbackslash{}tilde" in t:
                 tmp = t.split(r"\textbackslash{}tilde")
                 out = r"\ensuremath{\sim}".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if r"{\ensuremath{\sim}}" in t:
                 tmp = t.split(r"{\ensuremath{\sim}}")
                 out = r"\ensuremath{\sim}".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if r"\{\}" in t:
                 out = "".join(t.split(r"\{\}"))
                 arr[i] = out
                 t = out
 
-            
-                
+
+
         return arr
         #return [unicode_to_latex (self.text)]
 
@@ -284,7 +301,7 @@ class MupText (Markup):
         #         tmp = t.split('_{')
         #         out = tmp[0]+r"<sub>"+''.join(tmp.split("}"))+r"</sub>"
         #         arr[i] = out
-        
+
         for i, t in enumerate(arr):
             if r"KMOS3D" in t:
                 k3d_orig = "KMOS3D"
@@ -293,12 +310,12 @@ class MupText (Markup):
                 out = k3d.join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if r"_{" in t:
                 tmp = t.split(r'_{')
                 out = ''
                 pre = tmp[0]
-                for j in xrange(len(tmp)):
+                for j in range(len(tmp)):
                     if j < len(tmp)-1:
                         subs = tmp[j+1].split("}")[0]
                         #''.join(tmp[j+1].split("}"))
@@ -331,19 +348,19 @@ class MupText (Markup):
                 out = r"-".join(tmp)
                 arr[i] = out
                 t = out
-            
+
             if "$" in t:
                 tmp = t.split("$")
                 out = r"".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if r"\sim" in t:
                 tmp = t.split(r"\sim")
                 out = r"~".join(tmp)
                 arr[i] = out
                 t = out
-                
+
             if r"sim" in t:
                 tmp = t.split(r"sim")
                 out = r"~".join(tmp)
@@ -360,15 +377,15 @@ class MupText (Markup):
                 arr[i] = out
                 t = out
 
-                
+
             if r"{}" in t:
                 out = "".join(t.split(r"{}"))
                 arr[i] = out
                 t = out
-            
 
-            
-            
+
+
+
         return arr
         #return [html_escape (self.text)]
 
@@ -408,7 +425,8 @@ class MupUnderline (Markup):
 
 class MupLink (Markup):
     def __init__ (self, url, inner):
-        self.url = unicode (url)
+        #self.url = unicode (url)
+        self.url = str (url)
         self.inner = _maybe_wrap_text (inner)
 
     def _latex (self):
@@ -499,11 +517,14 @@ class MupList (Markup):
 
 def render_latex (value):
     if isinstance (value, int):
-        return unicode (value)
-    if isinstance (value, unicode):
-        return unicode_to_latex (value)
+        #return unicode (value)
+        return str (value)
+    #if isinstance (value, unicode):
     if isinstance (value, str):
-        return unicode_to_latex (unicode (value))
+        return unicode_to_latex (value)
+    #if isinstance (value, str):
+    if isinstance (value, bytes):
+        return unicode_to_latex (str (value))
     if isinstance (value, Markup):
         return value.latex ()
     raise ValueError ('don\'t know how to render %r into latex' % value)
@@ -511,11 +532,14 @@ def render_latex (value):
 
 def render_html (value):
     if isinstance (value, int):
-        return unicode (value)
-    if isinstance (value, unicode):
-        return html_escape (value)
+        #return unicode (value)
+        return str (value)
+    #if isinstance (value, unicode):
     if isinstance (value, str):
-        return html_escape (unicode (value))
+        return html_escape (value)
+    #if isinstance (value, str):
+    if isinstance (value, bytes):
+        return html_escape (str (value))
     if isinstance (value, Markup):
         return value.html ()
     raise ValueError ('don\'t know how to render %r into HTML' % value)
@@ -523,7 +547,7 @@ def render_html (value):
 
 
 class Formatter (object):
-    """Substituted items are delimited by pipes |likethis|. This works well in
+    r"""Substituted items are delimited by pipes |likethis|. This works well in
     both HTML and Latex. If `israw`, the non-substituted template text is
     returned verbatim; otherwise, it is escaped.
 
@@ -568,9 +592,10 @@ class Formatter (object):
                 thing = item.get (text)
             return self.renderer (thing)
         except ValueError as e:
+            # raise ValueError ((u'while rendering field "%s" of item %s: %s' \
+            #                    % (text, item, e)).encode ('utf-8'))
             raise ValueError ((u'while rendering field "%s" of item %s: %s' \
-                               % (text, item, e)).encode ('utf-8'))
-
+                               % (text, item, e)))
     def __call__ (self, item):
         return ''.join (self._handle_one (d, item) for d in self.tmplinfo)
 
@@ -622,7 +647,7 @@ def canonicalize_name (name):
     # Clean up case of someone having a hyphenated first name:
     bits = nameout.strip ().split ('. -. ')
     nameout = '.-'.join(bits)
-    
+
     return nameout
 
 
@@ -634,7 +659,8 @@ def not_surname (name):
 
 
 def best_url (item):
-    from urllib2 import quote
+    #from urllib2 import quote
+    from urllib.parse import quote
 
     if item.has ('bibcode'):
         return 'http://ui.adsabs.harvard.edu/abs/' + quote (item.bibcode)
@@ -661,9 +687,9 @@ def cite_info (oitem, context):
 
     # Canonicalized authors with bolding of self and underlining of advisees.
     cauths = [canonicalize_name (a) for a in oitem.authors.split (';')]
-    
+
     aitem.nsf_full_authors = MupJoin (', ', cauths)
-    
+
     myidx = int (oitem.mypos) - 1
     cauths[myidx] = MupBold (cauths[myidx])
 
@@ -673,7 +699,7 @@ def cite_info (oitem, context):
             cauths[i] = MupUnderline (cauths[i])
 
     aitem.full_authors = MupJoin (', ', cauths)
-    
+
     # --------------------------------------------------------------
     # Make a full authors list with semicolons and & at end:
     if len(cauths) == 1:
@@ -683,8 +709,8 @@ def cite_info (oitem, context):
     else:
         aitem.full_authors_semi = MupJoin('; ', cauths[:-1])
         aitem.full_authors_semi = MupJoin('; & ', [aitem.full_authors_semi, cauths[-1]])
-    
-    
+
+
     # --------------------------------------------------------------
 
     # Short list of authors, possibly abbreviating my name.
@@ -692,13 +718,13 @@ def cite_info (oitem, context):
     sauths = [surname (a)  for a in oitem.authors.split (';')]
     if context.my_abbrev_name is not None:
         sauths[myidx] = context.my_abbrev_name
-    
+
     #print "sauths:", sauths
-    
+
     if len (advposlist):
         for i in [int (x) - 1 for x in advposlist.split (',')]:
             sauths[i] = MupUnderline (sauths[i])
-            
+
     # Like canonicalized name scheme instead:
     if len (sauths) == 1:
         aitem.short_authors = cauths[0] #sauths[0]
@@ -711,8 +737,8 @@ def cite_info (oitem, context):
         #aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
         sauthsstr = MupJoin (', ', cauths[0:3])
         aitem.short_authors = MupJoin (', ', [sauthsstr, 'et' + nbsp + 'al.'])
-        
-        
+
+
         if ((context.my_abbrev_name is not None) & (myidx > 2)):
             sauths[myidx] = MupBold(sauths[myidx])
             sauthsstr = aitem.short_authors
@@ -727,32 +753,32 @@ def cite_info (oitem, context):
     sprepauths = [surname (a)  for a in oitem.authors.split (';')]
     if context.my_abbrev_name is not None:
         sprepauths[myidx] = context.my_abbrev_name
-    
+
     if len (advposlist):
         for i in [int (x) - 1 for x in advposlist.split (',')]:
             sprepauths[i] = MupUnderline (sprepauths[i])
-            
+
     # Like canonicalized name scheme instead:
     if len (sprepauths) == 1:
         sprepauthsstr = cauths[0]
         aitem.short_prep_authors =  MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
     elif len (sprepauths) == 2:
-        sprepauthsstr = MupJoin (', ', cauths[0:2]) 
+        sprepauthsstr = MupJoin (', ', cauths[0:2])
         aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
     elif (len (sprepauths) >= 3):
         sprepauthsstr = MupJoin (', ', cauths[0:3])
         aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
-        
-        
+
+
         if ((context.my_abbrev_name is not None) & (myidx > 2)):
             sprepauths[myidx] = MupBold(sprepauths[myidx])
             sprepauthsstr = aitem.short_prep_authors
             aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'including '])
             sprepauthsstr = aitem.short_prep_authors
             aitem.short_prep_authors = MupJoin (' ', [sprepauthsstr, sauths[myidx]])
-            
+
     # --------------------------------------------------------------
-    
+
     if oitem.refereed == 'y':
         aitem.refereed_mark = u'»'
     else:
@@ -763,8 +789,8 @@ def cite_info (oitem, context):
     aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
     #words_title = aitem.quotable_title.split(' ')
     #aitem.quotable_title = MupJoin (' ', words_title)
-    
-    
+
+
     # try:
     #     print "aitem.title=", aitem.title
     # except:
@@ -773,7 +799,7 @@ def cite_info (oitem, context):
     #     print "aitem.quotable_title=", aitem.quotable_title
     # except:
     #     pass
-    
+
     if myidx == 0:
         aitem.bold_if_first_title = MupBold (oitem.title)
     else:
@@ -797,7 +823,7 @@ def cite_info (oitem, context):
     else:
         aitem.citecountnote = u''
         aitem.citecountnotelonger = u''
- 
+
     # Make citation to have commas:
     citetmp = aitem.cite.split(' ')
     citetmp_orig = citetmp
@@ -806,7 +832,7 @@ def cite_info (oitem, context):
     # Clean up any underscores to force spaces:
     citetmp = citetmp2.split('_')
     aitem.cite = MupJoin(' ', citetmp)
-    
+
     # Chunk the cite to get stuff:
     citetmp = citetmp_orig
     try:
@@ -838,12 +864,12 @@ def cite_info (oitem, context):
         volume = 'v. '+citetmp[1]
         pages = 'p. '+citetmp[2]
         nsfcite = fulljournal+', '+volume+', '+pages
-        
+
         aitem.nsfcite = nsfcite
     except:
         tmpjourn = ''.join(citetmp[0].split("arXiv:"))
         aitem.nsfcite = 'ArXiv e-prints: '+tmpjourn
-    
+
 
     # Citation text with link
     url = best_url (oitem)
@@ -852,15 +878,16 @@ def cite_info (oitem, context):
         aitem.lcite = aitem.cite
     else:
         aitem.lcite = MupLink (url, aitem.cite)
-    
+
     # Title with link
     if url is None:
         aitem.title_link = aitem.title
     else:
         aitem.title_link = MupLink (url, aitem.title)
-    
+
     # Other links for the web pub list
-    from urllib2 import quote as urlquote
+    #from urllib2 import quote as urlquote
+    from urllib.parse import quote as urlquote
 
     aitem.abstract_link = u''
     aitem.preprint_link = u''
@@ -914,10 +941,10 @@ def compute_cite_stats (pubs):
 
         if pub.refereed == 'y':
             stats.refcites += citeinfo.cites
-            
+
             if int (pub.mypos) == 1:
                 stats.reffirstauthcites += citeinfo.cites
-            
+
 
     if not len (cites):
         stats.meddate = 0
@@ -951,38 +978,38 @@ def partition_pubs (pubs):
     groups.all_formal = []
     groups.all_non_refereed = []
     groups.informal = []
-    
+
     groups.first = []
     groups.contrib = []
-    
+
     groups.prep = []
     groups.prepsub = []
-    
+
     for pub in pubs:
         refereed = (pub.refereed == 'y')
         refpreprint = (pub.get ('refpreprint', 'n') == 'y')
         formal = (pub.get ('informal', 'n') == 'n')
         # we assume refereed implies formal.
-        
+
         try:
             prep = (pub.get ('prep', 'n') == 'y')
             prepsub = (pub.get ('prepsub', 'n') == 'y')
         except:
             prep = False
             prepsub = False
-        
-        
+
+
         first = (pub.mypos == '1')
-        
+
         #print pub.mypos
-        
+
         if ((not prep) & (not prepsub)):
             groups.all.append (pub)
-        
+
         if first & (not prep) & (not prepsub) & (refereed | refpreprint):
             #print "is first"
             groups.first.append (pub)
-        elif (not first) & (not prep) & (not prepsub) & (refereed | refpreprint):    
+        elif (not first) & (not prep) & (not prepsub) & (refereed | refpreprint):
             #print "is contrib"
             groups.contrib.append (pub)
         elif prep:
@@ -991,7 +1018,7 @@ def partition_pubs (pubs):
             groups.prepsub.append (pub)
         # else:
         #     #
-        
+
         if formal:
             groups.all_formal.append (pub)
 
@@ -1012,19 +1039,19 @@ def partition_pubs (pubs):
     groups.refpreprint_rev = groups.refpreprint[::-1]
     groups.non_refereed_rev = groups.non_refereed[::-1]
     groups.informal_rev = groups.informal[::-1]
-    
+
     groups.first = groups.first[::-1]
     groups.contrib = groups.contrib[::-1]
     return groups
 
 
-# 
+#
 def compute_team_talks (talks):
-    
+
     collabs = {}
 
     for talk in talks:
-        
+
 
         try:
             team = talk.collab
@@ -1047,11 +1074,14 @@ def compute_team_talks (talks):
                 lastyear = year
             collabs[team] = (q0 + quantity, unit, meeting_unit, lastyear)
 
-    return sorted((Holder (collab=k, unit=v[1], collab_meet_unit=v[2], 
-                        total=unicode (v[0]), lastyear=v[3])
-                    for (k, v) in collabs.iteritems ()), 
+    # return sorted((Holder (collab=k, unit=v[1], collab_meet_unit=v[2],
+    #                     total=unicode (v[0]), lastyear=v[3])
+    #                 for (k, v) in collabs.iteritems ()),
+    #                     key=lambda h: h.lastyear, reverse=True)
+    return sorted((Holder (collab=k, unit=v[1], collab_meet_unit=v[2],
+                        total=str (v[0]), lastyear=v[3])
+                    for (k, v) in collabs.items ()),
                         key=lambda h: h.lastyear, reverse=True)
-    
 
 # Utilities for dealing with allocated observing time. Namely, we total up the
 # time allocated for each telescope as PI.
@@ -1059,7 +1089,7 @@ def compute_team_talks (talks):
 def compute_observing_experience (observing):
     allocs = {}
     facil_inst_list = []
-    
+
     for obs in observing:
 
         amount = obs.get ('time')
@@ -1085,35 +1115,39 @@ def compute_observing_experience (observing):
                 die ('disagreeing time units for %s: both "%s" and "%s"',
                      facil_inst, u0, units)
             allocs[facil_inst] = (facil, facil_desc, inst, q0 + quantity, u0)
-            
+
     #print "allocs=", allocs
-    
+
     allocs_out = {}
     for facil_inst in facil_inst_list:
         facil, facil_desc, inst, quantity, units = allocs[facil_inst]
         if (quantity).is_integer():
             quantity = int(quantity)
-        
+
         if units == 'nght':
             if quantity > 1:
                 units = 'nights'
             else:
                 units = 'night'
-        
-        
+
+
         if facil not in allocs_out:
-            inst_list = inst+' ('+unicode(quantity)+' '+units+')'
+            #inst_list = inst+' ('+unicode(quantity)+' '+units+')'
+            inst_list = inst+' ('+str(quantity)+' '+units+')'
             allocs_out[facil] = (facil_desc, inst_list)
         else:
             facil_desc, inst_list = allocs_out[facil]
-            inst_list_new = inst+' ('+unicode(quantity)+' '+units+')'
+            #inst_list_new = inst+' ('+unicode(quantity)+' '+units+')'
+            inst_list_new = inst+' ('+str(quantity)+' '+units+')'
             allocs_out[facil] = (facil_desc, inst_list+', '+inst_list_new)
-        
-    
-    return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
-                    for (k, v) in allocs_out.iteritems ()),
-                   key=lambda h: h.facil)
 
+
+    # return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
+    #                 for (k, v) in allocs_out.iteritems ()),
+    #                key=lambda h: h.facil)
+    return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
+                    for (k, v) in allocs_out.items ()),
+                   key=lambda h: h.facil)
 
 def compute_time_allocations (props):
     allocs = {}
@@ -1147,15 +1181,18 @@ def compute_time_allocations (props):
                      facil, u0, units)
             allocs[facil] = (q0 + quantity, u0)
 
-    return sorted ((Holder (facil=k, total=unicode (v[0]), unit=v[1])
-                    for (k, v) in allocs.iteritems ()),
+    # return sorted ((Holder (facil=k, total=unicode (v[0]), unit=v[1])
+    #                 for (k, v) in allocs.iteritems ()),
+    #                key=lambda h: h.facil)
+    return sorted ((Holder (facil=k, total=str (v[0]), unit=v[1])
+                    for (k, v) in allocs.items ()),
                    key=lambda h: h.facil)
-
 
 # Utilities for dealing with public code repositories
 
 def process_repositories (items):
-    from urllib2 import quote as urlquote
+    #from urllib2 import quote as urlquote
+    from urllib.parse import quote as urlquote
     repos = []
 
     for i in items:
@@ -1199,7 +1236,7 @@ def cmd_cite_stats_tex (context, template):
 def cmd_format (context, *inline_template):
     inline_template = ' '.join (inline_template)
     context.cur_formatter = Formatter (context.render, True, inline_template)
-    
+
     # Every time reset alt, flag check:
     context.cur_formatter_alt = None
     context.format_alt_flag_check = None
@@ -1208,18 +1245,18 @@ def cmd_format (context, *inline_template):
 def cmd_format_alt (context, *inline_template):
     inline_template = ' '.join (inline_template)
     context.cur_formatter_alt = Formatter (context.render, True, inline_template)
-    
+
     if inline_template.strip() == 'None':
         context.cur_formatter_alt = None
-        
+
     return ''
 
 def cmd_format_alt_flag_check (context, flag_to_check):
     context.format_alt_flag_check = flag_to_check
-    
+
     if flag_to_check.strip() == 'None':
         context.format_alt_flag_check = None
-        
+
     return ''
 
 def cmd_my_abbrev_name (context, *text):
@@ -1233,7 +1270,7 @@ def cmd_pub_list (context, group):
 
     pubs = context.pubgroups.get (group)
     npubs = len (pubs)
-    
+
     # Put something in here to sort by pub year/month?
 
     for num, pub in enumerate (pubs):
@@ -1245,11 +1282,11 @@ def cmd_pub_list (context, group):
 def cmd_obsexp_list(context, sections):
     if context.cur_formatter is None:
         die ('cannot use OBSEXPLIST command before using FORMAT')
-    
+
     for info in context.obs_exp:
         yield context.cur_formatter (info)
-        
-        
+
+
 def cmd_talloc_list (context):
     if context.cur_formatter is None:
         die ('cannot use TALLOCLIST command before using FORMAT')
@@ -1260,11 +1297,11 @@ def cmd_talloc_list (context):
 def cmd_team_talk_list (context, sections):
     if context.cur_formatter is None:
         die ('cannot use TEAMTALKLIST command before using FORMAT')
-        
+
     num = 0
     for info in context.team_talks_counts:
         num += 1
-        
+
     #num = 2
     for i,info in enumerate(context.team_talks_counts):
         if i < num-1:
@@ -1280,13 +1317,13 @@ def _rev_misc_list (context, sections, gate):
         die ('cannot use RMISCLIST* command before using FORMAT')
 
     sections = frozenset (sections.split (','))
-    
+
     for item in context.items[::-1]:
         if item.section not in sections:
             continue
         if not gate (item):
             continue
-            
+
         if context.format_alt_flag_check is not None:
             if item.__dict__[context.format_alt_flag_check].strip() == '':
                 yield context.cur_formatter_alt (item)
@@ -1294,7 +1331,7 @@ def _rev_misc_list (context, sections, gate):
                 yield context.cur_formatter (item)
         else:
             yield context.cur_formatter (item)
-        
+
 
 
 def cmd_rev_misc_list (context, sections):
@@ -1310,7 +1347,7 @@ def cmd_rev_misc_list_if (context, sections, gatefield):
 def cmd_rev_misc_list_if_not (context, sections, gatefield):
     return _rev_misc_list (context, sections,
                            lambda i: i.get (gatefield, 'n') != 'y')
-                           
+
 #
 def cmd_rev_misc_list_switch (context, sections, gatefield, case):
     """Same a RMISCLIST, but only shows items where a certain item
@@ -1339,7 +1376,7 @@ def cmd_today (context):
     yr, mo, dy = localtime (time ())[:3]
     text = '%s%s%d,%s%d.' % (months[mo - 1], nbsp, dy, nbsp, yr)
     return context.render (text)
-    
+
 def cmd_today_invert (context):
     """No trailing period in the output, DD MM YYYY"""
     from time import time, localtime
@@ -1358,39 +1395,39 @@ def setup_processing (render, datadir):
     context.pubgroups = partition_pubs (context.pubs)
     context.props = [i for i in context.items if i.section == 'prop']
     context.time_allocs = compute_time_allocations (context.props)
-    
-    
+
+
     context.team_talks = [i for i in context.items if ((i.section == 'talk') & \
                     (i.get ('venue', 'n') == 'team'))]
     context.team_talks_counts = compute_team_talks (context.team_talks)
-    
+
     context.observing = [i for i in context.items if i.section == 'obs']
     context.obs_exp = compute_observing_experience (context.observing)
-    
+
     context.repos = process_repositories (context.items)
     context.cur_formatter = None
     context.cur_formatter_alt = None
     context.format_alt_flag_check = None
-    
+
     context.my_abbrev_name = None
 
     commands = {}
     commands['CITESTATS'] = cmd_cite_stats
     commands['CITESTATS_TEX'] = cmd_cite_stats_tex
-    
+
     commands['FORMAT'] = cmd_format
     commands['FORMAT_ALT'] = cmd_format_alt
     commands['FORMAT_ALT_FLAG_CHECK'] = cmd_format_alt_flag_check
-    
+
     commands['MYABBREVNAME'] = cmd_my_abbrev_name
     commands['PUBLIST'] = cmd_pub_list
     commands['TALLOCLIST'] = cmd_talloc_list
-    
-    
+
+
     commands['OBSEXPLIST'] = cmd_obsexp_list
-    
+
     commands['TEAMTALKLIST'] = cmd_team_talk_list
-    
+
     commands['RMISCLIST'] = cmd_rev_misc_list
     commands['RMISCLIST_IF'] = cmd_rev_misc_list_if
     commands['RMISCLIST_IF_NOT'] = cmd_rev_misc_list_if_not
@@ -1415,25 +1452,30 @@ class ADSCountError (Exception):
 
 
 def get_ads_cite_count_OLD (bibcode):
-    import httplib
-    from urllib2 import urlopen, quote, URLError
+    #import httplib
+    import http.client
+    #from urllib2 import urlopen, quote, URLError
+    from urllib.request import urlopen
+    from urllib.parse import quote
+    from urllib.error import URLError
     url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
     lastnonempty = None
-    
-    if bibcode != '':    
+
+    if bibcode != '':
         try:
             for line in urlopen (url):
                 line = line.strip ()
                 if len (line):
                     lastnonempty = line
-        except httplib.BadStatusLine as e:
+        #except httplib.BadStatusLine as e:
+        except http.client.BadStatusLine as e:
             raise ADSCountError ('received bad HTTP status: %r', e)
         except URLError as e:
             raise ADSCountError (str (e))
-    
+
         if lastnonempty is None:
             raise ADSCountError ('got only empty lines')
-    
+
         if lastnonempty.startswith ('Retrieved 0 abstracts'):
             raise ADSCountError ('no such bibcode')
 
@@ -1445,26 +1487,30 @@ def get_ads_cite_count_OLD (bibcode):
         count = 0
 
     return count
-    
-    
+
+
 #
 def get_ads_cite_count (bibcode):
-    
+
     import json
-    import requests 
+    import requests
     import os.path
-    
+
     mod_path = os.path.abspath(os.path.dirname(__file__))
     token_file = os.path.join(mod_path, "adsabs_token.txt")
     with open(token_file) as f:
         token=f.readline()
-    
-    import httplib
-    from urllib2 import urlopen, quote, URLError
+
+    #import httplib
+    import http.client
+    #from urllib2 import urlopen, quote, URLError
+    from urllib.request import urlopen
+    from urllib.parse import quote
+    from urllib.error import URLError
     url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
     n_cites = None
-    
-    if bibcode != '':   
+
+    if bibcode != '':
         try:
             # to pass a dictionary in the request payload, convert it to a string first using the json package
             bibcode = {"bibcodes":[bibcode]}
@@ -1479,7 +1525,7 @@ def get_ads_cite_count (bibcode):
                 n_cites = 0
         except URLError as e:
             raise ADSCountError (str (e))
-    
+
         if n_cites is None:
             raise ADSCountError ('got only empty lines')
 
@@ -1503,7 +1549,9 @@ def _write_with_wrapping (outfile, key, value):
     # we assume whitespace is fungible.
 
     if '#' in value:
-        print >>outfile, ('%s = "%s"' % (key, value)).encode ('utf-8')
+        #print >>outfile, ('%s = "%s"' % (key, value)).encode ('utf-8')
+        #print(('%s = "%s"' % (key, value)).decode("utf-8"), file=outfile)
+        print(('%s = "%s"' % (key, value)), file=outfile)
         return
 
     bits = value.split ()
@@ -1520,7 +1568,8 @@ def _write_with_wrapping (outfile, key, value):
                 s = '%s = %s' % (key, ' '.join (bits[head:tail]))
             else:
                 s = '  %s' % (' '.join (bits[head:tail]))
-            print >>outfile, s.encode ('utf-8')
+            #print >>outfile, s.encode ('utf-8')
+            print(s.decode("utf-8"), file=outfile)
             head = tail
             ofs = 1
 
@@ -1531,7 +1580,8 @@ def _write_with_wrapping (outfile, key, value):
     else:
         return
 
-    print >>outfile, s.encode ('utf-8')
+    #print >>outfile, s.encode ('utf-8')
+    print(s.decode("utf-8"), file=outfile)
 
 
 def _bib_fixup_author (text):
@@ -1597,7 +1647,8 @@ class BibCustomizer (object):
                 text = text.replace ('{', '').replace ('}', '').replace ('~', ' ')
                 surname, rest = text.split (',', 1)
                 if surname.lower () == self.mylsurname:
-                    rec['wl_mypos'] = unicode (idx + 1)
+                    #rec['wl_mypos'] = unicode (idx + 1)
+                    rec['wl_mypos'] = str (idx + 1)
                 newauths.append (rest + ' ' + surname.replace (' ', '_'))
 
             rec['author'] = '; '.join (newauths)
@@ -1623,25 +1674,30 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
         else:
             outfile = open (os.path.join (outdir, year + 'p.txt'), 'w')
             byyear[year] = outfile
-            print >>outfile, '# -*- conf -*-'
-            print >>outfile, '# XXX for all records, refereed status is guessed crudely'
-
-        print >>outfile, '\n[pub]'
+            # print >>outfile, '# -*- conf -*-'
+            # print >>outfile, '# XXX for all records, refereed status is guessed crudely'
+            print('# -*- conf -*-', file=outfile)
+            print('# XXX for all records, refereed status is guessed crudely', file=outfile)
+        #print >>outfile, '\n[pub]'
+        print('\n[pub]', file=outfile)
 
         if 'title' in rec:
             _write_with_wrapping (outfile, 'title', rec['title'])
         else:
-            print >>outfile, 'title = ? # XXX no title for this record'
+            #print >>outfile, 'title = ? # XXX no title for this record'
+            print('title = ? # XXX no title for this record', file=outfile)
 
         if 'author' in rec:
             _write_with_wrapping (outfile, 'authors', rec['author'])
         else:
-            print >>outfile, 'authors = ? # XXX no authors for this record'
+            #print >>outfile, 'authors = ? # XXX no authors for this record'
+            print('authors = ? # XXX no authors for this record', file=outfile)
 
         if 'wl_mypos' in rec:
             _write_with_wrapping (outfile, 'mypos', rec['wl_mypos'])
         else:
-            print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
+            #print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
+            print('mypos = 0 # XXX cannot determine "mypos" for this record', file=outfile)
 
         if 'year' in rec and 'month' in rec:
             _write_with_wrapping (outfile, 'pubdate',
@@ -1649,9 +1705,11 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
                                   _bib_months.get (rec['month'].lower (),
                                                    rec['month']))
         elif 'year' in rec:
-            print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
+            #print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
+            print('pubdate = %s/01 # XXX actual month unknown' % rec['year'], file=outfile)
         else:
-            print >>outfile, 'pubdate = ? # XXX no year and month for this record'
+            #print >>outfile, 'pubdate = ? # XXX no year and month for this record'
+            print('pubdate = ? # XXX no year and month for this record', file=outfile)
 
         if 'id' in rec:
             _write_with_wrapping (outfile, 'bibcode', rec['id'])
@@ -1663,13 +1721,15 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
             _write_with_wrapping (outfile, 'doi', rec['doi'])
 
         refereed = 'journal' in rec
-        print >>outfile, 'refereed = %s' % 'ny'[refereed]
+        #print >>outfile, 'refereed = %s' % 'ny'[refereed]
+        print('refereed = %s' % 'ny'[refereed], file=outfile)
 
         cite = _bib_cite (rec)
         if cite is not None:
             _write_with_wrapping (outfile, 'cite', cite)
         else:
-            print >>outfile, 'cite = ? # XXX cannot infer citation text'
+            #print >>outfile, 'cite = ? # XXX cannot infer citation text'
+            print('cite = ? # XXX cannot infer citation text', file=outfile)
 
     for f in byyear.itervalues ():
         f.close ()
@@ -1683,35 +1743,42 @@ def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
     from bibtexparser.bparser import BibTexParser
     bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
     byyear = {}
-    
-    
-    outfile = open (os.path.join (outdir,  'nsf_pub_log.txt'), 'w')
-    
-    print >>outfile, '# -*- conf -*-'
-    print >>outfile, '# XXX for all records, refereed status is guessed crudely'
 
-    
-    
+
+    outfile = open (os.path.join (outdir,  'nsf_pub_log.txt'), 'w')
+
+    # print >>outfile, '# -*- conf -*-'
+    # print >>outfile, '# XXX for all records, refereed status is guessed crudely'
+    print('# -*- conf -*-', file=outfile)
+    print('# XXX for all records, refereed status is guessed crudely', file=outfile)
+
+
+
+
     for rec in bp.get_entry_list ():
-        
+
         year = rec.get ('year', 'noyear')
-        
-        print >>outfile, '\n[pub]'
+
+        #print >>outfile, '\n[pub]'
+        print('\n[pub]', file=outfile)
 
         if 'title' in rec:
             _write_with_wrapping (outfile, 'title', rec['title'])
         else:
-            print >>outfile, 'title = ? # XXX no title for this record'
+            #print >>outfile, 'title = ? # XXX no title for this record'
+            print('title = ? # XXX no title for this record', file=outfile)
 
         if 'author' in rec:
             _write_with_wrapping (outfile, 'authors', rec['author'])
         else:
-            print >>outfile, 'authors = ? # XXX no authors for this record'
+            #print >>outfile, 'authors = ? # XXX no authors for this record'
+            print('authors = ? # XXX no authors for this record', file=outfile)
 
         if 'wl_mypos' in rec:
             _write_with_wrapping (outfile, 'mypos', rec['wl_mypos'])
         else:
-            print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
+            #print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
+            print('mypos = 0 # XXX cannot determine "mypos" for this record', file=outfile)
 
         if 'year' in rec and 'month' in rec:
             _write_with_wrapping (outfile, 'pubdate',
@@ -1719,9 +1786,11 @@ def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
                                   _bib_months.get (rec['month'].lower (),
                                                    rec['month']))
         elif 'year' in rec:
-            print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
+            #print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
+            print('pubdate = %s/01 # XXX actual month unknown' % rec['year'], file=outfile)
         else:
-            print >>outfile, 'pubdate = ? # XXX no year and month for this record'
+            #print >>outfile, 'pubdate = ? # XXX no year and month for this record'
+            print('pubdate = ? # XXX no year and month for this record', file=outfile)
 
         if 'id' in rec:
             _write_with_wrapping (outfile, 'bibcode', rec['id'])
@@ -1733,13 +1802,15 @@ def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
             _write_with_wrapping (outfile, 'doi', rec['doi'])
 
         refereed = 'journal' in rec
-        print >>outfile, 'refereed = %s' % 'ny'[refereed]
+        #print >>outfile, 'refereed = %s' % 'ny'[refereed]
+        print('refereed = %s' % 'ny'[refereed], file=outfile)
 
         cite = _bib_cite (rec)
         if cite is not None:
             _write_with_wrapping (outfile, 'cite', cite)
         else:
-            print >>outfile, 'cite = ? # XXX cannot infer citation text'
+            #print >>outfile, 'cite = ? # XXX cannot infer citation text'
+            print('cite = ? # XXX cannot infer citation text', file=outfile)
 
     for f in byyear.itervalues ():
         f.close ()

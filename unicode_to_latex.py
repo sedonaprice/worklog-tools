@@ -25,7 +25,7 @@ That is,
 # so far, the source table is far from perfect.
 
 unicode_to_latex_table_base = {
-    u"\u003C": r"$<$", 
+    u"\u003C": r"$<$",
     u"\u0023": r"\#",
     u"\u0024": r"\$",
     u"\u0025": r"\%",
@@ -2392,7 +2392,10 @@ unicode_to_latex_table_base = {
 
 from unicodedata import normalize
 
-unicode_to_latex_table = dict ((ord (k), unicode (v))
-                               for k, v in unicode_to_latex_table_base.iteritems ())
+# unicode_to_latex_table = dict ((ord (k), unicode (v))
+#                                for k, v in unicode_to_latex_table_base.iteritems ())
+unicode_to_latex_table = dict ((ord (k), str (v))
+                               for k, v in unicode_to_latex_table_base.items ())
 unicode_to_latex_string = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table)
-unicode_to_latex = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table).encode ('ascii')
+#unicode_to_latex = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table).encode ('ascii')
+unicode_to_latex = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table)

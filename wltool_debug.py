@@ -345,6 +345,7 @@ See the README.md that came with this package for more detailed information."""
             print(bibcode, ' *'[firstauth] + ' R'[reffed], '...',)
             #try:
             newcites = get_ads_cite_count (bibcode)
+            raise ValueError
             item.set ('adscites', nowstr + str (newcites))
             print('%d (%+d)' % (newcites, newcites - curcites))
             #except ADSCountError as e:
