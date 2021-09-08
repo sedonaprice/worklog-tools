@@ -1573,7 +1573,8 @@ def _write_with_wrapping (outfile, key, value):
             else:
                 s = '  %s' % (' '.join (bits[head:tail]))
             #print >>outfile, s.encode ('utf-8')
-            print(s.decode("utf-8"), file=outfile)
+            #print(s.decode("utf-8"), file=outfile)
+            print(s, file=outfile)
             head = tail
             ofs = 1
 
@@ -1585,7 +1586,8 @@ def _write_with_wrapping (outfile, key, value):
         return
 
     #print >>outfile, s.encode ('utf-8')
-    print(s.decode("utf-8"), file=outfile)
+    #print(s.decode("utf-8"), file=outfile)
+    print(s, file=outfile)
 
 
 def _bib_fixup_author (text):
@@ -1735,7 +1737,8 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
             #print >>outfile, 'cite = ? # XXX cannot infer citation text'
             print('cite = ? # XXX cannot infer citation text', file=outfile)
 
-    for f in byyear.itervalues ():
+    #for f in byyear.itervalues ():
+    for f in iter(byyear.values()):
         f.close ()
 
 #
@@ -1816,5 +1819,6 @@ def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
             #print >>outfile, 'cite = ? # XXX cannot infer citation text'
             print('cite = ? # XXX cannot infer citation text', file=outfile)
 
-    for f in byyear.itervalues ():
+    #for f in byyear.itervalues ():
+    for f in iter(byyear.values()):
         f.close ()
