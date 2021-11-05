@@ -187,7 +187,14 @@ class MupText (Markup):
                 out = k3d.join(tmp)
                 arr[i] = out
                 t = out
-
+            if "NOEMA3D" in t:
+                k3d_orig = "NOEMA3D"
+                #k3d = r"KMOS$^{3D}$"
+                k3d = r"NOEMA$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
 
             if "\$" in t:
                 tmp = t.split("\$")
@@ -195,6 +202,11 @@ class MupText (Markup):
                 arr[i] = out
                 t = out
 
+            if "pndsign" in t:
+                tmp = t.split("pndsign")
+                out = r"\#".join(tmp)
+                arr[i] = out
+                t = out
             #
             #
             if r"{\alpha}" in t:
@@ -305,12 +317,26 @@ class MupText (Markup):
         for i, t in enumerate(arr):
             if r"KMOS3D" in t:
                 k3d_orig = "KMOS3D"
-                k3d = r"KMOS<sup>3D</sup>$"
+                k3d = r"KMOS<sup>3D</sup>"
                 tmp = t.split(k3d_orig)
                 out = k3d.join(tmp)
                 arr[i] = out
                 t = out
 
+            if r"NOEMA3D" in t:
+                k3d_orig = "NOEMA3D"
+                k3d = r"NOEMA<sup>3D</sup>"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+            if "pndsign" in t:
+                k3d_orig = "pndsign"
+                k3d = r"#"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
             if r"_{" in t:
                 tmp = t.split(r'_{')
                 out = ''
@@ -474,6 +500,27 @@ class MupJoin (Markup):
         return result
 
 
+class MupPrepend (Markup):
+    def __init__ (self, pre, Mup):
+        self.pre = _maybe_wrap_text (pre)
+        self.Mup = Mup
+
+    def _latex (self):
+        result = []
+
+        result += self.pre._latex ()
+        result += self.Mup._latex ()
+
+        return result
+
+    def _html (self):
+        result = []
+
+        result += self.pre._html ()
+        result += self.Mup._html ()
+        return result
+
+
 class MupList (Markup):
     def __init__ (self, ordered, items):
         self.ordered = bool (ordered)
@@ -521,10 +568,14 @@ def render_latex (value):
         return str (value)
     #if isinstance (value, unicode):
     if isinstance (value, str):
-        return unicode_to_latex (value)
+        # return unicode_to_latex (value)
+        rend = MupText(value)
+        return rend.latex ()
     #if isinstance (value, str):
     if isinstance (value, bytes):
-        return unicode_to_latex (str (value))
+        #return unicode_to_latex (str (value))
+        rend = MupText(str (value))
+        return rend.latex ()
     if isinstance (value, Markup):
         return value.latex ()
     raise ValueError ('don\'t know how to render %r into latex' % value)
@@ -536,10 +587,14 @@ def render_html (value):
         return str (value)
     #if isinstance (value, unicode):
     if isinstance (value, str):
-        return html_escape (value)
+        # return html_escape (value)
+        rend = MupText(value)
+        return rend.html ()
     #if isinstance (value, str):
     if isinstance (value, bytes):
-        return html_escape (str (value))
+        #return html_escape (str (value))
+        rend = MupText(str (value))
+        return rend.html ()
     if isinstance (value, Markup):
         return value.html ()
     raise ValueError ('don\'t know how to render %r into HTML' % value)
@@ -584,18 +639,29 @@ class Formatter (object):
                 return text
             return self.renderer (text)
 
-        try:
-            if text.startswith ('texturl:'):
-                thing = item.get (text[8:])
-                thing = MupLink (thing, thing)
-            else:
-                thing = item.get (text)
-            return self.renderer (thing)
-        except ValueError as e:
-            # raise ValueError ((u'while rendering field "%s" of item %s: %s' \
-            #                    % (text, item, e)).encode ('utf-8'))
-            raise ValueError ((u'while rendering field "%s" of item %s: %s' \
-                               % (text, item, e)))
+        # try:
+        #     if text.startswith ('texturl:'):
+        #         thing = item.get (text[8:])
+        #         thing = MupLink (thing, thing)
+        #     else:
+        #         thing = item.get (text)
+        #         #thing = MupText (thing)
+        #     return self.renderer (thing)
+        # except ValueError as e:
+        #     # raise ValueError ((u'while rendering field "%s" of item %s: %s' \
+        #     #                    % (text, item, e)).encode ('utf-8'))
+        #     raise ValueError ((u'while rendering field "%s" of item %s: %s' \
+        #                        % (text, item, e)))
+
+
+        if text.startswith ('texturl:'):
+            thing = item.get (text[8:])
+            thing = MupLink (thing, thing)
+        else:
+            thing = item.get (text)
+            #thing = MupText (thing)
+        return self.renderer (thing)
+
     def __call__ (self, item):
         return ''.join (self._handle_one (d, item) for d in self.tmplinfo)
 
@@ -1192,6 +1258,64 @@ def compute_time_allocations (props):
                     for (k, v) in allocs.items ()),
                    key=lambda h: h.facil)
 
+# Utilities for dealing with proposals:
+
+def prop_info (oitem, context):
+    """Create a Holder with citation text from a publication item. This can then
+    be fed into a template however one wants. The various computed fields are
+    are Unicode or Markups.
+
+    `oitem` = original item; not to be modified
+    `aitem` = augmented item; = oitem + new fields
+    """
+
+    aitem = oitem.copy ()
+
+    try:
+        # Fix propIDs:
+        aitem.propID = MupText(aitem.propID)
+    except:
+        pass
+
+    # Canonicalized authors with bolding of self and underlining of advisees.
+    #pis = [canonicalize_name (a) for a in oitem.PIs.split (',')]
+    pis = [a for a in oitem.PIs.split (',')]
+    aitem.PIs = MupJoin (', ', pis)
+    if len(pis) > 1:
+        pis_front = 'PIs: '
+    else:
+        pis_front = 'PI: '
+    aitem.PIs_str = MupPrepend(pis_front, aitem.PIs)
+
+    try:
+        #cois = [canonicalize_name (a) for a in oitem.coIs.split (',')]
+        cois = [a for a in oitem.coIs.split (',')]
+        aitem.coIs = MupJoin (', ', cois)
+        if len(cois) > 1:
+            cois_front = 'PIs: '
+        else:
+            cois_front = 'PI: '
+        aitem.coIs_str = MupPrepend(cois_front, aitem.coIs)
+
+    except:
+        aitem.coIs = ''
+        aitem.coIs_str = ''
+
+
+    try:
+        # Title with replaced quotes, for nesting in double-quotes, and
+        # optionally-bolded for first authorship.
+        aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
+        #words_title = aitem.quotable_title.split(' ')
+        #aitem.quotable_title = MupJoin (' ', words_title)
+    except:
+        aitem.quotable_title = ''
+
+    return aitem
+
+
+
+
 # Utilities for dealing with public code repositories
 
 def process_repositories (items):
@@ -1371,6 +1495,42 @@ def cmd_rev_repo_list (context, sections):
             continue
         yield context.cur_formatter (item)
 
+def _rev_prop_list (context, sections, gate):
+    if context.cur_formatter is None:
+        die ('cannot use PROPLIST* command before using FORMAT')
+
+    sections = frozenset (sections.split (','))
+
+    for item in context.items[::-1]:
+        if item.section not in sections:
+            continue
+        if not gate (item):
+            continue
+
+        info = prop_info (item, context)
+
+        if context.format_alt_flag_check is not None:
+            if item.__dict__[context.format_alt_flag_check].strip() == '':
+                yield context.cur_formatter_alt (info)
+            else:
+                yield context.cur_formatter (info)
+        else:
+            yield context.cur_formatter (info)
+
+#
+def cmd_rev_prop_list (context, sections):
+    return _rev_prop_list (context, sections, lambda i: True)
+
+def cmd_rev_prop_list_if (context, sections, gatefield):
+    """Same a PROPLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_prop_list (context, sections,
+                           lambda i: i.get (gatefield, 'n') == 'y')
+
+def cmd_rev_prop_list_if_not (context, sections, gatefield):
+    return _rev_prop_list (context, sections,
+                           lambda i: i.get (gatefield, 'n') != 'y')
 
 def cmd_today (context):
     """Note the trailing period in the output."""
@@ -1436,6 +1596,13 @@ def setup_processing (render, datadir):
     commands['RMISCLIST_IF'] = cmd_rev_misc_list_if
     commands['RMISCLIST_IF_NOT'] = cmd_rev_misc_list_if_not
     commands['RMISCLIST_CASE'] = cmd_rev_misc_list_switch
+
+
+    commands['PROPLIST'] = cmd_rev_prop_list
+    commands['PROPLIST_IF'] = cmd_rev_prop_list_if
+    commands['PROPLIST_IF_NOT'] = cmd_rev_prop_list_if_not
+
+
     commands['RREPOLIST'] = cmd_rev_repo_list
     commands['TODAY.'] = cmd_today
     commands['TODAY'] = cmd_today_invert
