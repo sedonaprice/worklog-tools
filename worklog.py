@@ -438,6 +438,17 @@ class MupBold (Markup):
         return [u'<b>'] + self.inner._html () + [u'</b>']
 
 
+class MupBoldUnderline (Markup):
+    def __init__ (self, inner):
+        self.inner = _maybe_wrap_text (inner)
+
+    def _latex (self):
+        return [u'\\underline{\\smash{\\textbf{'] + self.inner._latex () + [u'}}}']
+
+    def _html (self):
+        return [u'<u>'] + [u'<b>'] + self.inner._html () + [u'</b>'] + [u'</u>']
+
+
 class MupUnderline (Markup):
     def __init__ (self, inner):
         self.inner = _maybe_wrap_text (inner)
@@ -761,7 +772,9 @@ def cite_info (oitem, context):
     aitem.nsf_full_authors = MupJoin (', ', cauths)
 
     myidx = int (oitem.mypos) - 1
-    cauths[myidx] = MupBold (cauths[myidx])
+    #cauths[myidx] = MupBold (cauths[myidx])
+    cauths[myidx] = MupBoldUnderline (cauths[myidx])
+
 
     advposlist = oitem.get ('advpos', '')
     if len (advposlist):
@@ -810,7 +823,8 @@ def cite_info (oitem, context):
 
 
         if ((context.my_abbrev_name is not None) & (myidx > 2)):
-            sauths[myidx] = MupBold(sauths[myidx])
+            #sauths[myidx] = MupBold(sauths[myidx])
+            sauths[myidx] = MupBoldUnderline (sauths[myidx])
             sauthsstr = aitem.short_authors
             aitem.short_authors = MupJoin (', ', [sauthsstr, 'including '])
             sauthsstr = aitem.short_authors
@@ -991,6 +1005,8 @@ def compute_cite_stats (pubs):
     stats.refcites = 0
     stats.reffirstauth = 0
     stats.reffirstauthcites = 0
+    stats.refsecauth = 0
+    stats.refsecauthcites = 0
     cites = []
     dates = []
 
@@ -999,6 +1015,8 @@ def compute_cite_stats (pubs):
             stats.refpubs += 1
             if int (pub.mypos) == 1:
                 stats.reffirstauth += 1
+            elif int (pub.mypos) == 2:
+                stats.refsecauth += 1
 
         citeinfo = parse_ads_cites (pub)
         if citeinfo is None:
@@ -1014,7 +1032,8 @@ def compute_cite_stats (pubs):
 
             if int (pub.mypos) == 1:
                 stats.reffirstauthcites += citeinfo.cites
-
+            elif int (pub.mypos) == 2:
+                stats.refsecauthcites += citeinfo.cites
 
     if not len (cites):
         stats.meddate = 0
@@ -1052,6 +1071,10 @@ def partition_pubs (pubs):
     groups.first = []
     groups.contrib = []
 
+    groups.firstfew = []
+    groups.contribfew = []
+    groups.fewsplit = 2 # <= goes to firstfew, > goes to contribfew
+
     groups.prep = []
     groups.prepsub = []
 
@@ -1070,6 +1093,7 @@ def partition_pubs (pubs):
 
 
         first = (pub.mypos == '1')
+        firstfew = (int (pub.mypos) <= groups.fewsplit)
 
         #print pub.mypos
 
@@ -1086,6 +1110,14 @@ def partition_pubs (pubs):
             groups.prep.append (pub)
         elif prepsub:
             groups.prepsub.append (pub)
+
+        if firstfew & (not prep) & (not prepsub) & (refereed | refpreprint):
+            #print "is firstfew"
+            groups.firstfew.append (pub)
+        elif (not firstfew) & (not prep) & (not prepsub) & (refereed | refpreprint):
+            #print "is contribfew"
+            groups.contribfew.append (pub)
+
         # else:
         #     #
 
@@ -1112,6 +1144,11 @@ def partition_pubs (pubs):
 
     groups.first = groups.first[::-1]
     groups.contrib = groups.contrib[::-1]
+
+
+    groups.firstfew = groups.firstfew[::-1]
+    groups.contribfew = groups.contribfew[::-1]
+
     return groups
 
 
@@ -1387,6 +1424,23 @@ def cmd_format_alt_flag_check (context, flag_to_check):
 
     return ''
 
+def cmd_format_alt2 (context, *inline_template):
+    inline_template = ' '.join (inline_template)
+    context.cur_formatter_alt2 = Formatter (context.render, True, inline_template)
+
+    if inline_template.strip() == 'None':
+        context.cur_formatter_alt2 = None
+
+    return ''
+
+def cmd_format_alt2_flag_check (context, flag_to_check):
+    context.format_alt2_flag_check = flag_to_check
+
+    if flag_to_check.strip() == 'None':
+        context.format_alt2_flag_check = None
+
+    return ''
+
 def cmd_my_abbrev_name (context, *text):
     context.my_abbrev_name = ' '.join (text)
     return ''
@@ -1452,11 +1506,22 @@ def _rev_misc_list (context, sections, gate):
         if not gate (item):
             continue
 
+        # if context.format_alt_flag_check is not None:
+        #     if item.__dict__[context.format_alt_flag_check].strip() == '':
+        #         yield context.cur_formatter_alt (item)
+        #     else:
+        #         yield context.cur_formatter (item)
         if context.format_alt_flag_check is not None:
             if item.__dict__[context.format_alt_flag_check].strip() == '':
                 yield context.cur_formatter_alt (item)
             else:
-                yield context.cur_formatter (item)
+                if context.format_alt2_flag_check is not None:
+                    if item.__dict__[context.format_alt2_flag_check].strip() == '':
+                        yield context.cur_formatter_alt2 (item)
+                    else:
+                        yield context.cur_formatter (item)
+                else:
+                    yield context.cur_formatter (item)
         else:
             yield context.cur_formatter (item)
 
@@ -1572,6 +1637,8 @@ def setup_processing (render, datadir):
     context.cur_formatter = None
     context.cur_formatter_alt = None
     context.format_alt_flag_check = None
+    context.cur_formatter_alt2 = None
+    context.format_alt2_flag_check = None
 
     context.my_abbrev_name = None
 
@@ -1582,6 +1649,8 @@ def setup_processing (render, datadir):
     commands['FORMAT'] = cmd_format
     commands['FORMAT_ALT'] = cmd_format_alt
     commands['FORMAT_ALT_FLAG_CHECK'] = cmd_format_alt_flag_check
+    commands['FORMAT_ALT2'] = cmd_format_alt2
+    commands['FORMAT_ALT2_FLAG_CHECK'] = cmd_format_alt2_flag_check
 
     commands['MYABBREVNAME'] = cmd_my_abbrev_name
     commands['PUBLIST'] = cmd_pub_list
