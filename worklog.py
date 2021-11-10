@@ -1908,7 +1908,9 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
     bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
     byyear = {}
 
-    for rec in bp.get_entry_list ():
+    bp_entries = bp.get_entry_list ()
+    #for rec in bp.get_entry_list ():
+    for rec in bp_entries[::-1]:
         year = rec.get ('year', 'noyear')
 
         if year in byyear:
