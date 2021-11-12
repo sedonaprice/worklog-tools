@@ -743,7 +743,8 @@ System requirements
 
 The tools should be broadly portable, but they do have a few requirements:
 
-* Python. Version 2.6 or higher should work. Only standard modules are used.
+* Python. Version 2.6 or higher should work.
+* Python package `bibtexparser`
 * To drive processing with the example [Makefile](example/Makefile), you need
   command-line access to `pdflatex` and (of course) `make`.
 * The following LaTeX packages are used:

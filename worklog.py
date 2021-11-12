@@ -1856,7 +1856,6 @@ def _bib_cite (rec):
 
     return None
 
-
 class BibCustomizer (object):
     # By "customize" the bibtexparser module just means post-processing. These
     # are a bunch of ad-hoc hacks based on what ADS gives us.
@@ -1864,8 +1863,64 @@ class BibCustomizer (object):
     def __init__ (self, mysurname):
         self.mylsurname = mysurname.lower ()
 
+    # # POSSIBLE FIXES?
+    # # Change customizer authors() to use a custom getnames()??
+    # def getnames(names):
+    #     """Make people names as surname, firstnames
+    #     or surname, initials. Should eventually combine up the two.
+    #
+    #     :param names: a list of names
+    #     :type names: list
+    #     :returns: list -- Correctly formated names
+    #     """
+    #     tidynames = []
+    #     for namestring in names:
+    #         namestring = namestring.strip()
+    #         if len(namestring) < 1:
+    #             continue
+    #         if ',' in namestring:
+    #             namesplit = namestring.split(',', 1)
+    #             last = namesplit[0].strip()
+    #             firsts = [i.strip() for i in namesplit[1].split()]
+    #         else:
+    #             namesplit = namestring.split()
+    #             last = namesplit.pop()
+    #             firsts = [i.replace('.', '. ').strip() for i in namesplit]
+    #         if last in ['jnr', 'jr', 'junior']:
+    #             last = firsts.pop()
+    #         for item in firsts:
+    #             if item in ['ben', 'van', 'der', 'de', 'la', 'le']:
+    #                 last = firsts.pop() + ' ' + last
+    #             elif (item in ['Forster', 'Förster', 'Foerster']) and (last == 'Schreiber'):
+    #                 # NMFS exception
+    #                 _ = firsts.pop()
+    #                 last = 'Förster ' + last
+    #         tidynames.append(last + ", " + ' '.join(firsts))
+    #     return tidynames
+
+
     def __call__ (self, rec):
+        import bibtexparser
         from bibtexparser.customization import author, type, convert_to_unicode
+
+        # Solving problem where it first searches for \l vs \lambda, and so on:
+        # Include the full set of matches, and then
+        # invert to check for longest matches first
+        bibtexparser.latexenc.unicode_to_crappy_latex1 = (
+              *bibtexparser.latexenc.unicode_to_latex, *bibtexparser.latexenc.unicode_to_crappy_latex1
+                )
+        bibtexparser.latexenc.unicode_to_crappy_latex1=sorted(bibtexparser.latexenc.unicode_to_crappy_latex1,
+                    key=lambda x: len(x[1]), reverse=True)
+
+        # First strip ensuremaths, and the really dumb ADS "\raisebox{-0.5ex}\textasciitilde":
+        for key in rec.keys ():
+            val = rec.get (key)
+            val = (val
+                   .replace ('\\ensuremath', "")
+                   .replace ("\\raisebox{-0.5ex}\\textasciitilde", "\\sim")
+                   .replace ("\raisebox{-0.5ex}\textasciitilde", "\\sim"))
+            rec[key] = val
+
         rec = type (convert_to_unicode (rec))
 
         for key in rec.keys ():
@@ -1898,17 +1953,23 @@ class BibCustomizer (object):
         rec['wl_cite'] = _bib_cite (rec)
         return rec
 
-
 def bootstrap_bibtex (bibfile, outdir, mysurname):
     import os.path
 
     # XXX we assume heavily that we're dealing with ADS bibtex.
 
+    import bibtexparser
     from bibtexparser.bparser import BibTexParser
-    bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
+    #bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
+
+    bp = BibTexParser (common_strings = True, customization=BibCustomizer (mysurname))
+    bdb = bibtexparser.load(bibfile, parser=bp)
+
+    bp_entries = bdb.entries
+
     byyear = {}
 
-    bp_entries = bp.get_entry_list ()
+    #bp_entries = bp.get_entry_list ()
     #for rec in bp.get_entry_list ():
     for rec in bp_entries[::-1]:
         year = rec.get ('year', 'noyear')
