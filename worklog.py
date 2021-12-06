@@ -1976,6 +1976,9 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
     #bp_entries = bp.get_entry_list ()
     #for rec in bp.get_entry_list ():
     for rec in bp_entries[::-1]:
+        # print(rec.keys())
+        # raise ValueError
+
         year = rec.get ('year', 'noyear')
 
         if year in byyear:
@@ -2020,8 +2023,9 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
             #print >>outfile, 'pubdate = ? # XXX no year and month for this record'
             print('pubdate = ? # XXX no year and month for this record', file=outfile)
 
-        if 'id' in rec:
-            _write_with_wrapping (outfile, 'bibcode', rec['id'])
+        #if 'id' in rec:
+        if 'ID' in rec:
+            _write_with_wrapping (outfile, 'bibcode', rec['ID'])
 
         if 'eprint' in rec:
             _write_with_wrapping (outfile, 'arxiv', rec['eprint'])
@@ -2102,8 +2106,9 @@ def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
             #print >>outfile, 'pubdate = ? # XXX no year and month for this record'
             print('pubdate = ? # XXX no year and month for this record', file=outfile)
 
-        if 'id' in rec:
-            _write_with_wrapping (outfile, 'bibcode', rec['id'])
+        #if 'id' in rec:
+        if 'ID' in rec:
+            _write_with_wrapping (outfile, 'bibcode', rec['ID'])
 
         if 'eprint' in rec:
             _write_with_wrapping (outfile, 'arxiv', rec['eprint'])
