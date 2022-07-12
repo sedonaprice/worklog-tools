@@ -23,6 +23,12 @@ __all__ = r'''nbsp months Holder die warn open_template slurp_template
 
 nbsp = u'\u00a0'
 months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split ()
+months_fullname = 'January February March April May June July August September October November December'.split ()
+months_num_map = {}
+for i, month in enumerate(months):
+    months_num_map[month] = i+1
+for i, month in enumerate(months_fullname):
+    months_num_map[month] = i+1
 
 
 # Infrastructure
@@ -896,7 +902,10 @@ def cite_info (oitem, context):
     except:
         tmp = oitem.pubdate.split ('/')
         aitem.year = tmp[0]
-        aitem.month = int(tmp[1])
+        try:
+            aitem.month = int(tmp[1])
+        except:
+            aitem.month = months_num_map[tmp[1]] # map string to number
         aitem.pubdate = u'%s%s%s' % (aitem.year, nbsp, months[aitem.month - 1])
 
     # Template-friendly citation count
