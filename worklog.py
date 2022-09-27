@@ -30,6 +30,9 @@ for i, month in enumerate(months):
 for i, month in enumerate(months_fullname):
     months_num_map[month] = i+1
 
+# Special for july:
+months_num_map['July'] = 7
+
 
 # Infrastructure
 
@@ -1913,11 +1916,15 @@ def _bib_fixup_author (text):
 #                'sep': '09',  'oct': '10',  'nov': '11',  'dec': '12'}
 
 _bib_months = {'january': '01', 'february': '02', 'march': '03', 'april': '04',
-               'may': '05',  'june': '06',  'julu': '07',  'august': '08',
+               'may': '05',  'june': '06',  'july': '07',  'august': '08',
                'september': '09',  'october': '10',  'november': '11',  'december': '12'}
 
-_bib_journals = {'\\aap': 'A&Ap', '\\aj': 'AJ', '\\apj': 'ApJ',
-                 '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': 'ARA&A',
+# _bib_journals = {'\\aap': r'A&Ap', '\\aa': r'A&A', '\\aj': 'AJ', '\\apj': 'ApJ',
+#                  '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': r'ARA&A',
+#                  '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
+_bib_journals_preprocess = {'\\aap': '\\anap', '\\aa': '\\ana' }
+_bib_journals = {'\\anap': r'A&Ap', '\\ana': r'A&A', '\\aj': 'AJ', '\\apj': 'ApJ',
+                 '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': r'ARA&A',
                  '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
 
 
@@ -1931,8 +1938,9 @@ def _bib_cite (rec):
     if rec.get ('type') == 'inproceedings' and 'booktitle' in rec and 'pages' in rec:
         return u'proceedings of “%s”, %s' % (rec['booktitle'], rec['pages'])
 
-    if rec.get ('journal') == u'ArXiv e-prints' and 'eprint' in rec:
-        return u'arXiv:' + rec['eprint']
+    if 'journal' in rec:
+        if rec.get ('journal').lower() == u'arxiv e-prints' and 'eprint' in rec:
+            return u'arXiv:' + rec['eprint']
 
     return None
 
@@ -2000,6 +2008,12 @@ class BibCustomizer (object):
                    .replace ("\\raisebox{-0.5ex}\\textasciitilde", "\\sim")
                    .replace ("\raisebox{-0.5ex}\textasciitilde", "\\sim"))
             rec[key] = val
+
+        # Hack for journals with \aa* standard abbreviations
+        if 'journal' in rec:
+            rec['journal'] = _bib_journals_preprocess.get (rec['journal'].lower (),
+                                                rec['journal'])
+
 
         rec = type (convert_to_unicode (rec))
 
@@ -2109,11 +2123,27 @@ def bootstrap_bibtex (bibfile, outdir, mysurname):
         if 'doi' in rec:
             _write_with_wrapping (outfile, 'doi', rec['doi'])
 
+        # refereed = 'journal' in rec
+        # if 'journal' in rec:
+        #     print(rec['journal'])
+        # #print >>outfile, 'refereed = %s' % 'ny'[refereed]
+        # print('refereed = %s' % 'ny'[refereed], file=outfile)
+
+
         refereed = 'journal' in rec
-        #print >>outfile, 'refereed = %s' % 'ny'[refereed]
-        print('refereed = %s' % 'ny'[refereed], file=outfile)
+        if 'journal' in rec:
+            notarxiv = ((rec.get ('journal').lower() != u'arxiv e-prints') & \
+                    (rec.get ('journal').lower() != u'none') )
+            if notarxiv:
+                print('refereed = %s' % 'ny'[refereed], file=outfile)
+            else:
+                print('refereed = n', file=outfile)
+                print('refpreprint = y', file=outfile)
+        else:
+            print('refereed = %s' % 'ny'[refereed], file=outfile)
 
         cite = _bib_cite (rec)
+
         if cite is not None:
             _write_with_wrapping (outfile, 'cite', cite)
         else:
