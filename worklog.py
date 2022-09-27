@@ -16,8 +16,8 @@ Shared routines for my worklog tools.
 __all__ = r'''nbsp months Holder die warn open_template slurp_template
               process_template list_data_files load unicode_to_latex
               html_escape Markup MupText MupItalics MupBold MupUnderline
-              MupLink MupJoin MupList render_latex render_html Formatter
-              ADSCountError parse_ads_cites canonicalize_name surname best_url
+              MupLink MupJoin MupList render_latex render_html render_markdown
+              Formatter ADSCountError parse_ads_cites canonicalize_name surname best_url
               cite_info compute_cite_stats partition_pubs setup_processing
               get_ads_cite_count bootstrap_bibtex bootstrap_bibtex_alphabetical'''.split ()
 
@@ -163,11 +163,17 @@ class Markup (object):
     def _html (self):
         raise NotImplementedError ()
 
+    def _markdown (self):
+        raise NotImplementedError ()
+
     def latex (self):
         return u''.join (self._latex ())
 
     def html (self):
         return u''.join (self._html ())
+
+    def markdown (self):
+        return u''.join (self._markdown ())
 
 
 
@@ -421,6 +427,8 @@ class MupText (Markup):
         return arr
         #return [html_escape (self.text)]
 
+    def _markdown (self):
+        return self._html()
 
 class MupItalics (Markup):
     def __init__ (self, inner):
@@ -431,6 +439,9 @@ class MupItalics (Markup):
 
     def _html (self):
         return [u'<i>'] + self.inner._html () + [u'</i>']
+
+    def _markdown (self):
+        return self._html()
 
 
 class MupBold (Markup):
@@ -443,6 +454,8 @@ class MupBold (Markup):
     def _html (self):
         return [u'<b>'] + self.inner._html () + [u'</b>']
 
+    def _markdown (self):
+        return [u'**'] + self.inner._html () + [u'**']
 
 class MupBoldUnderline (Markup):
     def __init__ (self, inner):
@@ -454,6 +467,8 @@ class MupBoldUnderline (Markup):
     def _html (self):
         return [u'<u>'] + [u'<b>'] + self.inner._html () + [u'</b>'] + [u'</u>']
 
+    def _markdown (self):
+        return [u'<ins>'] + [u'**'] + self.inner._html () + [u'**'] + [u'</ins>']
 
 class MupUnderline (Markup):
     def __init__ (self, inner):
@@ -463,8 +478,10 @@ class MupUnderline (Markup):
         return [u'\\underline{'] + self.inner._latex () + [u'}']
 
     def _html (self):
-        return [u'<u>'] + self.inner._html () + [u'</u>']
+        return [u'<ins>'] + self.inner._html () + [u'</ins>']
 
+    def _markdown (self):
+        return self._html()
 
 class MupLink (Markup):
     def __init__ (self, url, inner):
@@ -479,6 +496,10 @@ class MupLink (Markup):
     def _html (self):
         return ([u'<a href="', html_escape (self.url), u'">'] +
                 self.inner._html () + [u'</a>'])
+
+    def _markdown (self):
+        return ([u'['] + self.inner._html () + [u']'] +
+                [u'(', html_escape(self.url), u')'])
 
 
 class MupJoin (Markup):
@@ -516,6 +537,20 @@ class MupJoin (Markup):
 
         return result
 
+    def _markdown (self):
+        esep = self.sep._markdown ()
+        result = []
+        first = True
+
+        for i in self.items:
+            if first:
+                first = False
+            else:
+                result += esep
+
+            result += i._markdown ()
+
+        return result
 
 class MupPrepend (Markup):
     def __init__ (self, pre, Mup):
@@ -537,6 +572,12 @@ class MupPrepend (Markup):
         result += self.Mup._html ()
         return result
 
+    def _markdown (self):
+        result = []
+
+        result += self.pre._markdown ()
+        result += self.Mup._markdown ()
+        return result
 
 class MupList (Markup):
     def __init__ (self, ordered, items):
@@ -578,6 +619,18 @@ class MupList (Markup):
 
         return res
 
+    def _markdown (self):
+
+        for i in self.items:
+            if self.ordered:
+                res.append (u'\n1. ')
+            else:
+                res.append (u'\n+ ')
+            res += i._html ()
+
+        res.append (u'\n')
+
+        return res
 
 def render_latex (value):
     if isinstance (value, int):
@@ -615,6 +668,20 @@ def render_html (value):
     if isinstance (value, Markup):
         return value.html ()
     raise ValueError ('don\'t know how to render %r into HTML' % value)
+
+
+def render_markdown (value):
+    if isinstance (value, int):
+        return str (value)
+    if isinstance (value, str):
+        rend = MupText(value)
+        return rend.markdown ()
+    if isinstance (value, bytes):
+        rend = MupText(str (value))
+        return rend.markdown ()
+    if isinstance (value, Markup):
+        return value.markdown ()
+    raise ValueError ('don\'t know how to render %r into MARKDOWN' % value)
 
 
 
