@@ -2036,11 +2036,31 @@ class BibCustomizer (object):
 
             for idx, text in enumerate (rec['author']):
                 text = text.replace ('{', '').replace ('}', '').replace ('~', ' ')
+                # surname, rest = text.split (',', 1)
+                # if surname.lower () == self.mylsurname:
+                #     #rec['wl_mypos'] = unicode (idx + 1)
+                #     rec['wl_mypos'] = str (idx + 1)
+                # newauths.append (rest + ' ' + surname.replace (' ', '_'))
+
                 surname, rest = text.split (',', 1)
-                if surname.lower () == self.mylsurname:
+                last = surname.strip()
+                firsts = [i.strip() for i in rest.split()]
+                if last.lower () == self.mylsurname:
                     #rec['wl_mypos'] = unicode (idx + 1)
                     rec['wl_mypos'] = str (idx + 1)
-                newauths.append (rest + ' ' + surname.replace (' ', '_'))
+
+                # Clean up names:
+                if last in ['jnr', 'jr', 'junior']:
+                    last = firsts.pop()
+                for item in firsts:
+                    if item in ['ben', 'van', 'der', 'de', 'la', 'le']:
+                        last = firsts.pop() + ' ' + last
+                    elif (item in ['Forster', 'Förster', 'Foerster']) and (last == 'Schreiber'):
+                        # NMFS exception
+                        _ = firsts.pop()
+                        last = 'Förster ' + last
+
+                newauths.append (' '.join(firsts) + ' ' + last.replace (' ', '_'))
 
             rec['author'] = '; '.join (newauths)
 
