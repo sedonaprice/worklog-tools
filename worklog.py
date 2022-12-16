@@ -297,7 +297,17 @@ class MupText (Markup):
                 arr[i] = out
                 t = out
 
-            #
+            # if "\\approx\{\}" in t:
+            #     tmp = t.split("\\approx\{\}")
+            #     out = r"\ensuremath{\approx{}}".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            if "\\approx" in t:
+                tmp = t.split("\\approx")
+                out = r"\ensuremath{\approx}".join(tmp)
+                arr[i] = out
+                t = out
 
             if r"\textbackslash{}tilde" in t:
                 tmp = t.split(r"\textbackslash{}tilde")
