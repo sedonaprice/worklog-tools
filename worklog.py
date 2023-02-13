@@ -222,8 +222,148 @@ class MupText(Markup):
     def __init__(self, text):
         self.text = text_type(text)
 
-    def _latex(self):
-        return [unicode_to_latex_string(self.text)]
+    # def _latex(self):
+    #     return [unicode_to_latex_string(self.text)]
+
+    def _latex (self):
+        arr = [unicode_to_latex_string (self.text)]
+        for i, t in enumerate(arr):
+            if "KMOS3D" in t:
+                k3d_orig = "KMOS3D"
+                #k3d = r"KMOS$^{3D}$"
+                k3d = r"KMOS$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+            if "NOEMA3D" in t:
+                k3d_orig = "NOEMA3D"
+                #k3d = r"KMOS$^{3D}$"
+                k3d = r"NOEMA$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+
+            if "\$" in t:
+                tmp = t.split("\$")
+                out = r"$".join(tmp)
+                arr[i] = out
+                t = out
+
+            if "pndsign" in t:
+                tmp = t.split("pndsign")
+                out = r"\#".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            #
+            if r"{\alpha}" in t:
+                tmp = t.split(r"{\alpha}")
+                out = r"{\ensuremath{\alpha}}".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            #
+            if r"\{\textbackslash{}alpha\}" in t:
+                tmp = t.split(r"\{\textbackslash{}alpha\}")
+                out = r"{\ensuremath{\alpha}}".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            if r"{\lesssim}" in t:
+                tmp = t.split(r"{\lesssim}")
+                out = r"{\ensuremath{\lesssim}}".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            if r"\{\textbackslash{}lesssim\}" in t:
+                tmp = t.split(r"\{\textbackslash{}lesssim\}")
+                out = r"{\ensuremath{\lesssim}}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"\_\{" in t:
+                tmp = t.split(r"\_\{")
+                out = ''
+                pre = tmp[0]
+                for j in range(len(tmp)):
+                    if j < len(tmp)-1:
+                        subs = tmp[j+1].split("\}")[0]
+                        out += pre+r"\ensuremath{_{\mathrm{"+subs+r"}}}"
+                        try:
+                            pre = "}".join(tmp[j+1].split("\}")[1:])
+                        except:
+                            pre = ""
+                    else:
+                        out += pre
+                arr[i] = out
+                t = out
+
+            if "\~" in t:
+                tmp = t.split("\~")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"\textbackslash{}sim" in t:
+                tmp = t.split(r"\textbackslash{}sim")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+
+            if "\{sim\}" in t:
+                tmp = t.split("\{sim\}")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if " sim " in t:
+                tmp = t.split(" sim ")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"\{\textbackslash{}tilde\}" in t:
+                tmp = t.split(r"\{\textbackslash{}tilde\}")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+            # if "\\approx\{\}" in t:
+            #     tmp = t.split("\\approx\{\}")
+            #     out = r"\ensuremath{\approx{}}".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            if "\\approx" in t:
+                tmp = t.split("\\approx")
+                out = r"\ensuremath{\approx}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"\textbackslash{}tilde" in t:
+                tmp = t.split(r"\textbackslash{}tilde")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"{\ensuremath{\sim}}" in t:
+                tmp = t.split(r"{\ensuremath{\sim}}")
+                out = r"\ensuremath{\sim}".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"\{\}" in t:
+                out = "".join(t.split(r"\{\}"))
+                arr[i] = out
+                t = out
+
+
+
+        return arr
+
 
     def _html(self):
         return [html_escape(self.text)]
@@ -315,6 +455,33 @@ class MupJoin(Markup):
 
         return result
 
+# SHP-added
+class MupPrepend (Markup):
+    def __init__ (self, pre, Mup):
+        self.pre = _maybe_wrap_text (pre)
+        self.Mup = Mup
+
+    def _latex (self):
+        result = []
+
+        result += self.pre._latex ()
+        result += self.Mup._latex ()
+
+        return result
+
+    def _html (self):
+        result = []
+
+        result += self.pre._html ()
+        result += self.Mup._html ()
+        return result
+
+    def _markdown (self):
+        result = []
+
+        result += self.pre._markdown ()
+        result += self.Mup._markdown ()
+        return result
 
 class MupList(Markup):
     def __init__(self, ordered, items):
@@ -779,6 +946,118 @@ def partition_pubs(pubs):
     return groups
 
 
+
+# -------------------------------
+# SHP added
+
+def compute_team_talks (talks):
+
+    collabs = {}
+
+    for talk in talks:
+
+
+        try:
+            team = talk.collab
+            quantity = 1
+            year = talk.year
+        except Exception as e:
+            die ('error processing outcome of team talk <%s>: %s', talk, e)
+
+        if team not in collabs:
+            unit = 'talk'
+            meeting_unit = 'meeting'
+            lastyear = year
+            collabs[team] = (quantity, unit, meeting_unit, lastyear)
+        else:
+            q0, unit, meeting_unit, lastyear = collabs[team]
+            if q0 >= 1:
+                unit = 'talks'
+                meeting_unit = 'meetings'
+            if year > lastyear:
+                lastyear = year
+            collabs[team] = (q0 + quantity, unit, meeting_unit, lastyear)
+
+    # return sorted((Holder (collab=k, unit=v[1], collab_meet_unit=v[2],
+    #                     total=unicode (v[0]), lastyear=v[3])
+    #                 for (k, v) in collabs.iteritems ()),
+    #                     key=lambda h: h.lastyear, reverse=True)
+    return sorted((Holder (collab=k, unit=v[1], collab_meet_unit=v[2],
+                        total=str (v[0]), lastyear=v[3])
+                    for (k, v) in collabs.items ()),
+                        key=lambda h: h.lastyear, reverse=True)
+
+
+# -------------------------------
+# SHP added
+# Utilities for dealing with observing experience
+
+
+def compute_observing_experience (observing):
+    allocs = {}
+    facil_inst_list = []
+
+    for obs in observing:
+
+        amount = obs.get ('time')
+        if amount is None:
+            die ('no "nights" for obs %s', obs)
+
+        try:
+            facil = obs.facil
+            facil_desc = obs.facil_desc
+            inst = obs.inst
+            facil_inst = facil+': '+inst
+            quantity, units = amount.split ()
+            quantity = float (quantity)
+        except Exception as e:
+            die ('error processing outcome of obs <%s>: %s', obs, e)
+
+        if facil_inst not in allocs:
+                allocs[facil_inst] = (facil, facil_desc, inst, quantity, units)
+                facil_inst_list.append(facil_inst)
+        else:
+            facil, facil_desc, inst, q0, u0 = allocs[facil_inst]
+            if u0 != units:
+                die ('disagreeing time units for %s: both "%s" and "%s"',
+                     facil_inst, u0, units)
+            allocs[facil_inst] = (facil, facil_desc, inst, q0 + quantity, u0)
+
+    #print "allocs=", allocs
+
+    allocs_out = {}
+    for facil_inst in facil_inst_list:
+        facil, facil_desc, inst, quantity, units = allocs[facil_inst]
+        if (quantity).is_integer():
+            quantity = int(quantity)
+
+        if units == 'nght':
+            if quantity > 1:
+                units = 'nights'
+            else:
+                units = 'night'
+
+
+        if facil not in allocs_out:
+            #inst_list = inst+' ('+unicode(quantity)+' '+units+')'
+            inst_list = inst+' ('+str(quantity)+' '+units+')'
+            allocs_out[facil] = (facil_desc, inst_list)
+        else:
+            facil_desc, inst_list = allocs_out[facil]
+            #inst_list_new = inst+' ('+unicode(quantity)+' '+units+')'
+            inst_list_new = inst+' ('+str(quantity)+' '+units+')'
+            allocs_out[facil] = (facil_desc, inst_list+', '+inst_list_new)
+
+
+    # return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
+    #                 for (k, v) in allocs_out.iteritems ()),
+    #                key=lambda h: h.facil)
+    return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
+                    for (k, v) in allocs_out.items ()),
+                   key=lambda h: h.facil)
+
+# -------------------------------
+
 # Utilities for dealing with allocated observing time. Namely, we total up the
 # time allocated for each telescope as PI.
 
@@ -866,6 +1145,64 @@ def compute_time_allocations(props):
         (process(k, v) for (k, v) in allocs.items()),
         key=lambda h: (h.is_summary, h.facil),
     )
+
+
+# Utilities for dealing with proposals:
+
+def prop_info (oitem, context):
+    """Create a Holder with citation text from a publication item. This can then
+    be fed into a template however one wants. The various computed fields are
+    are Unicode or Markups.
+
+    `oitem` = original item; not to be modified
+    `aitem` = augmented item; = oitem + new fields
+    """
+
+    aitem = oitem.copy ()
+
+    try:
+        # Fix propIDs:
+        aitem.propID = MupText(aitem.propID)
+    except:
+        pass
+
+    # Canonicalized authors with bolding of self and underlining of advisees.
+    #pis = [canonicalize_name (a) for a in oitem.PIs.split (',')]
+    pis = [a for a in oitem.PIs.split (',')]
+    aitem.PIs = MupJoin (', ', pis)
+    if len(pis) > 1:
+        pis_front = 'PIs: '
+    else:
+        pis_front = 'PI: '
+    aitem.PIs_str = MupPrepend(pis_front, aitem.PIs)
+
+    try:
+        #cois = [canonicalize_name (a) for a in oitem.coIs.split (',')]
+        cois = [a for a in oitem.coIs.split (',')]
+        aitem.coIs = MupJoin (', ', cois)
+        if len(cois) > 1:
+            cois_front = 'PIs: '
+        else:
+            cois_front = 'PI: '
+        aitem.coIs_str = MupPrepend(cois_front, aitem.coIs)
+
+    except:
+        aitem.coIs = ''
+        aitem.coIs_str = ''
+
+
+    try:
+        # Title with replaced quotes, for nesting in double-quotes, and
+        # optionally-bolded for first authorship.
+        aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
+        #words_title = aitem.quotable_title.split(' ')
+        #aitem.quotable_title = MupJoin (' ', words_title)
+    except:
+        aitem.quotable_title = ''
+
+    return aitem
+
+
 
 
 # Utilities for dealing with public code repositories
@@ -982,8 +1319,58 @@ def cmd_begin_subst(context, group):
 def cmd_format(context, *inline_template):
     inline_template = " ".join(inline_template)
     context.cur_formatter = Formatter(context.render, True, inline_template)
+
+    # Every time reset alt, flag check:
+    context.cur_formatter_alt = None
+    context.format_alt_flag_check = None
+
     return ""
 
+# ---------------------
+# SHP added
+def cmd_format_alt (context, *inline_template):
+    inline_template = ' '.join (inline_template)
+    context.cur_formatter_alt = Formatter (context.render, True, inline_template)
+
+    if inline_template.strip() == 'None':
+        context.cur_formatter_alt = None
+
+    return ''
+
+def cmd_format_alt_flag_check (context, flag_to_check):
+    context.format_alt_flag_check = flag_to_check
+
+    if flag_to_check.strip() == 'None':
+        context.format_alt_flag_check = None
+
+    return ''
+
+def cmd_format_alt2 (context, *inline_template):
+    inline_template = ' '.join (inline_template)
+    context.cur_formatter_alt2 = Formatter (context.render, True, inline_template)
+
+    if inline_template.strip() == 'None':
+        context.cur_formatter_alt2 = None
+
+    return ''
+
+def cmd_format_alt2_flag_check (context, flag_to_check):
+    context.format_alt2_flag_check = flag_to_check
+
+    if flag_to_check.strip() == 'None':
+        context.format_alt2_flag_check = None
+
+    return ''
+
+#
+def cmd_rev_misc_list_switch (context, sections, gatefield, case):
+    """Same a RMISCLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_misc_list (context, sections,
+                           lambda i: i.get (gatefield, 'n') == case)
+
+# ---------------------
 
 def cmd_my_abbrev_name(context, *text):
     context.my_abbrev_name = " ".join(text)
@@ -1003,6 +1390,29 @@ def cmd_pub_list(context, group):
         info.rev_number = npubs - num
         yield context.cur_formatter(info)
 
+def cmd_obsexp_list(context, sections):
+    if context.cur_formatter is None:
+        die ('cannot use OBSEXPLIST command before using FORMAT')
+
+    for info in context.obs_exp:
+        yield context.cur_formatter (info)
+
+def cmd_team_talk_list (context, sections):
+    if context.cur_formatter is None:
+        die ('cannot use TEAMTALKLIST command before using FORMAT')
+
+    num = 0
+    for info in context.team_talks_counts:
+        num += 1
+
+    #num = 2
+    for i,info in enumerate(context.team_talks_counts):
+        if i < num-1:
+            end=';'
+        else:
+            end=''
+        info.end = end
+        yield context.cur_formatter (info)
 
 def cmd_talloc_list(context):
     if context.cur_formatter is None:
@@ -1070,6 +1480,44 @@ def cmd_rev_repo_list(context, sections):
         yield context.cur_formatter(item)
 
 
+def _rev_prop_list (context, sections, gate):
+    if context.cur_formatter is None:
+        die ('cannot use PROPLIST* command before using FORMAT')
+
+    sections = frozenset (sections.split (','))
+
+    for item in context.items[::-1]:
+        if item.section not in sections:
+            continue
+        if not gate (item):
+            continue
+
+        info = prop_info (item, context)
+
+        if context.format_alt_flag_check is not None:
+            if item.__dict__[context.format_alt_flag_check].strip() == '':
+                yield context.cur_formatter_alt (info)
+            else:
+                yield context.cur_formatter (info)
+        else:
+            yield context.cur_formatter (info)
+
+#
+def cmd_rev_prop_list (context, sections):
+    return _rev_prop_list (context, sections, lambda i: True)
+
+def cmd_rev_prop_list_if (context, sections, gatefield):
+    """Same a PROPLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_prop_list (context, sections,
+                           lambda i: i.get (gatefield, 'n') == 'y')
+
+def cmd_rev_prop_list_if_not (context, sections, gatefield):
+    return _rev_prop_list (context, sections,
+                           lambda i: i.get (gatefield, 'n') != 'y')
+
+
 def cmd_today(context):
     """Note the trailing period in the output."""
     from time import time, localtime
@@ -1100,6 +1548,22 @@ def setup_processing(render, datadir):
     context.cur_formatter = None
     context.my_abbrev_name = None
 
+    # ------------------------
+    # SHP additions:
+    context.team_talks = [i for i in context.items if ((i.section == 'talk') & \
+                    (i.get ('venue', 'n') == 'team'))]
+    context.team_talks_counts = compute_team_talks (context.team_talks)
+
+    context.observing = [i for i in context.items if i.section == 'obs']
+    context.obs_exp = compute_observing_experience (context.observing)
+
+    context.cur_formatter_alt = None
+    context.format_alt_flag_check = None
+    context.cur_formatter_alt2 = None
+    context.format_alt2_flag_check = None
+    # ------------------------
+
+
     commands = {}
     commands["BEGIN_SUBST"] = cmd_begin_subst
     commands["FORMAT"] = cmd_format
@@ -1107,11 +1571,25 @@ def setup_processing(render, datadir):
     commands["PUBLIST"] = cmd_pub_list
     commands["TALLOCLIST"] = cmd_talloc_list
     commands["SPLIT_TALLOCLIST"] = cmd_split_talloc_list
+
+
     commands["RMISCLIST"] = cmd_rev_misc_list
     commands["RMISCLIST_IF"] = cmd_rev_misc_list_if
     commands["RMISCLIST_IF_NOT"] = cmd_rev_misc_list_if_not
     commands["RREPOLIST"] = cmd_rev_repo_list
     commands["TODAY."] = cmd_today
+
+    # SHP additions
+    commands['FORMAT_ALT'] = cmd_format_alt
+    commands['FORMAT_ALT_FLAG_CHECK'] = cmd_format_alt_flag_check
+    commands['FORMAT_ALT2'] = cmd_format_alt2
+    commands['FORMAT_ALT2_FLAG_CHECK'] = cmd_format_alt2_flag_check
+    commands['RMISCLIST_CASE'] = cmd_rev_misc_list_switch
+    commands["OBSEXPLIST"] = cmd_obsexp_list
+    commands["TEAMTALKLIST"] = cmd_team_talk_list
+    commands["PROPLIST"] = cmd_rev_prop_list
+    commands["PROPLIST_IF"] = cmd_rev_prop_list_if
+    commands["PROPLIST_IF_NOT"] = cmd_rev_prop_list_if_not
 
     return context, commands
 
@@ -1224,31 +1702,46 @@ def _bib_fixup_author(text):
     return rest + " " + surname.replace(" ", "_")
 
 
-_bib_months = {
-    "jan": "01",
-    "feb": "02",
-    "mar": "03",
-    "apr": "04",
-    "may": "05",
-    "jun": "06",
-    "jul": "07",
-    "aug": "08",
-    "sep": "09",
-    "oct": "10",
-    "nov": "11",
-    "dec": "12",
-}
+# _bib_months = {
+#     "jan": "01",
+#     "feb": "02",
+#     "mar": "03",
+#     "apr": "04",
+#     "may": "05",
+#     "jun": "06",
+#     "jul": "07",
+#     "aug": "08",
+#     "sep": "09",
+#     "oct": "10",
+#     "nov": "11",
+#     "dec": "12",
+# }
 
-_bib_journals = {
-    "\\aap": "A&Ap",
-    "\\aj": "AJ",
-    "\\apj": "ApJ",
-    "\\apjl": "ApJL",
-    "\\apjs": "ApJS",
-    "\\araa": "ARA&A",
-    "\\mnras": "MNRAS",
-    "\\pasa": "PASA",
-}
+_bib_months = {'january': '01', 'february': '02', 'march': '03', 'april': '04',
+               'may': '05',  'june': '06',  'july': '07',  'august': '08',
+               'september': '09',  'october': '10',  'november': '11',  'december': '12'}
+
+
+# _bib_journals = {
+#     "\\aap": "A&Ap",
+#     "\\aj": "AJ",
+#     "\\apj": "ApJ",
+#     "\\apjl": "ApJL",
+#     "\\apjs": "ApJS",
+#     "\\araa": "ARA&A",
+#     "\\mnras": "MNRAS",
+#     "\\pasa": "PASA",
+# }
+
+
+# _bib_journals = {'\\aap': r'A&Ap', '\\aa': r'A&A', '\\aj': 'AJ', '\\apj': 'ApJ',
+#                  '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': r'ARA&A',
+#                  '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
+_bib_journals_preprocess = {'\\aap': '\\anap', '\\aa': '\\ana' }
+_bib_journals = {'\\anap': r'A&Ap', '\\ana': r'A&A', '\\aj': 'AJ', '\\apj': 'ApJ',
+                 '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': r'ARA&A',
+                 '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
+
 
 
 def _bib_cite(rec):
@@ -1275,28 +1768,108 @@ class BibCustomizer(object):
         self.mylsurname = mysurname.lower()
 
     def __call__(self, rec):
+        import bibtexparser
         from bibtexparser.customization import author, type, convert_to_unicode
 
-        rec = type(convert_to_unicode(rec))
+        # rec = type(convert_to_unicode(rec))
 
-        for key in list(rec.keys()):
-            val = rec.get(key)
-            val = val.replace("{\\nbsp}", nbsp).replace("``", "“").replace("''", "”")
+        # for key in list(rec.keys()):
+        #     val = rec.get(key)
+        #     val = val.replace("{\\nbsp}", nbsp).replace("``", "“").replace("''", "”")
+        #     val = (val
+        #            .replace ('\\ensuremath', "")
+        #            .replace ("\\raisebox{-0.5ex}\\textasciitilde", "\\sim")
+        #            .replace ("\raisebox{-0.5ex}\textasciitilde", "\\sim"))
+        #     rec[key] = val
+
+        # # if "journal" in rec:
+        # #     rec["journal"] = _bib_journals.get(rec["journal"].lower(), rec["journal"])
+
+        # # Hack for journals with \aa* standard abbreviations
+        # if 'journal' in rec:
+        #     rec['journal'] = _bib_journals_preprocess.get (rec['journal'].lower (),
+        #                                         rec['journal'])
+
+
+        # rec = author(rec)
+
+
+        # ----------------------------------------
+        # Solving problem where it first searches for \l vs \lambda, and so on:
+        # Include the full set of matches, and then
+        # invert to check for longest matches first
+        bibtexparser.latexenc.unicode_to_crappy_latex1 = (
+              *bibtexparser.latexenc.unicode_to_latex, *bibtexparser.latexenc.unicode_to_crappy_latex1
+                )
+        bibtexparser.latexenc.unicode_to_crappy_latex1=sorted(bibtexparser.latexenc.unicode_to_crappy_latex1,
+                    key=lambda x: len(x[1]), reverse=True)
+
+        # First strip ensuremaths, and the really dumb ADS "\raisebox{-0.5ex}\textasciitilde":
+        for key in rec.keys ():
+            val = rec.get (key)
+            val = (val
+                   .replace ('\\ensuremath', "")
+                   .replace ("\\raisebox{-0.5ex}\\textasciitilde", "\\sim")
+                   .replace ("\raisebox{-0.5ex}\textasciitilde", "\\sim"))
             rec[key] = val
 
-        if "journal" in rec:
-            rec["journal"] = _bib_journals.get(rec["journal"].lower(), rec["journal"])
+        # Hack for journals with \aa* standard abbreviations
+        if 'journal' in rec:
+            rec['journal'] = _bib_journals_preprocess.get (rec['journal'].lower (),
+                                                rec['journal'])
 
-        rec = author(rec)
+
+        rec = type (convert_to_unicode (rec))
+
+        for key in rec.keys ():
+            val = rec.get (key)
+            val = (val
+                   .replace ('{\\nbsp}', nbsp)
+                   .replace ('``', u'“')
+                   .replace ("''", u'”'))
+            rec[key] = val
+
+        if 'journal' in rec:
+            rec['journal'] = _bib_journals.get (rec['journal'].lower (),
+                                                rec['journal'])
+
+        rec = author (rec)
+
+        # ----------------------------------------
 
         if "author" in rec:
             newauths = []
 
             for idx, text in enumerate(rec["author"]):
                 text = text.replace("{", "").replace("}", "").replace("~", " ")
-                surname, rest = text.split(",", 1)
-                if surname.lower() == self.mylsurname:
-                    rec["wl_mypos"] = text_type(idx + 1)
+
+                # surname, rest = text.split(",", 1)
+                # if surname.lower() == self.mylsurname:
+                #     rec["wl_mypos"] = text_type(idx + 1)
+
+                # -------------
+
+                surname, rest = text.split (',', 1)
+                last = surname.strip()
+                firsts = [i.strip() for i in rest.split()]
+                if last.lower () == self.mylsurname:
+                    #rec['wl_mypos'] = unicode (idx + 1)
+                    rec['wl_mypos'] = str (idx + 1)
+                    
+                # Clean up names:
+                if last in ['jnr', 'jr', 'junior']:
+                    last = firsts.pop()
+                for item in firsts:
+                    if item in ['ben', 'van', 'der', 'de', 'la', 'le']:
+                        last = firsts.pop() + ' ' + last
+                    elif (item in ['Forster', 'Förster', 'Foerster']) and (last == 'Schreiber'):
+                        # NMFS exception
+                        _ = firsts.pop()
+                        last = 'Förster ' + last
+
+                # -------------
+
+
                 newauths.append(rest + " " + surname.replace(" ", "_"))
 
             rec["author"] = "; ".join(newauths)
