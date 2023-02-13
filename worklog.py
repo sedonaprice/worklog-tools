@@ -652,9 +652,6 @@ class MupLink(Markup):
         return ([u'['] + self.inner._html () + [u']'] +
                 [u'(', html_escape(self.url), u')'])
 
-    def _markdown (self):
-        return [u'**'] + self.inner._html () + [u'**']
-
 class MupBoldUnderline (Markup):
     def __init__ (self, inner):
         self.inner = _maybe_wrap_text (inner)
@@ -1572,6 +1569,7 @@ def compute_time_allocations(props):
     )
 
 
+
 # Utilities for dealing with proposals:
 
 def prop_info (oitem, context):
@@ -1584,63 +1582,11 @@ def prop_info (oitem, context):
     """
 
     aitem = oitem.copy ()
-
     try:
-        # Fix propIDs:
-        aitem.propID = MupText(aitem.propID)
+        # Fix name:
+        aitem.name = MupText(aitem.name)
     except:
         pass
-
-    # Canonicalized authors with bolding of self and underlining of advisees.
-    #pis = [canonicalize_name (a) for a in oitem.PIs.split (',')]
-    pis = [a for a in oitem.PIs.split (',')]
-    aitem.PIs = MupJoin (', ', pis)
-    if len(pis) > 1:
-        pis_front = 'PIs: '
-    else:
-        pis_front = 'PI: '
-    aitem.PIs_str = MupPrepend(pis_front, aitem.PIs)
-
-    try:
-        #cois = [canonicalize_name (a) for a in oitem.coIs.split (',')]
-        cois = [a for a in oitem.coIs.split (',')]
-        aitem.coIs = MupJoin (', ', cois)
-        if len(cois) > 1:
-            cois_front = 'PIs: '
-        else:
-            cois_front = 'PI: '
-        aitem.coIs_str = MupPrepend(cois_front, aitem.coIs)
-
-    except:
-        aitem.coIs = ''
-        aitem.coIs_str = ''
-
-
-    try:
-        # Title with replaced quotes, for nesting in double-quotes, and
-        # optionally-bolded for first authorship.
-        aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
-        #words_title = aitem.quotable_title.split(' ')
-        #aitem.quotable_title = MupJoin (' ', words_title)
-    except:
-        aitem.quotable_title = ''
-
-    return aitem
-
-
-
-# Utilities for dealing with proposals:
-
-def prop_info (oitem, context):
-    """Create a Holder with citation text from a publication item. This can then
-    be fed into a template however one wants. The various computed fields are
-    are Unicode or Markups.
-
-    `oitem` = original item; not to be modified
-    `aitem` = augmented item; = oitem + new fields
-    """
-
-    aitem = oitem.copy ()
 
     try:
         # Fix propIDs:
@@ -2008,28 +1954,6 @@ def cmd_rev_repo_list(context, sections):
             continue
         yield context.cur_formatter(item)
 
-def _rev_prop_list (context, sections, gate):
-    if context.cur_formatter is None:
-        die ('cannot use PROPLIST* command before using FORMAT')
-
-    sections = frozenset (sections.split (','))
-
-    for item in context.items[::-1]:
-        if item.section not in sections:
-            continue
-        if not gate (item):
-            continue
-
-        info = prop_info (item, context)
-
-        if context.format_alt_flag_check is not None:
-            if item.__dict__[context.format_alt_flag_check].strip() == '':
-                yield context.cur_formatter_alt (info)
-            else:
-                yield context.cur_formatter (info)
-        else:
-            yield context.cur_formatter (info)
-
 #
 def cmd_rev_prop_list (context, sections):
     return _rev_prop_list (context, sections, lambda i: True)
@@ -2066,22 +1990,6 @@ def _rev_prop_list (context, sections, gate):
                 yield context.cur_formatter (info)
         else:
             yield context.cur_formatter (info)
-
-#
-def cmd_rev_prop_list (context, sections):
-    return _rev_prop_list (context, sections, lambda i: True)
-
-def cmd_rev_prop_list_if (context, sections, gatefield):
-    """Same a PROPLIST, but only shows items where a certain item
-    is True. XXX: this kind of approach could get out of hand
-    quickly."""
-    return _rev_prop_list (context, sections,
-                           lambda i: i.get (gatefield, 'n') == 'y')
-
-def cmd_rev_prop_list_if_not (context, sections, gatefield):
-    return _rev_prop_list (context, sections,
-                           lambda i: i.get (gatefield, 'n') != 'y')
-
 
 def cmd_today(context):
     """Note the trailing period in the output."""
