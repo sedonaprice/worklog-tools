@@ -685,6 +685,12 @@ def partition_pubs(pubs):
     groups.informal = []
     groups.chapters = []
 
+
+    groups.first = []
+    groups.firstfew = []
+    groups.contribfew = []
+    groups.fewsplit = 2 # <= goes to firstfew, > goes to contribfew
+
     for pub in pubs:
         refereed = pub.refereed == "y"
         refpreprint = pub.get("refpreprint", "n") == "y"
