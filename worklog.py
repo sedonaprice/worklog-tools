@@ -372,8 +372,111 @@ class MupText(Markup):
         return arr
 
 
-    def _html(self):
-        return [html_escape(self.text)]
+    # def _html(self):
+    #     return [html_escape(self.text)]
+
+    def _html (self):
+        arr = [html_escape (self.text)]
+
+        for i, t in enumerate(arr):
+            if r"KMOS3D" in t:
+                k3d_orig = "KMOS3D"
+                k3d = r"KMOS<sup>3D</sup>"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"NOEMA3D" in t:
+                k3d_orig = "NOEMA3D"
+                k3d = r"NOEMA<sup>3D</sup>"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+            if "pndsign" in t:
+                k3d_orig = "pndsign"
+                k3d = r"#"
+                tmp = t.split(k3d_orig)
+                out = k3d.join(tmp)
+                arr[i] = out
+                t = out
+            if r"_{" in t:
+                tmp = t.split(r'_{')
+                out = ''
+                pre = tmp[0]
+                for j in range(len(tmp)):
+                    if j < len(tmp)-1:
+                        subs = tmp[j+1].split("}")[0]
+                        #''.join(tmp[j+1].split("}"))
+                        out += pre+r"<sub>"+subs+r"</sub>"
+                        try:
+                            pre = "}".join(tmp[j+1].split("}")[1:])
+                        except:
+                            pre = ""
+                    else:
+                        out += pre
+                arr[i] = out
+                t = out
+            #
+            #
+            if r"{\alpha}" in t:
+                tmp = t.split(r"{\alpha}")
+                out = u"\u03B1".join(tmp)
+                arr[i] = out
+                t = out
+            #
+            if r"{\lesssim}" in t:
+                tmp = t.split(r"{\lesssim}")
+                out = u"\u2272".join(tmp)
+                arr[i] = out
+                t = out
+                #
+            #
+            if r"--" in t:
+                tmp = t.split(r"--")
+                out = r"-".join(tmp)
+                arr[i] = out
+                t = out
+
+            if "$" in t:
+                tmp = t.split("$")
+                out = r"".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"\sim" in t:
+                tmp = t.split(r"\sim")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
+
+            if r"sim" in t:
+                tmp = t.split(r"sim")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
+            if r"{\tilde}" in t:
+                    tmp = t.split(r"{\tilde}")
+                    out = r"~".join(tmp)
+                    arr[i] = out
+                    t = out
+            if r"\tilde" in t:
+                tmp = t.split(r"\tilde")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
+
+
+            if r"{}" in t:
+                out = "".join(t.split(r"{}"))
+                arr[i] = out
+                t = out
+
+
+
+
+        return arr
 
     def _markdown (self):
         return self._html()
@@ -758,7 +861,7 @@ def best_url(item):
         from urllib2 import quote
 
     if item.has("bibcode"):
-        return "http://adsabs.harvard.edu/abs/" + quote(item.bibcode)
+        return "http://ui.adsabs.harvard.edu/abs/" + quote(item.bibcode)
     if item.has("doi"):
         return "http://dx.doi.org/" + quote(item.doi)
     if item.has("url"):
@@ -1647,7 +1750,7 @@ def _rev_misc_list (context, sections, gate):
             continue
         if not gate (item):
             continue
-        
+
         if context.format_alt_flag_check is not None:
             if item.__dict__[context.format_alt_flag_check].strip() == '':
                 yield context.cur_formatter_alt (item)
