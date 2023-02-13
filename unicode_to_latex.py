@@ -12,6 +12,9 @@ That is,
   unicode_to_latex(u) = unicode_to_latex_string(u).encode('ascii').
 """
 
+from __future__ import absolute_import, division, print_function
+from six import text_type
+
 # Based on https://gist.github.com/798549 (owned by github user
 # piquadrat), but modified to make a table usable with
 # unicode.translate(). I had to comment out a few things and also
@@ -37,8 +40,9 @@ unicode_to_latex_table_base = {
     u"\u005F": r"\_",
     u"\u0060": r"\textasciigrave{}",
     u"\u007B": r"\{",
-    u"\u007C": r"\vert{}",
+    u"\u007C": r"\ensuremath{\vert{}}",
     u"\u007D": r"\}",
+    # u"\u007E": r"\textasciitilde{}",
     u"\u007E": r"$\sim$",
     u"\u00A0": r"~",
     u"\u00A1": r"\textexclamdown{}",
@@ -325,6 +329,7 @@ unicode_to_latex_table_base = {
     u"\u02D9": r"\textperiodcentered{}",
     u"\u02DA": r"\r{}",
     u"\u02DB": r"\k{}",
+    # u"\u02DC": r"\texttildelow{}",
     u"\u02DC": r"$\sim$",
     u"\u02DD": r"\H{}",
     u"\u02E5": r"\tone{55}",
@@ -868,6 +873,15 @@ unicode_to_latex_table_base = {
     u"\u2260": r"\not =",
     u"\u2261": r"\equiv{}",
     u"\u2262": r"\not\equiv{}",
+    # u"\u2264": r"\leq{}",
+    # u"\u2265": r"\geq{}",
+    # u"\u2266": r"\leqq{}",
+    # u"\u2267": r"\geqq{}",
+    # u"\u2268": r"\lneqq{}",
+    # u"\u2269": r"\gneqq{}",
+    # u"\u226A": r"\ll{}",
+    # u"\u226B": r"\gg{}",
+    # u"\u226C": r"\between{}",
     u"\u2264": r"$\leq{}$",
     u"\u2265": r"$\geq{}$",
     u"\u2266": r"$\leqq{}$",
@@ -882,6 +896,8 @@ unicode_to_latex_table_base = {
     u"\u226F": r"\not&gt;",
     u"\u2270": r"\not\leq{}",
     u"\u2271": r"\not\geq{}",
+    # u"\u2272": r"\lessequivlnt{}",
+    # u"\u2273": r"\greaterequivlnt{}",
     u"\u2272": r"$\lesssim{}$",
     u"\u2273": r"$\gtrsim{}$",
     u"\u2274": r"\ElsevierGlyph{2274}",
@@ -2392,10 +2408,8 @@ unicode_to_latex_table_base = {
 
 from unicodedata import normalize
 
-# unicode_to_latex_table = dict ((ord (k), unicode (v))
-#                                for k, v in unicode_to_latex_table_base.iteritems ())
-unicode_to_latex_table = dict ((ord (k), str (v))
+unicode_to_latex_table = dict ((ord(k), text_type(v))
                                for k, v in unicode_to_latex_table_base.items ())
 unicode_to_latex_string = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table)
-#unicode_to_latex = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table).encode ('ascii')
+# unicode_to_latex = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table).encode ('ascii')
 unicode_to_latex = lambda u: normalize ('NFKC', u).translate (unicode_to_latex_table)

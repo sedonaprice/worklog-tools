@@ -43,6 +43,7 @@ Contents
   processing](#technical-details-publication-processing)
 * [Technical details: wltool invocation](#technical-details-wltool-invocation)
 * [Technical details: template directives](#technical-details-template-directives)
+* [Technical details: substitution groups](#technical-details-substitution-groups)
 * [Technical details: the ini file format](#technical-details-the-ini-file-format)
 * [System requirements](#system-requirements)
 
@@ -243,15 +244,65 @@ total awarded time by each facility. The relevant fields are:
 
 Proposals are grouped by facility, and the total amount awarded in each
 proposal where both `mepi` and `accepted` are `y` is computed. The totals may
-then be inserted into the template using [TALLOCLIST](#talloclist).
+then be inserted into the template using [TALLOCLIST](#talloclist) or
+[SPLIT_TALLOCLIST](#split-talloclist).
+
+### Software repositories list
+
+I have attempted to develop a framework for quantifying contributions that
+come in the form of software. I wouldn’t say that anyone really has any good
+idea of how to do this, but I’ve given it my best shot. Software contributions
+are quantified by tracing contributions to version-control repositories in
+`[repo]` records. These follow a somewhat specific format so that the tools
+can compute statistics such as total numbers of commits. The relevant fields are:
+
+* `usercommits` — the number of commits you have made to the repository.
+* `allcommits` — the total number of commits in the repository.
+* `lastusercommit` — the date on which you last made a commit, in the form
+  `YYYY/MM/DD`.
+* `forks` — the number of times the repository has been “forked”, if the hosting
+  service happens to allow and track that.
+* `stars` — the number of times the repository has been “starred”, if the
+  hosting service happens to allow and track that.
+
+**TODO**: this feature needs more documentation.
+
+### Public engagement activities list
+
+Public engagement activities can be listed in `[engagement]` records. These
+can be quite freeform, but if you give these records a `class` field, the
+tools will be able to count up different types of engagement activities.
+Different classes of activity that are tracked are:
+
+* `interview` — a media interview
+* `outreach_event` — a public outreach event
+* `press_release` — a press release
+* `public_talk` — a public lecture
+
+See the [engagement_stats](#engagement_stats) statistics group that can be
+used with the [BEGIN_SUBST](#begin_subst-group) directive.
+
+
+### Other derived information
+
+The [BEGIN_SUBST](#begin_subst-group) directive begins a block of text in
+which special text fragments can be inserted into the template directly. This
+block continues until a bare `END` directive is encountered. Different
+substitution groups are available:
+
+* [cite_stats](#cite_stats) — statistics regarding refereed publications
+  drawn from [NASA ADS].
+* [engagement_stats](#engagement_stats) — statistics regarding public
+  engagement activities.
+* [repo_stats](#repo_stats) — statistics regarding open-source software
+  contributions.
+* [talk_stats](#talk_stats) — statistics regarding professional talks
 
 ### Miscellaneous template directives
 
 There are also some more specialized templating directives that are [fully
-documented below](#technical-details-template-directives). Of particular
-interest are [TODAY.](#today), which inserts the current date, and
-[CITESTATS](#citestats-subtemplate-name), which inserts some citation
-statistics based on the information gathered from [NASA ADS].
+documented below](#technical-details-template-directives). For example,
+[TODAY.](#today), inserts the current date.
 
 
 Technical details: publication processing
@@ -271,7 +322,8 @@ certain fields. Some of the key ones are:
   should have the words separated by *underscores* — this is the easiest
   way to have the software pull out surnames automatically. Initials are OK.
 * `mypos` — your numerical position in the author list, with 1 (sensibly)
-  being first.
+  being first. Negative numbers are treated like Python list indices: -1
+  means that you are the last author, -2 means second-to-last, and so on.
 * `advpos` — a comma-separated list of positions in the author list, again
   with 1 being first. The corresponding author names will be underlined in
   the full author list. The intention is to highlight the names of
@@ -320,6 +372,9 @@ The `cite_info` function uses the above information to create the following fiel
 * `lcite` — a copy of `cite`, but with markup to make it a hyperlink to an
   appropriate URL for the publication, based on `arxiv`, `bibcode`, `doi`, or
   `url`.
+* `links_list` — an unordered list containing all the links for this
+  publication: some subset of `abstract_link`, `official_link`, `other_link`, or
+  `preprint_link`, depending on which of those are defined.
 * `month` — the numerical month of publication
 * `official_link` — a hyperlink reading “official” that leads to the DOI
   page for the publication, if `doi` is defined.
@@ -469,11 +524,19 @@ $
 Updates citation counts for publications from [NASA ADS].
 
 For each record in the log files with a `bibcode` field, the script connects
-to the ADS website and fetches the number of citations. The log files are
+to the ADS API and fetches the number of refereed citations. The log files are
 modified in-place to have the citation counts inserted into each record in a
 field called `adscites`. The `adscites` field records the date that citation
 counts were last checked, and the script won’t update check counts more
 frequently than once a week.
+
+In order for this command to work, you must sign up for an ADS account and
+[request an ADS API token](https://github.com/adsabs/adsabs-dev-api#access).
+Create a plain text file named `ads-token.secret` in the directory containing
+your `.txt` files and paste your API token into it. This token is a secret, so
+you should make sure not to track it with any version control system that you
+may be using. If on a multi-user machine, you should make sure that the file
+is not readable by other users.
 
 As the updates are conducted, the script will print out each bibcode and the
 change in the number of citations it has received. Records will be annotated
@@ -504,39 +567,24 @@ recognized when it appears at the very beginning of a line in a template. Most
 of the directives take arguments that appear on the same line, separated by
 whitespace.
 
-### CITESTATS {subtemplate-name}
+### BEGIN_SUBST {group}
 
-Inserts a snippet of text with citation statistics following a sub-template.
-The sub-template is searched for first at the file name
-`templates/{template-name}`, then at `{toolsdir}/templates/{template-name}`,
-where `{toolsdir}` is the directory containing the [wltool](wltool) script. We
-provide a default version called
-[templates/citestats.frag.txt](templates/citestats.frag.txt).
+Marks the beginning of a region in which text will be substituted. The
+behavior resembles a [FORMAT](#format-template-text-) directive in that the
+following lines should contain pipe-delimited field names that will be
+substituted with computed values. This behavior will continue until a line
+containing just the word `END` is encountered.
 
-That sub-template resembles a [FORMAT](#format-template-text-) directive in
-that it should contain pipe-delimited field names that will be substituted
-with computed values. Possible fields are:
-
-* `day` — the numerical day of the month of the median date when citations
-  were updated.
-* `hindex` — your numerical *h*-index.
-* `italich` — a bit of a hack; code for the letter “h” in italics, appropriate
-  for either LaTeX or HTML as needed.
-* `meddate` — the median *Unix time* around which citations were updated.
-* `month` — the numerical month of the median date when citations were updated.
-* `monthstr` — the three-letter abbreviated month of the median date when
-   citations were updated.
-* `refcites` — the total number of citations to refereed publications
-* `reffirstauth` — the total number of refereed first-author publications
-* `refpubs` — the total number of refereed publications
-* `year` — the year of the median date around which citations were updated.
+The subsitutions are batched into different groups. The available substitution
+groups [are listed below](#technical-details-substitution-groups).
 
 Example:
 
 ```HTML
-<p>Do people cite me?
-CITESTATS citestats.frag.txt
-So basically, yes, they do.</p>
+BEGIN_SUBST cite_stats
+<p>I may have written only |refpubs| refereed publications, but I assure you
+that they are all profound.</p>
+END
 ```
 
 ### FORMAT {template text ...}
@@ -616,11 +664,47 @@ each facility with a successful proposal as PI.
 
 The fields accessible to the template are:
 
-* `facil` — the facility name
+* `facil` — the facility name, but see below.
 * `total` — the total of the allocations for that facility
 * `unit` — the unit string specified in the proposals for the facility
 
-The records are sorted alphabetically by `facil`.
+The records are sorted alphabetically by `facil`, with the following
+exception. All `facil` names starting with the text `SUMMARY:` are sorted
+*after* the other facilities, and are rendered in italics with the `SUMMARY:`
+tag stripped off. This feature is intended for money awards, which one
+typically wants to emphasize. A relevant worklog entry might look like:
+
+```
+[prop]
+title = My Awesome Science
+date = 2017/11
+pi = P K G Williams
+mepi = y
+facil = Very Large Array
+request = 100 hr
+request2 = 100 ks Chandra
+accepted = y
+award3 = 100000 USD SUMMARY:Support funding
+```
+
+Example of the template:
+
+```TeX
+FORMAT |facil| & |total| & |unit| \cr
+
+\section*{Total Allocations as PI}
+\begin{tabular}{lrl}
+TALLOCLIST
+\end{tabular}
+```
+
+### SPLIT_TALLOCLIST {text...}
+
+This is a giant hack to typeset time allocation lists when space is at a
+premium. It is just like [TALLOCLIST](#talloclist), but you can specify
+arbitrary raw text that will be inserted halfway through the list of
+allocations. This can let you break the list of allocations into two
+equal-sized tables, which can then by typeset side-by-side.
 
 Example
 
@@ -629,7 +713,7 @@ FORMAT |facil| & |total| & |unit| \cr
 
 \section*{Total Allocations as PI}
 \begin{tabular}{lrl}
-TALLOCLIST
+SPLIT_TALLOCLIST \end{tabular} \begin{tabular}{lrl}
 \end{tabular}
 ```
 
@@ -694,6 +778,63 @@ Example:
 This document was last updated
 TODAY.
 ```
+
+
+Technical details: substitution groups
+--------------------------------------
+
+Here are the different substitution groups known to the
+[BEGIN_SUBST](#begin_subst-group) directive.
+
+### cite_stats
+
+These are statistics relating to refereed publications and their citations.
+The fields within this group are:
+
+* `day` — the numerical day of the month of the median date when citations
+  were updated.
+* `hindex` — your numerical *h*-index.
+* `italich` — a bit of a hack; code for the letter “h” in italics, appropriate
+  for either LaTeX or HTML as needed.
+* `meddate` — the median *Unix time* around which citations were updated.
+* `month` — the numerical month of the median date when citations were updated.
+* `monthstr` — the three-letter abbreviated month of the median date when
+   citations were updated.
+* `refcites` — the total number of citations to refereed publications
+* `reffirstauth` — the total number of refereed first-author publications
+* `refpubs` — the total number of refereed publications
+* `year` — the year of the median date around which citations were updated.
+
+### engagement_stats
+
+These are statistics relating to public engagement activities. The fields are:
+
+* `n_interviews` — the number of `[engagement]` records with `class = interview`.
+* `n_outreach_events` — the number of `[engagement]` records with `class = outreach_event`.
+* `n_press_releases` — the number of `[engagement]` records with `class = press_release`.
+* `n_public_talks` — the number of `[engagement]` records with `class = public_talk`.
+
+### repo_stats
+
+These are statistics relating to open-source software contributions. The
+fields within this group are:
+
+* `total_repos` — the total number of tracked repositories.
+* `total_commits` — the total number of commits made by you in all repositories.
+* `primary_author_stars` — the total number of GitHub stars given to repositories
+  in which you are the primary author, which we define as those in which you have
+  made more than 50% of the commits.
+* `primary_author_forks` — the total number of GitHub forks of repositories
+  in which you are the primary author.
+
+### talk_stats
+
+These are statistics relating to professional talks you have given. The fields
+within this group are:
+
+* `n_total` — the total number of talks
+* `n_invited` — the number of talks with `invited = y`
+* `n_conference` — the number of talks with `conference = y`
 
 
 Technical details: the ini file format
