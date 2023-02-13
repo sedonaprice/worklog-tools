@@ -633,6 +633,9 @@ def compute_cite_stats(pubs):
     stats.refpubs = 0
     stats.refcites = 0
     stats.reffirstauth = 0
+    stats.reffirstauthcites = 0
+    stats.refsecauth = 0
+    stats.refsecauthcites = 0
     cites = []
     dates = []
 
@@ -641,6 +644,8 @@ def compute_cite_stats(pubs):
             stats.refpubs += 1
             if int(pub.mypos) == 1:
                 stats.reffirstauth += 1
+            elif int (pub.mypos) == 2:
+                stats.refsecauth += 1
 
         citeinfo = parse_ads_cites(pub)
         if citeinfo is None:
@@ -653,6 +658,11 @@ def compute_cite_stats(pubs):
 
         if pub.refereed == "y":
             stats.refcites += citeinfo.cites
+            
+            if int (pub.mypos) == 1:
+                stats.reffirstauthcites += citeinfo.cites
+            elif int (pub.mypos) == 2:
+                stats.refsecauthcites += citeinfo.cites
 
     if not len(cites):
         stats.meddate = 0
@@ -671,7 +681,8 @@ def compute_cite_stats(pubs):
     stats.year, stats.month, stats.day = gmtime(stats.meddate)[:3]
     stats.monthstr = months[stats.month - 1]
     stats.italich = MupItalics("h")
-    stats.adslink = MupLink("http://labs.adsabs.harvard.edu/adsabs", "ADS")
+    # stats.adslink = MupLink("http://labs.adsabs.harvard.edu/adsabs", "ADS")
+    stats.adslink = MupLink ("http://ui.adsabs.harvard.edu/", "ADS")
     return stats
 
 
