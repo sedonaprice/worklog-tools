@@ -567,22 +567,8 @@ class MupText(Markup):
 
 
 
-
         return arr
         #return [html_escape (self.text)]
-
-    def _markdown (self):
-        return self._html()
-
-            if r"{}" in t:
-                out = "".join(t.split(r"{}"))
-                arr[i] = out
-                t = out
-
-
-
-
-        return arr
 
     def _markdown (self):
         return self._html()

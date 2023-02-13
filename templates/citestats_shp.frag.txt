@@ -1,7 +1,0 @@
-\begin{itemize}
-%\item |reffirstauth| first-author refereed publications -- |reffirstauthcites| citations
-%\item |refsecauth| second-author refereed publications -- |refsecauthcites| citations
-\item |reffirstauth| first- and \emph{|refsecauth| second-}author refereed publications --
-|reffirstauthcites| \emph{(|refsecauthcites|)} citations
-\item |refpubs| total refereed publications -- |refcites| citations
-\end{itemize}
