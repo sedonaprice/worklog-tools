@@ -725,7 +725,8 @@ def canonicalize_name(name):
     abbrev = []
 
     for item in rest:
-        for char in item:
+        # for char in item:
+        for j,char in enumerate(item):
             if char.isupper() or char == "-":
                 abbrev.append(char)
             #Handle uncapitalized hyphenated names:
@@ -1621,19 +1622,45 @@ def cmd_split_talloc_list(context, *split_template):
         yield context.cur_formatter(info)
 
 
-def _rev_misc_list(context, sections, gate):
-    if context.cur_formatter is None:
-        die("cannot use RMISCLIST* command before using FORMAT")
+# def _rev_misc_list(context, sections, gate):
+#     if context.cur_formatter is None:
+#         die("cannot use RMISCLIST* command before using FORMAT")
 
-    sections = frozenset(sections.split(","))
+#     sections = frozenset(sections.split(","))
+
+#     for item in context.items[::-1]:
+#         if item.section not in sections:
+#             continue
+#         if not gate(item):
+#             continue
+#         yield context.cur_formatter(item)
+
+
+def _rev_misc_list (context, sections, gate):
+    if context.cur_formatter is None:
+        die ('cannot use RMISCLIST* command before using FORMAT')
+
+    sections = frozenset (sections.split (','))
 
     for item in context.items[::-1]:
         if item.section not in sections:
             continue
-        if not gate(item):
+        if not gate (item):
             continue
-        yield context.cur_formatter(item)
-
+        
+        if context.format_alt_flag_check is not None:
+            if item.__dict__[context.format_alt_flag_check].strip() == '':
+                yield context.cur_formatter_alt (item)
+            else:
+                if context.format_alt2_flag_check is not None:
+                    if item.__dict__[context.format_alt2_flag_check].strip() == '':
+                        yield context.cur_formatter_alt2 (item)
+                    else:
+                        yield context.cur_formatter (item)
+                else:
+                    yield context.cur_formatter (item)
+        else:
+            yield context.cur_formatter (item)
 
 def cmd_rev_misc_list(context, sections):
     return _rev_misc_list(context, sections, lambda i: True)
@@ -1709,6 +1736,16 @@ def cmd_today(context):
     text = "%s%s%d,%s%d." % (months[mo - 1], nbsp, dy, nbsp, yr)
     return context.render(text)
 
+# SHP addition
+def cmd_today_invert (context):
+    """No trailing period in the output, DD MM YYYY"""
+    from time import time, localtime
+
+    # This is a little bit gross.
+    yr, mo, dy = localtime (time ())[:3]
+    text = '%d %s %d' % (dy, months[mo - 1], yr)
+    return context.render (text)
+
 
 def setup_processing(render, datadir):
     context = Holder()
@@ -1772,6 +1809,7 @@ def setup_processing(render, datadir):
     commands["PROPLIST"] = cmd_rev_prop_list
     commands["PROPLIST_IF"] = cmd_rev_prop_list_if
     commands["PROPLIST_IF_NOT"] = cmd_rev_prop_list_if_not
+    commands['TODAY'] = cmd_today_invert
 
     return context, commands
 
@@ -1829,7 +1867,9 @@ def get_ads_cite_count(bibcode):
     # NB, the "citation stats refereed" structure is all zeros for items that
     # are not themselves refereed.
     d = structured.get("citation stats", {})
-    count = d.get("total number of refereed citations")
+
+    #count = d.get("total number of refereed citations")
+    count = d.get("total number of citations")
 
     if count is None:
         raise ADSCountError(
