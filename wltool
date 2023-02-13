@@ -12,6 +12,7 @@ workog commands are:
   github-repos      Print list of GitHub repositories contributed to
   html              Fill in an HTML-formatted template
   latex             Fill in a LaTeX-formatted template
+  markdown          Fill in a Markdown-formatted template
   nsf-collabs       Print stub list of collaborators in past 48 months
   summarize         Summarize the records present in the worklog data files
   update-cites      Update ADS citation counts in the worklog data files
@@ -252,6 +253,8 @@ def _cli_render(argv):
         render = render_latex
     elif fmtname == "html":
         render = render_html
+    elif fmtname == 'markdown':
+        render = render_markdown
     else:
         die('unknown output format "%s"', fmtname)
 
@@ -264,7 +267,7 @@ def _cli_render(argv):
 
 cli_latex = _cli_render
 cli_html = _cli_render
-
+cli_markdown = _cli_render
 
 def cli_summarize(argv):
     """usage: wltool summarize [datadir]

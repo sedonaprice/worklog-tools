@@ -35,6 +35,7 @@ MupJoin
 MupList
 render_latex
 render_html
+render_markdown
 Formatter
 ADSCountError
 parse_ads_cites
@@ -205,11 +206,17 @@ class Markup(object):
     def _html(self):
         raise NotImplementedError()
 
+    def _markdown (self):
+        raise NotImplementedError ()
+
     def latex(self):
         return "".join(self._latex())
 
     def html(self):
         return "".join(self._html())
+
+    def markdown (self):
+        return u''.join (self._markdown ())
 
 
 def _maybe_wrap_text(thing):
@@ -368,6 +375,9 @@ class MupText(Markup):
     def _html(self):
         return [html_escape(self.text)]
 
+    def _markdown (self):
+        return self._html()
+
 
 class MupItalics(Markup):
     def __init__(self, inner):
@@ -378,6 +388,9 @@ class MupItalics(Markup):
 
     def _html(self):
         return ["<i>"] + self.inner._html() + ["</i>"]
+
+    def _markdown (self):
+        return self._html()
 
 
 class MupBold(Markup):
@@ -390,6 +403,22 @@ class MupBold(Markup):
     def _html(self):
         return ["<b>"] + self.inner._html() + ["</b>"]
 
+    def _markdown (self):
+        return [u'**'] + self.inner._html () + [u'**']
+
+class MupBoldUnderline (Markup):
+    def __init__ (self, inner):
+        self.inner = _maybe_wrap_text (inner)
+
+    def _latex (self):
+        return [u'\\underline{\\smash{\\textbf{'] + self.inner._latex () + [u'}}}']
+
+    def _html (self):
+        return [u'<u>'] + [u'<b>'] + self.inner._html () + [u'</b>'] + [u'</u>']
+
+    def _markdown (self):
+        return [u'<ins>'] + [u'**'] + self.inner._html () + [u'**'] + [u'</ins>']
+
 
 class MupUnderline(Markup):
     def __init__(self, inner):
@@ -401,6 +430,8 @@ class MupUnderline(Markup):
     def _html(self):
         return ["<u>"] + self.inner._html() + ["</u>"]
 
+    def _markdown (self):
+        return self._html()
 
 class MupLink(Markup):
     def __init__(self, url, inner):
@@ -418,6 +449,11 @@ class MupLink(Markup):
         return (
             ['<a href="', html_escape(self.url), '">'] + self.inner._html() + ["</a>"]
         )
+
+    def _markdown (self):
+        return ([u'['] + self.inner._html () + [u']'] +
+                [u'(', html_escape(self.url), u')'])
+
 
 
 class MupJoin(Markup):
@@ -455,6 +491,21 @@ class MupJoin(Markup):
 
         return result
 
+    def _markdown (self):
+        esep = self.sep._markdown ()
+        result = []
+        first = True
+
+        for i in self.items:
+            if first:
+                first = False
+            else:
+                result += esep
+
+            result += i._markdown ()
+
+        return result
+
 # SHP-added
 class MupPrepend (Markup):
     def __init__ (self, pre, Mup):
@@ -482,6 +533,7 @@ class MupPrepend (Markup):
         result += self.pre._markdown ()
         result += self.Mup._markdown ()
         return result
+
 
 class MupList(Markup):
     def __init__(self, ordered, items):
@@ -523,6 +575,19 @@ class MupList(Markup):
 
         return res
 
+    def _markdown (self):
+
+        for i in self.items:
+            if self.ordered:
+                res.append (u'\n1. ')
+            else:
+                res.append (u'\n+ ')
+            res += i._html ()
+
+        res.append (u'\n')
+
+        return res
+
 
 def render_latex(value):
     if isinstance(value, int):
@@ -546,6 +611,21 @@ def render_html(value):
     if isinstance(value, Markup):
         return value.html()
     raise ValueError("don't know how to render %r into HTML" % value)
+
+
+def render_markdown (value):
+    if isinstance (value, int):
+        return str (value)
+    if isinstance (value, str):
+        rend = MupText(value)
+        return rend.markdown ()
+    if isinstance (value, bytes):
+        rend = MupText(str (value))
+        return rend.markdown ()
+    if isinstance (value, Markup):
+        return value.markdown ()
+    raise ValueError ('don\'t know how to render %r into MARKDOWN' % value)
+
 
 
 class Formatter(object):
@@ -648,8 +728,22 @@ def canonicalize_name(name):
         for char in item:
             if char.isupper() or char == "-":
                 abbrev.append(char)
+            #Handle uncapitalized hyphenated names:
+            elif j > 0:
+                if item[j-1] == "-" and (not char.isupper()):
+                    abbrev.append (char) #char.upper())
 
-    return "".join(abbrev) + nbsp + surname
+    # return "".join(abbrev) + nbsp + surname
+
+    # Join surname, initials:
+    nameout = surname +"," + nbsp + ". ".join (abbrev)+"."
+
+    # Clean up case of someone having a hyphenated first name:
+    bits = nameout.strip ().split (". -. ")
+    nameout = ".-".join(bits)
+
+    return nameout
+
 
 
 def surname(name):
@@ -695,7 +789,8 @@ def cite_info(oitem, context):
         die("illegal mypos value %r" % (oitem.mypos,))
     else:
         myidx = mypos - 1
-    cauths[myidx] = MupBold(cauths[myidx])
+    #cauths[myidx] = MupBold (cauths[myidx])
+    cauths[myidx] = MupBoldUnderline (cauths[myidx])
 
     advposlist = oitem.get("advpos", "")
     if len(advposlist):
@@ -703,6 +798,18 @@ def cite_info(oitem, context):
             cauths[i] = MupUnderline(cauths[i])
 
     aitem.full_authors = MupJoin(", ", cauths)
+
+    # --------------------------------------------------------------
+    # Make a full authors list with semicolons and & at end:
+    if len(cauths) == 1:
+        aitem.full_authors_semi = cauths[0]
+    if len(cauths) == 2:
+        aitem.full_authors_semi = MupJoin (' & ', cauths)
+    else:
+        aitem.full_authors_semi = MupJoin('; ', cauths[:-1])
+        aitem.full_authors_semi = MupJoin('; & ', [aitem.full_authors_semi, cauths[-1]])
+
+    # --------------------------------------------------------------
 
     # Short list of authors, possibly abbreviating my name.
     sauths = [surname(a) for a in oitem.authors.split(";")]
@@ -713,23 +820,82 @@ def cite_info(oitem, context):
         for i in [int(x) - 1 for x in advposlist.split(",")]:
             sauths[i] = MupUnderline(sauths[i])
 
-    if len(sauths) == 1:
-        aitem.short_authors = sauths[0]
-    elif len(sauths) == 2:
-        aitem.short_authors = MupJoin(" & ", sauths)
-    elif len(sauths) == 3:
-        aitem.short_authors = MupJoin(", ", sauths)
+    # if len(sauths) == 1:
+    #     aitem.short_authors = sauths[0]
+    # elif len(sauths) == 2:
+    #     aitem.short_authors = MupJoin(" & ", sauths)
+    # elif len(sauths) == 3:
+    #     aitem.short_authors = MupJoin(", ", sauths)
+    # else:
+    #     aitem.short_authors = MupJoin(" ", [sauths[0], "et" + nbsp + "al."])
+
+    # --------------------------------------------------------------
+    # Like canonicalized name scheme instead:
+    if len (sauths) == 1:
+        aitem.short_authors = cauths[0] #sauths[0]
+    elif len (sauths) == 2:
+        aitem.short_authors = MupJoin (' & ', cauths) #sauths)
+    elif (len (sauths) >= 3) & (len (sauths) <= 5):
+        aitem.short_authors = MupJoin (', ', cauths[:-1]) #sauths)
+        aitem.short_authors = MupJoin(', & ', [aitem.short_authors, cauths[-1]])
     else:
-        aitem.short_authors = MupJoin(" ", [sauths[0], "et" + nbsp + "al."])
+        #aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
+        sauthsstr = MupJoin (', ', cauths[0:3])
+        aitem.short_authors = MupJoin (', ', [sauthsstr, 'et' + nbsp + 'al.'])
+
+
+        if ((context.my_abbrev_name is not None) & (myidx > 2)):
+            #sauths[myidx] = MupBold(sauths[myidx])
+            sauths[myidx] = MupBoldUnderline (sauths[myidx])
+            sauthsstr = aitem.short_authors
+            aitem.short_authors = MupJoin (', ', [sauthsstr, 'including '])
+            sauthsstr = aitem.short_authors
+            aitem.short_authors = MupJoin (' ', [sauthsstr, sauths[myidx]])
+
+
+    # --------------------------------------------------------------
+
+    # Short list of authors, for IN PREP PUBLICATIONS: possibly abbreviating my name.
+    sprepauths = [surname (a)  for a in oitem.authors.split (';')]
+    if context.my_abbrev_name is not None:
+        sprepauths[myidx] = context.my_abbrev_name
+
+    if len (advposlist):
+        for i in [int (x) - 1 for x in advposlist.split (',')]:
+            sprepauths[i] = MupUnderline (sprepauths[i])
+
+    # Like canonicalized name scheme instead:
+    if len (sprepauths) == 1:
+        sprepauthsstr = cauths[0]
+        aitem.short_prep_authors =  MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
+    elif len (sprepauths) == 2:
+        sprepauthsstr = MupJoin (', ', cauths[0:2])
+        aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
+    elif (len (sprepauths) >= 3):
+        sprepauthsstr = MupJoin (', ', cauths[0:3])
+        aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
+
+
+        if ((context.my_abbrev_name is not None) & (myidx > 2)):
+            sprepauths[myidx] = MupBold(sprepauths[myidx])
+            sprepauthsstr = aitem.short_prep_authors
+            aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'including '])
+            sprepauthsstr = aitem.short_prep_authors
+            aitem.short_prep_authors = MupJoin (' ', [sprepauthsstr, sauths[myidx]])
+
+    # --------------------------------------------------------------
+
 
     if oitem.refereed == "y":
         aitem.refereed_mark = "»"
     else:
         aitem.refereed_mark = ""
 
-    # Title with replaced quotes, for nesting in double-quotes, and
-    # optionally-bolded for first authorship.
-    aitem.quotable_title = oitem.title.replace("“", "‘").replace("”", "’")
+    # # Title with replaced quotes, for nesting in double-quotes, and
+    # # optionally-bolded for first authorship.
+    # aitem.quotable_title = oitem.title.replace("“", "‘").replace("”", "’")
+    aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
+
 
     if myidx == 0:
         aitem.bold_if_first_title = MupBold(oitem.title)
@@ -744,8 +910,12 @@ def cite_info(oitem, context):
     citeinfo = parse_ads_cites(oitem)
     if citeinfo is not None and citeinfo.cites > 0:
         aitem.citecountnote = " [%d]" % citeinfo.cites
+        # SHP addition: 
+        aitem.citecountnotelonger = u' [citations: %d]' % citeinfo.cites
     else:
         aitem.citecountnote = ""
+        # SHP addition: 
+        aitem.citecountnotelonger = u''
 
     # Citation text with link
     url = best_url(oitem)
@@ -753,6 +923,18 @@ def cite_info(oitem, context):
         aitem.lcite = aitem.cite
     else:
         aitem.lcite = MupLink(url, aitem.cite)
+
+
+    # -----------------------
+    # SHP addition: 
+    # Title with link
+    if url is None:
+        aitem.title_link = aitem.title
+    else:
+        aitem.title_link = MupLink (url, aitem.title)
+
+    # -----------------------
+
 
     # Other links for the web pub list, individually and as an <ul>
     try:
@@ -768,7 +950,7 @@ def cite_info(oitem, context):
 
     if oitem.has("bibcode"):
         aitem.abstract_link = MupLink(
-            "http://adsabs.harvard.edu/abs/" + urlquote(oitem.bibcode), "abstract"
+            "http://ui.adsabs.harvard.edu/abs/" + urlquote(oitem.bibcode), "abstract"
         )
         link_items.append(aitem.abstract_link)
 
