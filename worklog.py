@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 # Copyright 2014-2017 Peter Williams <peter@newton.cx>
 # Licensed under the GNU General Public License, version 3 or higher.
+# Some modifications: Sedona Price 2016-2023 <sedona.price@gmail.com>
 
 """
 Shared routines for my worklog tools.
@@ -687,6 +688,8 @@ def partition_pubs(pubs):
 
 
     groups.first = []
+    groups.contrib = []
+
     groups.firstfew = []
     groups.contribfew = []
     groups.fewsplit = 2 # <= goes to firstfew, > goes to contribfew
@@ -698,7 +701,39 @@ def partition_pubs(pubs):
         formal = pub.get("informal", "n") == "n"
         # we assume refereed implies formal.
 
-        groups.all.append(pub)
+        try:
+            prep = (pub.get ('prep', 'n') == 'y')
+            prepsub = (pub.get ('prepsub', 'n') == 'y')
+        except:
+            prep = False
+            prepsub = False
+
+        first = (pub.mypos == '1')
+        firstfew = (int (pub.mypos) <= groups.fewsplit)
+
+        if ((not prep) & (not prepsub)):
+            groups.all.append (pub)
+
+        if first & (not prep) & (not prepsub) & (refereed | refpreprint):
+            #print "is first"
+            groups.first.append (pub)
+        elif (not first) & (not prep) & (not prepsub) & (refereed | refpreprint):
+            #print "is contrib"
+            groups.contrib.append (pub)
+        elif prep:
+            groups.prep.append (pub)
+        elif prepsub:
+            groups.prepsub.append (pub)
+
+        if firstfew & (not prep) & (not prepsub) & (refereed | refpreprint):
+            #print "is firstfew"
+            groups.firstfew.append (pub)
+        elif (not firstfew) & (not prep) & (not prepsub) & (refereed | refpreprint):
+            #print "is contribfew"
+            groups.contribfew.append (pub)
+
+
+
         if formal:
             groups.all_formal.append(pub)
 
@@ -722,6 +757,14 @@ def partition_pubs(pubs):
     groups.refpreprint_rev = groups.refpreprint[::-1]
     groups.non_refereed_rev = groups.non_refereed[::-1]
     groups.informal_rev = groups.informal[::-1]
+
+    groups.first = groups.first[::-1]
+    groups.contrib = groups.contrib[::-1]
+    
+    groups.firstfew = groups.firstfew[::-1]
+    groups.contribfew = groups.contribfew[::-1]
+
+
     return groups
 
 
