@@ -6,6 +6,9 @@
 """
 Shared routines for my worklog tools.
 """
+# import sys
+# sys.stdout.reconfigure(encoding='utf-8')
+
 
 from __future__ import absolute_import, division, print_function
 from six import string_types, text_type
@@ -2157,54 +2160,54 @@ def get_ads_cite_count(bibcode):
     return count
 
 
-#
-def get_ads_cite_count (bibcode):
+# #
+# def get_ads_cite_count (bibcode):
 
-    import json
-    import requests
-    import os.path
+#     import json
+#     import requests
+#     import os.path
 
-    mod_path = os.path.abspath(os.path.dirname(__file__))
-    token_file = os.path.join(mod_path, "adsabs_token.txt")
-    with open(token_file) as f:
-        token=f.readline()
+#     mod_path = os.path.abspath(os.path.dirname(__file__))
+#     token_file = os.path.join(mod_path, "adsabs_token.txt")
+#     with open(token_file) as f:
+#         token=f.readline()
 
-    #import httplib
-    import http.client
-    #from urllib2 import urlopen, quote, URLError
-    from urllib.request import urlopen
-    from urllib.parse import quote
-    from urllib.error import URLError
-    url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
-    n_cites = None
+#     #import httplib
+#     import http.client
+#     #from urllib2 import urlopen, quote, URLError
+#     from urllib.request import urlopen
+#     from urllib.parse import quote
+#     from urllib.error import URLError
+#     url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
+#     n_cites = None
 
-    if bibcode != '':
-        try:
-            # to pass a dictionary in the request payload, convert it to a string first using the json package
-            bibcode = {"bibcodes":[bibcode]}
-            r = requests.post("https://api.adsabs.harvard.edu/v1/metrics", \
-                             headers={"Authorization": "Bearer " + token, "Content-type": "application/json"}, \
-                             data=json.dumps(bibcode))
-            try:
-                n_cites = r.json()['citation stats']['total number of citations']
-            except:
-                print(r.json())
-                #raise ValueError
-                n_cites = 0
-        except URLError as e:
-            raise ADSCountError (str (e))
+#     if bibcode != '':
+#         try:
+#             # to pass a dictionary in the request payload, convert it to a string first using the json package
+#             bibcode = {"bibcodes":[bibcode]}
+#             r = requests.post("https://api.adsabs.harvard.edu/v1/metrics", \
+#                              headers={"Authorization": "Bearer " + token, "Content-type": "application/json"}, \
+#                              data=json.dumps(bibcode))
+#             try:
+#                 n_cites = r.json()['citation stats']['total number of citations']
+#             except:
+#                 print(r.json())
+#                 #raise ValueError
+#                 n_cites = 0
+#         except URLError as e:
+#             raise ADSCountError (str (e))
 
-        if n_cites is None:
-            raise ADSCountError ('got only empty lines')
+#         if n_cites is None:
+#             raise ADSCountError ('got only empty lines')
 
-        try:
-            count = int (n_cites)
-        except Exception:
-            raise ADSCountError ('got unexpected final line %r', n_cites)
-    else:
-        count = 0
+#         try:
+#             count = int (n_cites)
+#         except Exception:
+#             raise ADSCountError ('got unexpected final line %r', n_cites)
+#     else:
+#         count = 0
 
-    return count
+#     return count
 
 
 
@@ -2218,7 +2221,8 @@ def _write_with_wrapping(outfile, key, value):
     # we assume whitespace is fungible.
 
     if "#" in value:
-        print(('%s = "%s"' % (key, value)).encode("utf-8"), file=outfile)
+        print(('%s = "%s"' % (key, value)).encode("utf-8").decode("utf-8"), 
+               file=outfile)
         return
 
     bits = value.split()
@@ -2235,7 +2239,8 @@ def _write_with_wrapping(outfile, key, value):
                 s = "%s = %s" % (key, " ".join(bits[head:tail]))
             else:
                 s = "  %s" % (" ".join(bits[head:tail]))
-            print(s.encode("utf-8"), file=outfile)
+            # print(s.encode("utf-8"), file=outfile)
+            print(s.encode("utf-8").decode("utf-8"), file=outfile)
             head = tail
             ofs = 1
 
@@ -2246,7 +2251,9 @@ def _write_with_wrapping(outfile, key, value):
     else:
         return
 
-    print(s.encode("utf-8"), file=outfile)
+    # print(s.encode("utf-8").decode("utf-8"))
+    # raise ValueError
+    print(s.encode("utf-8").decode("utf-8"), file=outfile)
 
 
 def _bib_fixup_author(text):
