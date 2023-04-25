@@ -34,7 +34,7 @@ unicode_to_latex_table_base = {
     u"\u0025": r"\%",
     u"\u0026": r"\&",
     u"\u0027": r"'",
-    u"\u002A": r"\textasteriskcentered",
+    u"\u002A": r"*", #r"\textasteriskcentered",
     u"\u005C": r"\textbackslash{}",
     u"\u005E": r"\^{}",
     u"\u005F": r"\_",

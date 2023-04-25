@@ -620,6 +620,21 @@ class MupBoldUnderline (Markup):
     def _markdown (self):
         return self._html()
 
+class MupAsterisk(Markup):
+    def __init__(self, inner):
+        self.inner = _maybe_wrap_text(inner)
+
+    def _latex(self):
+        return ["$^{\dag}$"] + self.inner._latex() + [""]
+        # return ["\\textit{*"] + self.inner._latex() + ["}"]
+
+    def _html(self):
+        return ["<sup>&#8224;</sup>"] + self.inner._html() + [""]
+        # return ["<i>&#8224;"] + self.inner._html() + ["</i>"]
+
+    def _markdown (self):
+        return self._html()
+
 
 class MupUnderline(Markup):
     def __init__(self, inner):
@@ -1038,7 +1053,8 @@ def cite_info(oitem, context):
     advposlist = oitem.get("advpos", "")
     if len(advposlist):
         for i in [int(x) - 1 for x in advposlist.split(",")]:
-            cauths[i] = MupUnderline(cauths[i])
+            # cauths[i] = MupUnderline(cauths[i])
+            cauths[i] = MupAsterisk(cauths[i])
 
     aitem.full_authors = MupJoin(", ", cauths)
 
@@ -1061,7 +1077,8 @@ def cite_info(oitem, context):
 
     if len(advposlist):
         for i in [int(x) - 1 for x in advposlist.split(",")]:
-            sauths[i] = MupUnderline(sauths[i])
+            # sauths[i] = MupUnderline(sauths[i])
+            sauths[i] = MupAsterisk(sauths[i])
 
     # if len(sauths) == 1:
     #     aitem.short_authors = sauths[0]
@@ -1105,7 +1122,8 @@ def cite_info(oitem, context):
 
     if len (advposlist):
         for i in [int (x) - 1 for x in advposlist.split (',')]:
-            sprepauths[i] = MupUnderline (sprepauths[i])
+            # sprepauths[i] = MupUnderline (sprepauths[i])
+            sprepauths[i] = MupAsterisk(sprepauths[i])
 
     # Like canonicalized name scheme instead:
     if len (sprepauths) == 1:

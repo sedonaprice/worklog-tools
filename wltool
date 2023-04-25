@@ -336,6 +336,7 @@ def cli_summarize(argv):
 
 
 _update_minwait = 7 * 24 * 3600  # 1 week
+# _update_minwait = 0
 
 
 def cli_update_cites(argv):
