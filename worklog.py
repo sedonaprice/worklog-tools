@@ -2332,8 +2332,9 @@ def _bib_cite(rec):
     if rec.get("type") == "inproceedings" and "booktitle" in rec and "pages" in rec:
         return "proceedings of “%s”, %s" % (rec["booktitle"], rec["pages"])
 
-    if rec.get("journal") == "ArXiv e-prints" and "eprint" in rec:
-        return "arxiv:" + rec["eprint"]
+    if rec.get("journal") is not None:
+        if rec.get("journal").lower() == "arxiv e-prints" and "eprint" in rec:
+            return "arXiv:" + rec["eprint"]
 
     return None
 
