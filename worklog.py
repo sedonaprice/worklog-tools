@@ -457,11 +457,11 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
 
-            if r"sim" in t:
-                tmp = t.split(r"sim")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"sim" in t:
+            #     tmp = t.split(r"sim")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
             if r"{\tilde}" in t:
                     tmp = t.split(r"{\tilde}")
                     out = r"~".join(tmp)
@@ -546,11 +546,11 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
 
-            if r"sim" in t:
-                tmp = t.split(r"sim")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"sim" in t:
+            #     tmp = t.split(r"sim")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
             if r"{\tilde}" in t:
                     tmp = t.split(r"{\tilde}")
                     out = r"~".join(tmp)
