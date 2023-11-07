@@ -95,7 +95,9 @@ def open_template(stem):
     try:
         return open(join(dirname(__file__), "templates", stem))
     except Exception as e:
-        die('cannot open template "%s": %s (%s)', stem, e, e.__class__.__name__)
+        die(
+            'cannot open template "%s": %s (%s)', stem, e, e.__class__.__name__
+        )
 
 
 def slurp_template(stem):
@@ -209,8 +211,8 @@ class Markup(object):
     def _html(self):
         raise NotImplementedError()
 
-    def _markdown (self):
-        raise NotImplementedError ()
+    def _markdown(self):
+        raise NotImplementedError()
 
     def latex(self):
         return "".join(self._latex())
@@ -218,11 +220,11 @@ class Markup(object):
     def html(self):
         return "".join(self._html())
 
-    def markdown (self):
-        return u''.join (self._markdown ())
+    def markdown(self):
+        return "".join(self._markdown())
 
-    def markdown (self):
-        return u''.join (self._markdown ())
+    def markdown(self):
+        return "".join(self._markdown())
 
 
 def _maybe_wrap_text(thing):
@@ -238,12 +240,12 @@ class MupText(Markup):
     # def _latex(self):
     #     return [unicode_to_latex_string(self.text)]
 
-    def _latex (self):
-        arr = [unicode_to_latex_string (self.text)]
+    def _latex(self):
+        arr = [unicode_to_latex_string(self.text)]
         for i, t in enumerate(arr):
             if "KMOS3D" in t:
                 k3d_orig = "KMOS3D"
-                #k3d = r"KMOS$^{3D}$"
+                # k3d = r"KMOS$^{3D}$"
                 k3d = r"KMOS$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
                 tmp = t.split(k3d_orig)
                 out = k3d.join(tmp)
@@ -251,7 +253,7 @@ class MupText(Markup):
                 t = out
             if "NOEMA3D" in t:
                 k3d_orig = "NOEMA3D"
-                #k3d = r"KMOS$^{3D}$"
+                # k3d = r"KMOS$^{3D}$"
                 k3d = r"NOEMA$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
                 tmp = t.split(k3d_orig)
                 out = k3d.join(tmp)
@@ -298,14 +300,14 @@ class MupText(Markup):
 
             if r"\_\{" in t:
                 tmp = t.split(r"\_\{")
-                out = ''
+                out = ""
                 pre = tmp[0]
                 for j in range(len(tmp)):
-                    if j < len(tmp)-1:
-                        subs = tmp[j+1].split("\}")[0]
-                        out += pre+r"\ensuremath{_{\mathrm{"+subs+r"}}}"
+                    if j < len(tmp) - 1:
+                        subs = tmp[j + 1].split("\}")[0]
+                        out += pre + r"\ensuremath{_{\mathrm{" + subs + r"}}}"
                         try:
-                            pre = "}".join(tmp[j+1].split("\}")[1:])
+                            pre = "}".join(tmp[j + 1].split("\}")[1:])
                         except:
                             pre = ""
                     else:
@@ -324,7 +326,6 @@ class MupText(Markup):
                 out = r"\ensuremath{\sim}".join(tmp)
                 arr[i] = out
                 t = out
-
 
             if "\{sim\}" in t:
                 tmp = t.split("\{sim\}")
@@ -373,16 +374,13 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
 
-
-
         return arr
-
 
     # def _html(self):
     #     return [html_escape(self.text)]
 
-    def _html (self):
-        arr = [html_escape (self.text)]
+    def _html(self):
+        arr = [html_escape(self.text)]
 
         for i, t in enumerate(arr):
             if r"KMOS3D" in t:
@@ -408,16 +406,16 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
             if r"_{" in t:
-                tmp = t.split(r'_{')
-                out = ''
+                tmp = t.split(r"_{")
+                out = ""
                 pre = tmp[0]
                 for j in range(len(tmp)):
-                    if j < len(tmp)-1:
-                        subs = tmp[j+1].split("}")[0]
+                    if j < len(tmp) - 1:
+                        subs = tmp[j + 1].split("}")[0]
                         #''.join(tmp[j+1].split("}"))
-                        out += pre+r"<sub>"+subs+r"</sub>"
+                        out += pre + r"<sub>" + subs + r"</sub>"
                         try:
-                            pre = "}".join(tmp[j+1].split("}")[1:])
+                            pre = "}".join(tmp[j + 1].split("}")[1:])
                         except:
                             pre = ""
                     else:
@@ -428,13 +426,13 @@ class MupText(Markup):
             #
             if r"{\alpha}" in t:
                 tmp = t.split(r"{\alpha}")
-                out = u"\u03B1".join(tmp)
+                out = "\u03B1".join(tmp)
                 arr[i] = out
                 t = out
             #
             if r"{\lesssim}" in t:
                 tmp = t.split(r"{\lesssim}")
-                out = u"\u2272".join(tmp)
+                out = "\u2272".join(tmp)
                 arr[i] = out
                 t = out
                 #
@@ -463,10 +461,10 @@ class MupText(Markup):
             #     arr[i] = out
             #     t = out
             if r"{\tilde}" in t:
-                    tmp = t.split(r"{\tilde}")
-                    out = r"~".join(tmp)
-                    arr[i] = out
-                    t = out
+                tmp = t.split(r"{\tilde}")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
             if r"\tilde" in t:
                 tmp = t.split(r"\tilde")
                 out = r"~".join(tmp)
@@ -497,16 +495,16 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
             if r"_{" in t:
-                tmp = t.split(r'_{')
-                out = ''
+                tmp = t.split(r"_{")
+                out = ""
                 pre = tmp[0]
                 for j in range(len(tmp)):
-                    if j < len(tmp)-1:
-                        subs = tmp[j+1].split("}")[0]
+                    if j < len(tmp) - 1:
+                        subs = tmp[j + 1].split("}")[0]
                         #''.join(tmp[j+1].split("}"))
-                        out += pre+r"<sub>"+subs+r"</sub>"
+                        out += pre + r"<sub>" + subs + r"</sub>"
                         try:
-                            pre = "}".join(tmp[j+1].split("}")[1:])
+                            pre = "}".join(tmp[j + 1].split("}")[1:])
                         except:
                             pre = ""
                     else:
@@ -517,13 +515,13 @@ class MupText(Markup):
             #
             if r"{\alpha}" in t:
                 tmp = t.split(r"{\alpha}")
-                out = u"\u03B1".join(tmp)
+                out = "\u03B1".join(tmp)
                 arr[i] = out
                 t = out
             #
             if r"{\lesssim}" in t:
                 tmp = t.split(r"{\lesssim}")
-                out = u"\u2272".join(tmp)
+                out = "\u2272".join(tmp)
                 arr[i] = out
                 t = out
                 #
@@ -552,28 +550,25 @@ class MupText(Markup):
             #     arr[i] = out
             #     t = out
             if r"{\tilde}" in t:
-                    tmp = t.split(r"{\tilde}")
-                    out = r"~".join(tmp)
-                    arr[i] = out
-                    t = out
+                tmp = t.split(r"{\tilde}")
+                out = r"~".join(tmp)
+                arr[i] = out
+                t = out
             if r"\tilde" in t:
                 tmp = t.split(r"\tilde")
                 out = r"~".join(tmp)
                 arr[i] = out
                 t = out
-
 
             if r"{}" in t:
                 out = "".join(t.split(r"{}"))
                 arr[i] = out
                 t = out
 
-
-
         return arr
-        #return [html_escape (self.text)]
+        # return [html_escape (self.text)]
 
-    def _markdown (self):
+    def _markdown(self):
         return self._html()
 
 
@@ -587,7 +582,7 @@ class MupItalics(Markup):
     def _html(self):
         return ["<i>"] + self.inner._html() + ["</i>"]
 
-    def _markdown (self):
+    def _markdown(self):
         return self._html()
 
 
@@ -601,24 +596,28 @@ class MupBold(Markup):
     def _html(self):
         return ["<b>"] + self.inner._html() + ["</b>"]
 
-    def _markdown (self):
-        return [u'**'] + self.inner._html () + [u'**']
+    def _markdown(self):
+        return ["**"] + self.inner._html() + ["**"]
 
-class MupBoldUnderline (Markup):
-    def __init__ (self, inner):
-        self.inner = _maybe_wrap_text (inner)
 
-    def _latex (self):
-        return [u'\\underline{\\smash{\\textbf{'] + self.inner._latex () + [u'}}}']
+class MupBoldUnderline(Markup):
+    def __init__(self, inner):
+        self.inner = _maybe_wrap_text(inner)
 
-    def _html (self):
-        return [u'<u>'] + [u'<b>'] + self.inner._html () + [u'</b>'] + [u'</u>']
+    def _latex(self):
+        return (
+            ["\\underline{\\smash{\\textbf{"] + self.inner._latex() + ["}}}"]
+        )
 
-    def _markdown (self):
-        return [u'<ins>'] + [u'**'] + self.inner._html () + [u'**'] + [u'</ins>']
+    def _html(self):
+        return ["<u>"] + ["<b>"] + self.inner._html() + ["</b>"] + ["</u>"]
 
-    def _markdown (self):
+    def _markdown(self):
+        return ["<ins>"] + ["**"] + self.inner._html() + ["**"] + ["</ins>"]
+
+    def _markdown(self):
         return self._html()
+
 
 class MupAsterisk(Markup):
     def __init__(self, inner):
@@ -632,7 +631,7 @@ class MupAsterisk(Markup):
         return ["<sup>&#8224;</sup>"] + self.inner._html() + [""]
         # return ["<i>&#8224;"] + self.inner._html() + ["</i>"]
 
-    def _markdown (self):
+    def _markdown(self):
         return self._html()
 
 
@@ -646,8 +645,9 @@ class MupUnderline(Markup):
     def _html(self):
         return ["<u>"] + self.inner._html() + ["</u>"]
 
-    def _markdown (self):
+    def _markdown(self):
         return self._html()
+
 
 class MupLink(Markup):
     def __init__(self, url, inner):
@@ -663,25 +663,34 @@ class MupLink(Markup):
 
     def _html(self):
         return (
-            ['<a href="', html_escape(self.url), '">'] + self.inner._html() + ["</a>"]
+            ['<a href="', html_escape(self.url), '">']
+            + self.inner._html()
+            + ["</a>"]
         )
 
-    def _markdown (self):
-        return ([u'['] + self.inner._html () + [u']'] +
-                [u'(', html_escape(self.url), u')'])
+    def _markdown(self):
+        return (
+            ["["]
+            + self.inner._html()
+            + ["]"]
+            + ["(", html_escape(self.url), ")"]
+        )
 
-class MupBoldUnderline (Markup):
-    def __init__ (self, inner):
-        self.inner = _maybe_wrap_text (inner)
 
-    def _latex (self):
-        return [u'\\underline{\\smash{\\textbf{'] + self.inner._latex () + [u'}}}']
+class MupBoldUnderline(Markup):
+    def __init__(self, inner):
+        self.inner = _maybe_wrap_text(inner)
 
-    def _html (self):
-        return [u'<u>'] + [u'<b>'] + self.inner._html () + [u'</b>'] + [u'</u>']
+    def _latex(self):
+        return (
+            ["\\underline{\\smash{\\textbf{"] + self.inner._latex() + ["}}}"]
+        )
 
-    def _markdown (self):
-        return [u'<ins>'] + [u'**'] + self.inner._html () + [u'**'] + [u'</ins>']
+    def _html(self):
+        return ["<u>"] + ["<b>"] + self.inner._html() + ["</b>"] + ["</u>"]
+
+    def _markdown(self):
+        return ["<ins>"] + ["**"] + self.inner._html() + ["**"] + ["</ins>"]
 
 
 class MupJoin(Markup):
@@ -719,8 +728,8 @@ class MupJoin(Markup):
 
         return result
 
-    def _markdown (self):
-        esep = self.sep._markdown ()
+    def _markdown(self):
+        esep = self.sep._markdown()
         result = []
         first = True
 
@@ -730,36 +739,37 @@ class MupJoin(Markup):
             else:
                 result += esep
 
-            result += i._markdown ()
+            result += i._markdown()
 
         return result
+
 
 # SHP-added
-class MupPrepend (Markup):
-    def __init__ (self, pre, Mup):
-        self.pre = _maybe_wrap_text (pre)
+class MupPrepend(Markup):
+    def __init__(self, pre, Mup):
+        self.pre = _maybe_wrap_text(pre)
         self.Mup = Mup
 
-    def _latex (self):
+    def _latex(self):
         result = []
 
-        result += self.pre._latex ()
-        result += self.Mup._latex ()
+        result += self.pre._latex()
+        result += self.Mup._latex()
 
         return result
 
-    def _html (self):
+    def _html(self):
         result = []
 
-        result += self.pre._html ()
-        result += self.Mup._html ()
+        result += self.pre._html()
+        result += self.Mup._html()
         return result
 
-    def _markdown (self):
+    def _markdown(self):
         result = []
 
-        result += self.pre._markdown ()
-        result += self.Mup._markdown ()
+        result += self.pre._markdown()
+        result += self.Mup._markdown()
         return result
 
 
@@ -803,31 +813,30 @@ class MupList(Markup):
 
         return res
 
-    def _markdown (self):
-
+    def _markdown(self):
         for i in self.items:
             if self.ordered:
-                res.append (u'\n1. ')
+                res.append("\n1. ")
             else:
-                res.append (u'\n+ ')
-            res += i._html ()
+                res.append("\n+ ")
+            res += i._html()
 
-        res.append (u'\n')
+        res.append("\n")
 
         return res
 
-    def _markdown (self):
-
+    def _markdown(self):
         for i in self.items:
             if self.ordered:
-                res.append (u'\n1. ')
+                res.append("\n1. ")
             else:
-                res.append (u'\n+ ')
-            res += i._html ()
+                res.append("\n+ ")
+            res += i._html()
 
-        res.append (u'\n')
+        res.append("\n")
 
         return res
+
 
 def render_latex(value):
     if isinstance(value, int):
@@ -853,33 +862,32 @@ def render_html(value):
     raise ValueError("don't know how to render %r into HTML" % value)
 
 
-def render_markdown (value):
-    if isinstance (value, int):
-        return str (value)
-    if isinstance (value, str):
+def render_markdown(value):
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, str):
         rend = MupText(value)
-        return rend.markdown ()
-    if isinstance (value, bytes):
-        rend = MupText(str (value))
-        return rend.markdown ()
-    if isinstance (value, Markup):
-        return value.markdown ()
-    raise ValueError ('don\'t know how to render %r into MARKDOWN' % value)
+        return rend.markdown()
+    if isinstance(value, bytes):
+        rend = MupText(str(value))
+        return rend.markdown()
+    if isinstance(value, Markup):
+        return value.markdown()
+    raise ValueError("don't know how to render %r into MARKDOWN" % value)
 
 
-def render_markdown (value):
-    if isinstance (value, int):
-        return str (value)
-    if isinstance (value, str):
+def render_markdown(value):
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, str):
         rend = MupText(value)
-        return rend.markdown ()
-    if isinstance (value, bytes):
-        rend = MupText(str (value))
-        return rend.markdown ()
-    if isinstance (value, Markup):
-        return value.markdown ()
-    raise ValueError ('don\'t know how to render %r into MARKDOWN' % value)
-
+        return rend.markdown()
+    if isinstance(value, bytes):
+        rend = MupText(str(value))
+        return rend.markdown()
+    if isinstance(value, Markup):
+        return value.markdown()
+    raise ValueError("don't know how to render %r into MARKDOWN" % value)
 
 
 class Formatter(object):
@@ -931,9 +939,10 @@ class Formatter(object):
             return self.renderer(thing)
         except ValueError as e:
             raise ValueError(
-                ('while rendering field "%s" of item %s: %s' % (text, item, e)).encode(
-                    "utf-8"
-                )
+                (
+                    'while rendering field "%s" of item %s: %s'
+                    % (text, item, e)
+                ).encode("utf-8")
             )
 
     def __call__(self, item):
@@ -980,32 +989,32 @@ def canonicalize_name(name):
 
     for item in rest:
         # for char in item:
-        for j,char in enumerate(item):
+        for j, char in enumerate(item):
             if char.isupper() or char == "-":
                 abbrev.append(char)
-            #Handle uncapitalized hyphenated names:
+            # Handle uncapitalized hyphenated names:
             elif j > 0:
-                if item[j-1] == "-" and (not char.isupper()):
-                    abbrev.append (char) #char.upper())
+                if item[j - 1] == "-" and (not char.isupper()):
+                    abbrev.append(char)  # char.upper())
 
     # return "".join(abbrev) + nbsp + surname
 
     # Join surname, initials:
-    nameout = surname +"," + nbsp + ". ".join (abbrev)+"."
+    nameout = surname + "," + nbsp + ". ".join(abbrev) + "."
 
     # Clean up case of someone having a hyphenated first name:
-    bits = nameout.strip ().split (". -. ")
+    bits = nameout.strip().split(". -. ")
     nameout = ".-".join(bits)
 
     return nameout
 
 
-
 def surname(name):
     return name.strip().split()[-1].replace("_", " ")
 
-def not_surname (name):
-    return " ".join(name.strip ().split ()[:-1]).replace ('_', ' ')
+
+def not_surname(name):
+    return " ".join(name.strip().split()[:-1]).replace("_", " ")
 
 
 def best_url(item):
@@ -1047,8 +1056,8 @@ def cite_info(oitem, context):
         die("illegal mypos value %r" % (oitem.mypos,))
     else:
         myidx = mypos - 1
-    #cauths[myidx] = MupBold (cauths[myidx])
-    cauths[myidx] = MupBoldUnderline (cauths[myidx])
+    # cauths[myidx] = MupBold (cauths[myidx])
+    cauths[myidx] = MupBoldUnderline(cauths[myidx])
 
     advposlist = oitem.get("advpos", "")
     if len(advposlist):
@@ -1063,10 +1072,12 @@ def cite_info(oitem, context):
     if len(cauths) == 1:
         aitem.full_authors_semi = cauths[0]
     if len(cauths) == 2:
-        aitem.full_authors_semi = MupJoin (' & ', cauths)
+        aitem.full_authors_semi = MupJoin(" & ", cauths)
     else:
-        aitem.full_authors_semi = MupJoin('; ', cauths[:-1])
-        aitem.full_authors_semi = MupJoin('; & ', [aitem.full_authors_semi, cauths[-1]])
+        aitem.full_authors_semi = MupJoin("; ", cauths[:-1])
+        aitem.full_authors_semi = MupJoin(
+            "; & ", [aitem.full_authors_semi, cauths[-1]]
+        )
 
     # --------------------------------------------------------------
 
@@ -1091,61 +1102,69 @@ def cite_info(oitem, context):
 
     # --------------------------------------------------------------
     # Like canonicalized name scheme instead:
-    if len (sauths) == 1:
-        aitem.short_authors = cauths[0] #sauths[0]
-    elif len (sauths) == 2:
-        aitem.short_authors = MupJoin (' & ', cauths) #sauths)
-    elif (len (sauths) >= 3) & (len (sauths) <= 5):
-        aitem.short_authors = MupJoin (', ', cauths[:-1]) #sauths)
-        aitem.short_authors = MupJoin(', & ', [aitem.short_authors, cauths[-1]])
+    if len(sauths) == 1:
+        aitem.short_authors = cauths[0]  # sauths[0]
+    elif len(sauths) == 2:
+        aitem.short_authors = MupJoin(" & ", cauths)  # sauths)
+    elif (len(sauths) >= 3) & (len(sauths) <= 5):
+        aitem.short_authors = MupJoin(", ", cauths[:-1])  # sauths)
+        aitem.short_authors = MupJoin(
+            ", & ", [aitem.short_authors, cauths[-1]]
+        )
     else:
-        #aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
-        sauthsstr = MupJoin (', ', cauths[0:3])
-        aitem.short_authors = MupJoin (', ', [sauthsstr, 'et' + nbsp + 'al.'])
+        # aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
+        sauthsstr = MupJoin(", ", cauths[0:3])
+        aitem.short_authors = MupJoin(", ", [sauthsstr, "et" + nbsp + "al."])
 
-
-        if ((context.my_abbrev_name is not None) & (myidx > 2)):
-            #sauths[myidx] = MupBold(sauths[myidx])
-            sauths[myidx] = MupBoldUnderline (sauths[myidx])
+        if (context.my_abbrev_name is not None) & (myidx > 2):
+            # sauths[myidx] = MupBold(sauths[myidx])
+            sauths[myidx] = MupBoldUnderline(sauths[myidx])
             sauthsstr = aitem.short_authors
-            aitem.short_authors = MupJoin (', ', [sauthsstr, 'including '])
+            aitem.short_authors = MupJoin(", ", [sauthsstr, "including "])
             sauthsstr = aitem.short_authors
-            aitem.short_authors = MupJoin (' ', [sauthsstr, sauths[myidx]])
-
+            aitem.short_authors = MupJoin(" ", [sauthsstr, sauths[myidx]])
 
     # --------------------------------------------------------------
 
     # Short list of authors, for IN PREP PUBLICATIONS: possibly abbreviating my name.
-    sprepauths = [surname (a)  for a in oitem.authors.split (';')]
+    sprepauths = [surname(a) for a in oitem.authors.split(";")]
     if context.my_abbrev_name is not None:
         sprepauths[myidx] = context.my_abbrev_name
 
-    if len (advposlist):
-        for i in [int (x) - 1 for x in advposlist.split (',')]:
+    if len(advposlist):
+        for i in [int(x) - 1 for x in advposlist.split(",")]:
             # sprepauths[i] = MupUnderline (sprepauths[i])
             sprepauths[i] = MupAsterisk(sprepauths[i])
 
     # Like canonicalized name scheme instead:
-    if len (sprepauths) == 1:
+    if len(sprepauths) == 1:
         sprepauthsstr = cauths[0]
-        aitem.short_prep_authors =  MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
-    elif len (sprepauths) == 2:
-        sprepauthsstr = MupJoin (', ', cauths[0:2])
-        aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
-    elif (len (sprepauths) >= 3):
-        sprepauthsstr = MupJoin (', ', cauths[0:3])
-        aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'et' + nbsp + 'al.'])
+        aitem.short_prep_authors = MupJoin(
+            ", ", [sprepauthsstr, "et" + nbsp + "al."]
+        )
+    elif len(sprepauths) == 2:
+        sprepauthsstr = MupJoin(", ", cauths[0:2])
+        aitem.short_prep_authors = MupJoin(
+            ", ", [sprepauthsstr, "et" + nbsp + "al."]
+        )
+    elif len(sprepauths) >= 3:
+        sprepauthsstr = MupJoin(", ", cauths[0:3])
+        aitem.short_prep_authors = MupJoin(
+            ", ", [sprepauthsstr, "et" + nbsp + "al."]
+        )
 
-
-        if ((context.my_abbrev_name is not None) & (myidx > 2)):
+        if (context.my_abbrev_name is not None) & (myidx > 2):
             sprepauths[myidx] = MupBold(sprepauths[myidx])
             sprepauthsstr = aitem.short_prep_authors
-            aitem.short_prep_authors = MupJoin (', ', [sprepauthsstr, 'including '])
+            aitem.short_prep_authors = MupJoin(
+                ", ", [sprepauthsstr, "including "]
+            )
             sprepauthsstr = aitem.short_prep_authors
-            aitem.short_prep_authors = MupJoin (' ', [sprepauthsstr, sauths[myidx]])
+            aitem.short_prep_authors = MupJoin(
+                " ", [sprepauthsstr, sauths[myidx]]
+            )
 
     # --------------------------------------------------------------
-
 
     if oitem.refereed == "y":
         aitem.refereed_mark = "»"
@@ -1155,8 +1174,9 @@ def cite_info(oitem, context):
     # # Title with replaced quotes, for nesting in double-quotes, and
     # # optionally-bolded for first authorship.
     # aitem.quotable_title = oitem.title.replace("“", "‘").replace("”", "’")
-    aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
-
+    aitem.quotable_title = MupText(
+        oitem.title.replace("“", "‘").replace("”", "’")
+    )
 
     if myidx == 0:
         aitem.bold_if_first_title = MupBold(oitem.title)
@@ -1171,12 +1191,12 @@ def cite_info(oitem, context):
     citeinfo = parse_ads_cites(oitem)
     if citeinfo is not None and citeinfo.cites > 0:
         aitem.citecountnote = " [%d]" % citeinfo.cites
-        # SHP addition: 
-        aitem.citecountnotelonger = u' [citations: %d]' % citeinfo.cites
+        # SHP addition:
+        aitem.citecountnotelonger = " [citations: %d]" % citeinfo.cites
     else:
         aitem.citecountnote = ""
-        # SHP addition: 
-        aitem.citecountnotelonger = u''
+        # SHP addition:
+        aitem.citecountnotelonger = ""
 
     # Citation text with link
     url = best_url(oitem)
@@ -1185,17 +1205,15 @@ def cite_info(oitem, context):
     else:
         aitem.lcite = MupLink(url, aitem.cite)
 
-
     # -----------------------
-    # SHP addition: 
+    # SHP addition:
     # Title with link
     if url is None:
         aitem.title_link = aitem.title
     else:
-        aitem.title_link = MupLink (url, aitem.title)
+        aitem.title_link = MupLink(url, aitem.title)
 
     # -----------------------
-
 
     # Other links for the web pub list, individually and as an <ul>
     try:
@@ -1211,7 +1229,8 @@ def cite_info(oitem, context):
 
     if oitem.has("bibcode"):
         aitem.abstract_link = MupLink(
-            "http://ui.adsabs.harvard.edu/abs/" + urlquote(oitem.bibcode), "abstract"
+            "http://ui.adsabs.harvard.edu/abs/" + urlquote(oitem.bibcode),
+            "abstract",
         )
         link_items.append(aitem.abstract_link)
 
@@ -1246,15 +1265,26 @@ def compute_cite_stats(pubs):
     stats.reffirstauthcites = 0
     stats.refsecauth = 0
     stats.refsecauthcites = 0
+    stats.pubs = 0
+    stats.cites = 0
+    stats.firstauth = 0
+    stats.firstauthcites = 0
+    stats.secauth = 0
+    stats.secauthcites = 0
     cites = []
     dates = []
 
     for pub in pubs:
+        stats.pubs += 1
+        if int(pub.mypos) == 1:
+            stats.firstauth += 1
+        elif int(pub.mypos) == 2:
+            stats.secauth += 1
         if pub.refereed == "y":
             stats.refpubs += 1
             if int(pub.mypos) == 1:
                 stats.reffirstauth += 1
-            elif int (pub.mypos) == 2:
+            elif int(pub.mypos) == 2:
                 stats.refsecauth += 1
 
         citeinfo = parse_ads_cites(pub)
@@ -1268,11 +1298,17 @@ def compute_cite_stats(pubs):
 
         if pub.refereed == "y":
             stats.refcites += citeinfo.cites
-            
-            if int (pub.mypos) == 1:
+
+            if int(pub.mypos) == 1:
                 stats.reffirstauthcites += citeinfo.cites
-            elif int (pub.mypos) == 2:
+            elif int(pub.mypos) == 2:
                 stats.refsecauthcites += citeinfo.cites
+
+        stats.cites += citeinfo.cites
+        if int(pub.mypos) == 1:
+            stats.firstauthcites += citeinfo.cites
+        elif int(pub.mypos) == 2:
+            stats.secauthcites += citeinfo.cites
 
     if not len(cites):
         stats.meddate = 0
@@ -1292,7 +1328,7 @@ def compute_cite_stats(pubs):
     stats.monthstr = months[stats.month - 1]
     stats.italich = MupItalics("h")
     # stats.adslink = MupLink("http://labs.adsabs.harvard.edu/adsabs", "ADS")
-    stats.adslink = MupLink ("http://ui.adsabs.harvard.edu/", "ADS")
+    stats.adslink = MupLink("http://ui.adsabs.harvard.edu/", "ADS")
     return stats
 
 
@@ -1307,13 +1343,12 @@ def partition_pubs(pubs):
     groups.informal = []
     groups.chapters = []
 
-
     groups.first = []
     groups.contrib = []
 
     groups.firstfew = []
     groups.contribfew = []
-    groups.fewsplit = 2 # <= goes to firstfew, > goes to contribfew
+    groups.fewsplit = 2  # <= goes to firstfew, > goes to contribfew
 
     for pub in pubs:
         refereed = pub.refereed == "y"
@@ -1323,37 +1358,42 @@ def partition_pubs(pubs):
         # we assume refereed implies formal.
 
         try:
-            prep = (pub.get ('prep', 'n') == 'y')
-            prepsub = (pub.get ('prepsub', 'n') == 'y')
+            prep = pub.get("prep", "n") == "y"
+            prepsub = pub.get("prepsub", "n") == "y"
         except:
             prep = False
             prepsub = False
 
-        first = (pub.mypos == '1')
-        firstfew = (int (pub.mypos) <= groups.fewsplit)
+        first = pub.mypos == "1"
+        firstfew = int(pub.mypos) <= groups.fewsplit
 
-        if ((not prep) & (not prepsub)):
-            groups.all.append (pub)
+        if (not prep) & (not prepsub):
+            groups.all.append(pub)
 
         if first & (not prep) & (not prepsub) & (refereed | refpreprint):
-            #print "is first"
-            groups.first.append (pub)
-        elif (not first) & (not prep) & (not prepsub) & (refereed | refpreprint):
-            #print "is contrib"
-            groups.contrib.append (pub)
+            # print "is first"
+            groups.first.append(pub)
+        elif (
+            (not first) & (not prep) & (not prepsub) & (refereed | refpreprint)
+        ):
+            # print "is contrib"
+            groups.contrib.append(pub)
         elif prep:
-            groups.prep.append (pub)
+            groups.prep.append(pub)
         elif prepsub:
-            groups.prepsub.append (pub)
+            groups.prepsub.append(pub)
 
         if firstfew & (not prep) & (not prepsub) & (refereed | refpreprint):
-            #print "is firstfew"
-            groups.firstfew.append (pub)
-        elif (not firstfew) & (not prep) & (not prepsub) & (refereed | refpreprint):
-            #print "is contribfew"
-            groups.contribfew.append (pub)
-
-
+            # print "is firstfew"
+            groups.firstfew.append(pub)
+        elif (
+            (not firstfew)
+            & (not prep)
+            & (not prepsub)
+            & (refereed | refpreprint)
+        ):
+            # print "is contribfew"
+            groups.contribfew.append(pub)
 
         if formal:
             groups.all_formal.append(pub)
@@ -1381,42 +1421,38 @@ def partition_pubs(pubs):
 
     groups.first = groups.first[::-1]
     groups.contrib = groups.contrib[::-1]
-    
+
     groups.firstfew = groups.firstfew[::-1]
     groups.contribfew = groups.contribfew[::-1]
 
-
     return groups
-
 
 
 # -------------------------------
 # SHP added
 
-def compute_team_talks (talks):
 
+def compute_team_talks(talks):
     collabs = {}
 
     for talk in talks:
-
-
         try:
             team = talk.collab
             quantity = 1
             year = talk.year
         except Exception as e:
-            die ('error processing outcome of team talk <%s>: %s', talk, e)
+            die("error processing outcome of team talk <%s>: %s", talk, e)
 
         if team not in collabs:
-            unit = 'talk'
-            meeting_unit = 'meeting'
+            unit = "talk"
+            meeting_unit = "meeting"
             lastyear = year
             collabs[team] = (quantity, unit, meeting_unit, lastyear)
         else:
             q0, unit, meeting_unit, lastyear = collabs[team]
             if q0 >= 1:
-                unit = 'talks'
-                meeting_unit = 'meetings'
+                unit = "talks"
+                meeting_unit = "meetings"
             if year > lastyear:
                 lastyear = year
             collabs[team] = (q0 + quantity, unit, meeting_unit, lastyear)
@@ -1425,10 +1461,20 @@ def compute_team_talks (talks):
     #                     total=unicode (v[0]), lastyear=v[3])
     #                 for (k, v) in collabs.iteritems ()),
     #                     key=lambda h: h.lastyear, reverse=True)
-    return sorted((Holder (collab=k, unit=v[1], collab_meet_unit=v[2],
-                        total=str (v[0]), lastyear=v[3])
-                    for (k, v) in collabs.items ()),
-                        key=lambda h: h.lastyear, reverse=True)
+    return sorted(
+        (
+            Holder(
+                collab=k,
+                unit=v[1],
+                collab_meet_unit=v[2],
+                total=str(v[0]),
+                lastyear=v[3],
+            )
+            for (k, v) in collabs.items()
+        ),
+        key=lambda h: h.lastyear,
+        reverse=True,
+    )
 
 
 # -------------------------------
@@ -1436,37 +1482,40 @@ def compute_team_talks (talks):
 # Utilities for dealing with observing experience
 
 
-def compute_observing_experience (observing):
+def compute_observing_experience(observing):
     allocs = {}
     facil_inst_list = []
 
     for obs in observing:
-
-        amount = obs.get ('time')
+        amount = obs.get("time")
         if amount is None:
-            die ('no "nights" for obs %s', obs)
+            die('no "nights" for obs %s', obs)
 
         try:
             facil = obs.facil
             facil_desc = obs.facil_desc
             inst = obs.inst
-            facil_inst = facil+': '+inst
-            quantity, units = amount.split ()
-            quantity = float (quantity)
+            facil_inst = facil + ": " + inst
+            quantity, units = amount.split()
+            quantity = float(quantity)
         except Exception as e:
-            die ('error processing outcome of obs <%s>: %s', obs, e)
+            die("error processing outcome of obs <%s>: %s", obs, e)
 
         if facil_inst not in allocs:
-                allocs[facil_inst] = (facil, facil_desc, inst, quantity, units)
-                facil_inst_list.append(facil_inst)
+            allocs[facil_inst] = (facil, facil_desc, inst, quantity, units)
+            facil_inst_list.append(facil_inst)
         else:
             facil, facil_desc, inst, q0, u0 = allocs[facil_inst]
             if u0 != units:
-                die ('disagreeing time units for %s: both "%s" and "%s"',
-                     facil_inst, u0, units)
+                die(
+                    'disagreeing time units for %s: both "%s" and "%s"',
+                    facil_inst,
+                    u0,
+                    units,
+                )
             allocs[facil_inst] = (facil, facil_desc, inst, q0 + quantity, u0)
 
-    #print "allocs=", allocs
+    # print "allocs=", allocs
 
     allocs_out = {}
     for facil_inst in facil_inst_list:
@@ -1474,30 +1523,33 @@ def compute_observing_experience (observing):
         if (quantity).is_integer():
             quantity = int(quantity)
 
-        if units == 'nght':
+        if units == "nght":
             if quantity > 1:
-                units = 'nights'
+                units = "nights"
             else:
-                units = 'night'
-
+                units = "night"
 
         if facil not in allocs_out:
-            #inst_list = inst+' ('+unicode(quantity)+' '+units+')'
-            inst_list = inst+' ('+str(quantity)+' '+units+')'
+            # inst_list = inst+' ('+unicode(quantity)+' '+units+')'
+            inst_list = inst + " (" + str(quantity) + " " + units + ")"
             allocs_out[facil] = (facil_desc, inst_list)
         else:
             facil_desc, inst_list = allocs_out[facil]
-            #inst_list_new = inst+' ('+unicode(quantity)+' '+units+')'
-            inst_list_new = inst+' ('+str(quantity)+' '+units+')'
-            allocs_out[facil] = (facil_desc, inst_list+', '+inst_list_new)
-
+            # inst_list_new = inst+' ('+unicode(quantity)+' '+units+')'
+            inst_list_new = inst + " (" + str(quantity) + " " + units + ")"
+            allocs_out[facil] = (facil_desc, inst_list + ", " + inst_list_new)
 
     # return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
     #                 for (k, v) in allocs_out.iteritems ()),
     #                key=lambda h: h.facil)
-    return sorted ((Holder (facil=k, facil_desc=v[0], inst_list=v[1])
-                    for (k, v) in allocs_out.items ()),
-                   key=lambda h: h.facil)
+    return sorted(
+        (
+            Holder(facil=k, facil_desc=v[0], inst_list=v[1])
+            for (k, v) in allocs_out.items()
+        ),
+        key=lambda h: h.facil,
+    )
+
 
 # -------------------------------
 
@@ -1520,7 +1572,11 @@ def compute_time_allocations(props):
             quantity1, units1 = amount.split()
             quantity1 = float(quantity1)
         except Exception as e:
-            die("error processing primary outcome of proposal <%s>: %s", prop, e)
+            die(
+                "error processing primary outcome of proposal <%s>: %s",
+                prop,
+                e,
+            )
 
         yield facil1, quantity1, units1
 
@@ -1537,7 +1593,12 @@ def compute_time_allocations(props):
                 quantity, units, facil = amount.split(None, 2)
                 quantity = float(quantity)
             except Exception as e:
-                die("error processing outcome #%d of proposal <%s>: %s", i, prop, e)
+                die(
+                    "error processing outcome #%d of proposal <%s>: %s",
+                    i,
+                    prop,
+                    e,
+                )
 
             yield facil, quantity, units
             i += 1
@@ -1590,10 +1651,10 @@ def compute_time_allocations(props):
     )
 
 
-
 # Utilities for dealing with proposals:
 
-def prop_info (oitem, context):
+
+def prop_info(oitem, context):
     """Create a Holder with citation text from a publication item. This can then
     be fed into a template however one wants. The various computed fields are
     are Unicode or Markups.
@@ -1602,7 +1663,7 @@ def prop_info (oitem, context):
     `aitem` = augmented item; = oitem + new fields
     """
 
-    aitem = oitem.copy ()
+    aitem = oitem.copy()
     try:
         # Fix name:
         aitem.name = MupText(aitem.name)
@@ -1616,42 +1677,41 @@ def prop_info (oitem, context):
         pass
 
     # Canonicalized authors with bolding of self and underlining of advisees.
-    #pis = [canonicalize_name (a) for a in oitem.PIs.split (',')]
-    pis = [a for a in oitem.PIs.split (',')]
-    aitem.PIs = MupJoin (', ', pis)
+    # pis = [canonicalize_name (a) for a in oitem.PIs.split (',')]
+    pis = [a for a in oitem.PIs.split(",")]
+    aitem.PIs = MupJoin(", ", pis)
     if len(pis) > 1:
-        pis_front = 'PIs: '
+        pis_front = "PIs: "
     else:
-        pis_front = 'PI: '
+        pis_front = "PI: "
     aitem.PIs_str = MupPrepend(pis_front, aitem.PIs)
 
     try:
-        #cois = [canonicalize_name (a) for a in oitem.coIs.split (',')]
-        cois = [a for a in oitem.coIs.split (',')]
-        aitem.coIs = MupJoin (', ', cois)
+        # cois = [canonicalize_name (a) for a in oitem.coIs.split (',')]
+        cois = [a for a in oitem.coIs.split(",")]
+        aitem.coIs = MupJoin(", ", cois)
         if len(cois) > 1:
-            cois_front = 'PIs: '
+            cois_front = "PIs: "
         else:
-            cois_front = 'PI: '
+            cois_front = "PI: "
         aitem.coIs_str = MupPrepend(cois_front, aitem.coIs)
 
     except:
-        aitem.coIs = ''
-        aitem.coIs_str = ''
-
+        aitem.coIs = ""
+        aitem.coIs_str = ""
 
     try:
         # Title with replaced quotes, for nesting in double-quotes, and
         # optionally-bolded for first authorship.
-        aitem.quotable_title = MupText(oitem.title.replace (u'“', u'‘').replace (u'”', u'’'))
-        #words_title = aitem.quotable_title.split(' ')
-        #aitem.quotable_title = MupJoin (' ', words_title)
+        aitem.quotable_title = MupText(
+            oitem.title.replace("“", "‘").replace("”", "’")
+        )
+        # words_title = aitem.quotable_title.split(' ')
+        # aitem.quotable_title = MupJoin (' ', words_title)
     except:
-        aitem.quotable_title = ''
+        aitem.quotable_title = ""
 
     return aitem
-
-
 
 
 # Utilities for dealing with public code repositories
@@ -1676,11 +1736,15 @@ def process_repositories(items):
         repos.append(repo)
 
         if i.service == "github":
-            repo.linkname = MupLink("https://github.com/" + urlquote(i.name), i.name)
+            repo.linkname = MupLink(
+                "https://github.com/" + urlquote(i.name), i.name
+            )
         else:
             repo.linkname = i.name
 
-        repo.commit_frac = "%.0f%%" % (100.0 * int(i.usercommits) / int(i.allcommits))
+        repo.commit_frac = "%.0f%%" % (
+            100.0 * int(i.usercommits) / int(i.allcommits)
+        )
         if repo.commit_frac == "0%":
             repo.commit_frac = "<1%"
 
@@ -1688,7 +1752,9 @@ def process_repositories(items):
             int(x) for x in i.lastusercommit.split("/")
         ]
         repo.date = "%04d %s" % (repo.luc_year, months[repo.luc_month - 1])
-        repo._datekey = repo.luc_year * 10000 + repo.luc_month * 100 + repo.luc_day
+        repo._datekey = (
+            repo.luc_year * 10000 + repo.luc_month * 100 + repo.luc_day
+        )
 
     return sorted(repos, key=lambda r: r._datekey)
 
@@ -1723,7 +1789,9 @@ def summarize_talks(talks):
     info = {}
     info["n_total"] = len(talks)
     info["n_invited"] = len([t for t in talks if t.get("invited", "n") == "y"])
-    info["n_conference"] = len([t for t in talks if t.get("conference", "n") == "y"])
+    info["n_conference"] = len(
+        [t for t in talks if t.get("conference", "n") == "y"]
+    )
     return info
 
 
@@ -1756,10 +1824,12 @@ class MultilineSubstHandler(MultilineHandler):
         tmpl = "\n".join(self.lines)
         return Formatter(context.render, True, tmpl)(self.info)
 
+
 #
-def cmd_cite_stats_tex (context, template):
-    info = compute_cite_stats (context.pubgroups.all_formal)
-    return Formatter (context.render, True, slurp_template (template)) (info)
+def cmd_cite_stats_tex(context, template):
+    info = compute_cite_stats(context.pubgroups.all_formal)
+    return Formatter(context.render, True, slurp_template(template))(info)
+
 
 def cmd_begin_subst(context, group):
     try:
@@ -1779,51 +1849,63 @@ def cmd_format(context, *inline_template):
 
     return ""
 
+
 # ---------------------
 # SHP added
-def cmd_format_alt (context, *inline_template):
-    inline_template = ' '.join (inline_template)
-    context.cur_formatter_alt = Formatter (context.render, True, inline_template)
+def cmd_format_alt(context, *inline_template):
+    inline_template = " ".join(inline_template)
+    context.cur_formatter_alt = Formatter(
+        context.render, True, inline_template
+    )
 
-    if inline_template.strip() == 'None':
+    if inline_template.strip() == "None":
         context.cur_formatter_alt = None
 
-    return ''
+    return ""
 
-def cmd_format_alt_flag_check (context, flag_to_check):
+
+def cmd_format_alt_flag_check(context, flag_to_check):
     context.format_alt_flag_check = flag_to_check
 
-    if flag_to_check.strip() == 'None':
+    if flag_to_check.strip() == "None":
         context.format_alt_flag_check = None
 
-    return ''
+    return ""
 
-def cmd_format_alt2 (context, *inline_template):
-    inline_template = ' '.join (inline_template)
-    context.cur_formatter_alt2 = Formatter (context.render, True, inline_template)
 
-    if inline_template.strip() == 'None':
+def cmd_format_alt2(context, *inline_template):
+    inline_template = " ".join(inline_template)
+    context.cur_formatter_alt2 = Formatter(
+        context.render, True, inline_template
+    )
+
+    if inline_template.strip() == "None":
         context.cur_formatter_alt2 = None
 
-    return ''
+    return ""
 
-def cmd_format_alt2_flag_check (context, flag_to_check):
+
+def cmd_format_alt2_flag_check(context, flag_to_check):
     context.format_alt2_flag_check = flag_to_check
 
-    if flag_to_check.strip() == 'None':
+    if flag_to_check.strip() == "None":
         context.format_alt2_flag_check = None
 
-    return ''
+    return ""
+
 
 #
-def cmd_rev_misc_list_switch (context, sections, gatefield, case):
+def cmd_rev_misc_list_switch(context, sections, gatefield, case):
     """Same a RMISCLIST, but only shows items where a certain item
     is True. XXX: this kind of approach could get out of hand
     quickly."""
-    return _rev_misc_list (context, sections,
-                           lambda i: i.get (gatefield, 'n') == case)
+    return _rev_misc_list(
+        context, sections, lambda i: i.get(gatefield, "n") == case
+    )
+
 
 # ---------------------
+
 
 def cmd_my_abbrev_name(context, *text):
     context.my_abbrev_name = " ".join(text)
@@ -1843,29 +1925,32 @@ def cmd_pub_list(context, group):
         info.rev_number = npubs - num
         yield context.cur_formatter(info)
 
+
 def cmd_obsexp_list(context, sections):
     if context.cur_formatter is None:
-        die ('cannot use OBSEXPLIST command before using FORMAT')
+        die("cannot use OBSEXPLIST command before using FORMAT")
 
     for info in context.obs_exp:
-        yield context.cur_formatter (info)
+        yield context.cur_formatter(info)
 
-def cmd_team_talk_list (context, sections):
+
+def cmd_team_talk_list(context, sections):
     if context.cur_formatter is None:
-        die ('cannot use TEAMTALKLIST command before using FORMAT')
+        die("cannot use TEAMTALKLIST command before using FORMAT")
 
     num = 0
     for info in context.team_talks_counts:
         num += 1
 
-    #num = 2
-    for i,info in enumerate(context.team_talks_counts):
-        if i < num-1:
-            end=';'
+    # num = 2
+    for i, info in enumerate(context.team_talks_counts):
+        if i < num - 1:
+            end = ";"
         else:
-            end=''
+            end = ""
         info.end = end
-        yield context.cur_formatter (info)
+        yield context.cur_formatter(info)
+
 
 def cmd_talloc_list(context):
     if context.cur_formatter is None:
@@ -1905,49 +1990,54 @@ def cmd_split_talloc_list(context, *split_template):
 #             continue
 #         yield context.cur_formatter(item)
 
-def cmd_team_talk_list (context, sections):
+
+def cmd_team_talk_list(context, sections):
     if context.cur_formatter is None:
-        die ('cannot use TEAMTALKLIST command before using FORMAT')
+        die("cannot use TEAMTALKLIST command before using FORMAT")
 
     num = 0
     for info in context.team_talks_counts:
         num += 1
 
-    #num = 2
-    for i,info in enumerate(context.team_talks_counts):
-        if i < num-1:
-            end=';'
+    # num = 2
+    for i, info in enumerate(context.team_talks_counts):
+        if i < num - 1:
+            end = ";"
         else:
-            end=''
+            end = ""
         info.end = end
-        yield context.cur_formatter (info)
+        yield context.cur_formatter(info)
 
 
-def _rev_misc_list (context, sections, gate):
+def _rev_misc_list(context, sections, gate):
     if context.cur_formatter is None:
-        die ('cannot use RMISCLIST* command before using FORMAT')
+        die("cannot use RMISCLIST* command before using FORMAT")
 
-    sections = frozenset (sections.split (','))
+    sections = frozenset(sections.split(","))
 
     for item in context.items[::-1]:
         if item.section not in sections:
             continue
-        if not gate (item):
+        if not gate(item):
             continue
 
         if context.format_alt_flag_check is not None:
-            if item.__dict__[context.format_alt_flag_check].strip() == '':
-                yield context.cur_formatter_alt (item)
+            if item.__dict__[context.format_alt_flag_check].strip() == "":
+                yield context.cur_formatter_alt(item)
             else:
                 if context.format_alt2_flag_check is not None:
-                    if item.__dict__[context.format_alt2_flag_check].strip() == '':
-                        yield context.cur_formatter_alt2 (item)
+                    if (
+                        item.__dict__[context.format_alt2_flag_check].strip()
+                        == ""
+                    ):
+                        yield context.cur_formatter_alt2(item)
                     else:
-                        yield context.cur_formatter (item)
+                        yield context.cur_formatter(item)
                 else:
-                    yield context.cur_formatter (item)
+                    yield context.cur_formatter(item)
         else:
-            yield context.cur_formatter (item)
+            yield context.cur_formatter(item)
+
 
 def cmd_rev_misc_list(context, sections):
     return _rev_misc_list(context, sections, lambda i: True)
@@ -1957,11 +2047,15 @@ def cmd_rev_misc_list_if(context, sections, gatefield):
     """Same a RMISCLIST, but only shows items where a certain item
     is True. XXX: this kind of approach could get out of hand
     quickly."""
-    return _rev_misc_list(context, sections, lambda i: i.get(gatefield, "n") == "y")
+    return _rev_misc_list(
+        context, sections, lambda i: i.get(gatefield, "n") == "y"
+    )
 
 
 def cmd_rev_misc_list_if_not(context, sections, gatefield):
-    return _rev_misc_list(context, sections, lambda i: i.get(gatefield, "n") != "y")
+    return _rev_misc_list(
+        context, sections, lambda i: i.get(gatefield, "n") != "y"
+    )
 
 
 def cmd_rev_repo_list(context, sections):
@@ -1975,42 +2069,49 @@ def cmd_rev_repo_list(context, sections):
             continue
         yield context.cur_formatter(item)
 
-#
-def cmd_rev_prop_list (context, sections):
-    return _rev_prop_list (context, sections, lambda i: True)
 
-def cmd_rev_prop_list_if (context, sections, gatefield):
+#
+def cmd_rev_prop_list(context, sections):
+    return _rev_prop_list(context, sections, lambda i: True)
+
+
+def cmd_rev_prop_list_if(context, sections, gatefield):
     """Same a PROPLIST, but only shows items where a certain item
     is True. XXX: this kind of approach could get out of hand
     quickly."""
-    return _rev_prop_list (context, sections,
-                           lambda i: i.get (gatefield, 'n') == 'y')
+    return _rev_prop_list(
+        context, sections, lambda i: i.get(gatefield, "n") == "y"
+    )
 
-def cmd_rev_prop_list_if_not (context, sections, gatefield):
-    return _rev_prop_list (context, sections,
-                           lambda i: i.get (gatefield, 'n') != 'y')
 
-def _rev_prop_list (context, sections, gate):
+def cmd_rev_prop_list_if_not(context, sections, gatefield):
+    return _rev_prop_list(
+        context, sections, lambda i: i.get(gatefield, "n") != "y"
+    )
+
+
+def _rev_prop_list(context, sections, gate):
     if context.cur_formatter is None:
-        die ('cannot use PROPLIST* command before using FORMAT')
+        die("cannot use PROPLIST* command before using FORMAT")
 
-    sections = frozenset (sections.split (','))
+    sections = frozenset(sections.split(","))
 
     for item in context.items[::-1]:
         if item.section not in sections:
             continue
-        if not gate (item):
+        if not gate(item):
             continue
 
-        info = prop_info (item, context)
+        info = prop_info(item, context)
 
         if context.format_alt_flag_check is not None:
-            if item.__dict__[context.format_alt_flag_check].strip() == '':
-                yield context.cur_formatter_alt (info)
+            if item.__dict__[context.format_alt_flag_check].strip() == "":
+                yield context.cur_formatter_alt(info)
             else:
-                yield context.cur_formatter (info)
+                yield context.cur_formatter(info)
         else:
-            yield context.cur_formatter (info)
+            yield context.cur_formatter(info)
+
 
 def cmd_today(context):
     """Note the trailing period in the output."""
@@ -2021,24 +2122,26 @@ def cmd_today(context):
     text = "%s%s%d,%s%d." % (months[mo - 1], nbsp, dy, nbsp, yr)
     return context.render(text)
 
+
 # SHP addition
-def cmd_today_invert (context):
+def cmd_today_invert(context):
     """No trailing period in the output, DD MM YYYY"""
     from time import time, localtime
 
     # This is a little bit gross.
-    yr, mo, dy = localtime (time ())[:3]
-    text = '%d %s %d' % (dy, months[mo - 1], yr)
-    return context.render (text)
+    yr, mo, dy = localtime(time())[:3]
+    text = "%d %s %d" % (dy, months[mo - 1], yr)
+    return context.render(text)
 
-def cmd_today_invert (context):
+
+def cmd_today_invert(context):
     """No trailing period in the output, DD MM YYYY"""
     from time import time, localtime
 
     # This is a little bit gross.
-    yr, mo, dy = localtime (time ())[:3]
-    text = '%d %s %d' % (dy, months[mo - 1], yr)
-    return context.render (text)
+    yr, mo, dy = localtime(time())[:3]
+    text = "%d %s %d" % (dy, months[mo - 1], yr)
+    return context.render(text)
 
 
 def setup_processing(render, datadir):
@@ -2068,19 +2171,21 @@ def setup_processing(render, datadir):
 
     # ------------------------
     # SHP additions:
-    context.team_talks = [i for i in context.items if ((i.section == 'talk') & \
-                    (i.get ('venue', 'n') == 'team'))]
-    context.team_talks_counts = compute_team_talks (context.team_talks)
+    context.team_talks = [
+        i
+        for i in context.items
+        if ((i.section == "talk") & (i.get("venue", "n") == "team"))
+    ]
+    context.team_talks_counts = compute_team_talks(context.team_talks)
 
-    context.observing = [i for i in context.items if i.section == 'obs']
-    context.obs_exp = compute_observing_experience (context.observing)
+    context.observing = [i for i in context.items if i.section == "obs"]
+    context.obs_exp = compute_observing_experience(context.observing)
 
     context.cur_formatter_alt = None
     context.format_alt_flag_check = None
     context.cur_formatter_alt2 = None
     context.format_alt2_flag_check = None
     # ------------------------
-
 
     commands = {}
     commands["BEGIN_SUBST"] = cmd_begin_subst
@@ -2090,7 +2195,6 @@ def setup_processing(render, datadir):
     commands["TALLOCLIST"] = cmd_talloc_list
     commands["SPLIT_TALLOCLIST"] = cmd_split_talloc_list
 
-
     commands["RMISCLIST"] = cmd_rev_misc_list
     commands["RMISCLIST_IF"] = cmd_rev_misc_list_if
     commands["RMISCLIST_IF_NOT"] = cmd_rev_misc_list_if_not
@@ -2098,17 +2202,17 @@ def setup_processing(render, datadir):
     commands["TODAY."] = cmd_today
 
     # SHP additions
-    commands['FORMAT_ALT'] = cmd_format_alt
-    commands['FORMAT_ALT_FLAG_CHECK'] = cmd_format_alt_flag_check
-    commands['FORMAT_ALT2'] = cmd_format_alt2
-    commands['FORMAT_ALT2_FLAG_CHECK'] = cmd_format_alt2_flag_check
-    commands['RMISCLIST_CASE'] = cmd_rev_misc_list_switch
+    commands["FORMAT_ALT"] = cmd_format_alt
+    commands["FORMAT_ALT_FLAG_CHECK"] = cmd_format_alt_flag_check
+    commands["FORMAT_ALT2"] = cmd_format_alt2
+    commands["FORMAT_ALT2_FLAG_CHECK"] = cmd_format_alt2_flag_check
+    commands["RMISCLIST_CASE"] = cmd_rev_misc_list_switch
     commands["OBSEXPLIST"] = cmd_obsexp_list
     commands["TEAMTALKLIST"] = cmd_team_talk_list
     commands["PROPLIST"] = cmd_rev_prop_list
     commands["PROPLIST_IF"] = cmd_rev_prop_list_if
     commands["PROPLIST_IF_NOT"] = cmd_rev_prop_list_if_not
-    commands['TODAY'] = cmd_today_invert
+    commands["TODAY"] = cmd_today_invert
 
     return context, commands
 
@@ -2161,13 +2265,15 @@ def get_ads_cite_count(bibcode):
     structured = json.loads(resp.text)
 
     if "Error" in structured:
-        raise ADSCountError(structured.get("Error Info", "unknown ADS API error"))
+        raise ADSCountError(
+            structured.get("Error Info", "unknown ADS API error")
+        )
 
     # NB, the "citation stats refereed" structure is all zeros for items that
     # are not themselves refereed.
     d = structured.get("citation stats", {})
 
-    #count = d.get("total number of refereed citations")
+    # count = d.get("total number of refereed citations")
     count = d.get("total number of citations")
 
     if count is None:
@@ -2228,9 +2334,6 @@ def get_ads_cite_count(bibcode):
 #     return count
 
 
-
-
-
 # Bootstrapping from a BibTeX file. This is currently aimed 100% at
 # ADS-generated BibTeX; it'd be nice to make it more general.
 
@@ -2239,8 +2342,10 @@ def _write_with_wrapping(outfile, key, value):
     # we assume whitespace is fungible.
 
     if "#" in value:
-        print(('%s = "%s"' % (key, value)).encode("utf-8").decode("utf-8"), 
-               file=outfile)
+        print(
+            ('%s = "%s"' % (key, value)).encode("utf-8").decode("utf-8"),
+            file=outfile,
+        )
         return
 
     bits = value.split()
@@ -2295,9 +2400,20 @@ def _bib_fixup_author(text):
 #     "dec": "12",
 # }
 
-_bib_months = {'january': '01', 'february': '02', 'march': '03', 'april': '04',
-               'may': '05',  'june': '06',  'july': '07',  'august': '08',
-               'september': '09',  'october': '10',  'november': '11',  'december': '12'}
+_bib_months = {
+    "january": "01",
+    "february": "02",
+    "march": "03",
+    "april": "04",
+    "may": "05",
+    "june": "06",
+    "july": "07",
+    "august": "08",
+    "september": "09",
+    "october": "10",
+    "november": "11",
+    "december": "12",
+}
 
 
 # _bib_journals = {
@@ -2315,11 +2431,18 @@ _bib_months = {'january': '01', 'february': '02', 'march': '03', 'april': '04',
 # _bib_journals = {'\\aap': r'A&Ap', '\\aa': r'A&A', '\\aj': 'AJ', '\\apj': 'ApJ',
 #                  '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': r'ARA&A',
 #                  '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
-_bib_journals_preprocess = {'\\aap': '\\anap', '\\aa': '\\ana' }
-_bib_journals = {'\\anap': r'A&Ap', '\\ana': r'A&A', '\\aj': 'AJ', '\\apj': 'ApJ',
-                 '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': r'ARA&A',
-                 '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
-
+_bib_journals_preprocess = {"\\aap": "\\anap", "\\aa": "\\ana"}
+_bib_journals = {
+    "\\anap": r"A&Ap",
+    "\\ana": r"A&A",
+    "\\aj": "AJ",
+    "\\apj": "ApJ",
+    "\\apjl": "ApJL",
+    "\\apjs": "ApJS",
+    "\\araa": r"ARA&A",
+    "\\mnras": "MNRAS",
+    "\\pasa": "PASA",
+}
 
 
 def _bib_cite(rec):
@@ -2329,7 +2452,11 @@ def _bib_cite(rec):
     if "series" in rec and "volume" in rec and "pages" in rec:
         return " ".join((rec["series"], rec["volume"], rec["pages"]))
 
-    if rec.get("type") == "inproceedings" and "booktitle" in rec and "pages" in rec:
+    if (
+        rec.get("type") == "inproceedings"
+        and "booktitle" in rec
+        and "pages" in rec
+    ):
         return "proceedings of “%s”, %s" % (rec["booktitle"], rec["pages"])
 
     if rec.get("journal") is not None:
@@ -2369,50 +2496,55 @@ class BibCustomizer(object):
         #     rec['journal'] = _bib_journals_preprocess.get (rec['journal'].lower (),
         #                                         rec['journal'])
 
-
         # rec = author(rec)
-
 
         # ----------------------------------------
         # Solving problem where it first searches for \l vs \lambda, and so on:
         # Include the full set of matches, and then
         # invert to check for longest matches first
         bibtexparser.latexenc.unicode_to_crappy_latex1 = (
-              *bibtexparser.latexenc.unicode_to_latex, *bibtexparser.latexenc.unicode_to_crappy_latex1
-                )
-        bibtexparser.latexenc.unicode_to_crappy_latex1=sorted(bibtexparser.latexenc.unicode_to_crappy_latex1,
-                    key=lambda x: len(x[1]), reverse=True)
+            *bibtexparser.latexenc.unicode_to_latex,
+            *bibtexparser.latexenc.unicode_to_crappy_latex1,
+        )
+        bibtexparser.latexenc.unicode_to_crappy_latex1 = sorted(
+            bibtexparser.latexenc.unicode_to_crappy_latex1,
+            key=lambda x: len(x[1]),
+            reverse=True,
+        )
 
         # First strip ensuremaths, and the really dumb ADS "\raisebox{-0.5ex}\textasciitilde":
-        for key in rec.keys ():
-            val = rec.get (key)
-            val = (val
-                   .replace ('\\ensuremath', "")
-                   .replace ("\\raisebox{-0.5ex}\\textasciitilde", "\\sim")
-                   .replace ("\raisebox{-0.5ex}\textasciitilde", "\\sim"))
+        for key in rec.keys():
+            val = rec.get(key)
+            val = (
+                val.replace("\\ensuremath", "")
+                .replace("\\raisebox{-0.5ex}\\textasciitilde", "\\sim")
+                .replace("\raisebox{-0.5ex}\textasciitilde", "\\sim")
+            )
             rec[key] = val
 
         # Hack for journals with \aa* standard abbreviations
-        if 'journal' in rec:
-            rec['journal'] = _bib_journals_preprocess.get (rec['journal'].lower (),
-                                                rec['journal'])
+        if "journal" in rec:
+            rec["journal"] = _bib_journals_preprocess.get(
+                rec["journal"].lower(), rec["journal"]
+            )
 
+        rec = type(convert_to_unicode(rec))
 
-        rec = type (convert_to_unicode (rec))
-
-        for key in rec.keys ():
-            val = rec.get (key)
-            val = (val
-                   .replace ('{\\nbsp}', nbsp)
-                   .replace ('``', u'“')
-                   .replace ("''", u'”'))
+        for key in rec.keys():
+            val = rec.get(key)
+            val = (
+                val.replace("{\\nbsp}", nbsp)
+                .replace("``", "“")
+                .replace("''", "”")
+            )
             rec[key] = val
 
-        if 'journal' in rec:
-            rec['journal'] = _bib_journals.get (rec['journal'].lower (),
-                                                rec['journal'])
+        if "journal" in rec:
+            rec["journal"] = _bib_journals.get(
+                rec["journal"].lower(), rec["journal"]
+            )
 
-        rec = author (rec)
+        rec = author(rec)
 
         # ----------------------------------------
 
@@ -2428,26 +2560,27 @@ class BibCustomizer(object):
 
                 # -------------
 
-                surname, rest = text.split (',', 1)
+                surname, rest = text.split(",", 1)
                 last = surname.strip()
                 firsts = [i.strip() for i in rest.split()]
-                if last.lower () == self.mylsurname:
-                    #rec['wl_mypos'] = unicode (idx + 1)
-                    rec['wl_mypos'] = str (idx + 1)
-                    
+                if last.lower() == self.mylsurname:
+                    # rec['wl_mypos'] = unicode (idx + 1)
+                    rec["wl_mypos"] = str(idx + 1)
+
                 # Clean up names:
-                if last in ['jnr', 'jr', 'junior']:
+                if last in ["jnr", "jr", "junior"]:
                     last = firsts.pop()
                 for item in firsts:
-                    if item in ['ben', 'van', 'der', 'de', 'la', 'le']:
-                        last = firsts.pop() + ' ' + last
-                    elif (item in ['Forster', 'Förster', 'Foerster']) and (last == 'Schreiber'):
+                    if item in ["ben", "van", "der", "de", "la", "le"]:
+                        last = firsts.pop() + " " + last
+                    elif (item in ["Forster", "Förster", "Foerster"]) and (
+                        last == "Schreiber"
+                    ):
                         # NMFS exception
                         _ = firsts.pop()
-                        last = 'Förster ' + last
+                        last = "Förster " + last
 
                 # -------------
-
 
                 newauths.append(rest + " " + surname.replace(" ", "_"))
 
@@ -2464,74 +2597,92 @@ def bootstrap_bibtex(bibfile, outdir, mysurname):
 
     import bibtexparser
     from bibtexparser.bparser import BibTexParser
-    #bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
 
-    bp = BibTexParser (common_strings = True, customization=BibCustomizer (mysurname))
+    # bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
+
+    bp = BibTexParser(
+        common_strings=True, customization=BibCustomizer(mysurname)
+    )
     bdb = bibtexparser.load(bibfile, parser=bp)
 
     bp_entries = bdb.entries
 
     byyear = {}
 
-    #bp_entries = bp.get_entry_list ()
-    #for rec in bp.get_entry_list ():
+    # bp_entries = bp.get_entry_list ()
+    # for rec in bp.get_entry_list ():
     for rec in bp_entries[::-1]:
         # print(rec.keys())
         # raise ValueError
 
-        year = rec.get ('year', 'noyear')
+        year = rec.get("year", "noyear")
 
         if year in byyear:
             outfile = byyear[year]
         else:
-            outfile = open (os.path.join (outdir, year + 'p.txt'), 'w')
+            outfile = open(os.path.join(outdir, year + "p.txt"), "w")
             byyear[year] = outfile
             # print >>outfile, '# -*- conf -*-'
             # print >>outfile, '# XXX for all records, refereed status is guessed crudely'
-            print('# -*- conf -*-', file=outfile)
-            print('# XXX for all records, refereed status is guessed crudely', file=outfile)
-        #print >>outfile, '\n[pub]'
-        print('\n[pub]', file=outfile)
+            print("# -*- conf -*-", file=outfile)
+            print(
+                "# XXX for all records, refereed status is guessed crudely",
+                file=outfile,
+            )
+        # print >>outfile, '\n[pub]'
+        print("\n[pub]", file=outfile)
 
-        if 'title' in rec:
-            _write_with_wrapping (outfile, 'title', rec['title'])
+        if "title" in rec:
+            _write_with_wrapping(outfile, "title", rec["title"])
         else:
-            #print >>outfile, 'title = ? # XXX no title for this record'
-            print('title = ? # XXX no title for this record', file=outfile)
+            # print >>outfile, 'title = ? # XXX no title for this record'
+            print("title = ? # XXX no title for this record", file=outfile)
 
-        if 'author' in rec:
-            _write_with_wrapping (outfile, 'authors', rec['author'])
+        if "author" in rec:
+            _write_with_wrapping(outfile, "authors", rec["author"])
         else:
-            #print >>outfile, 'authors = ? # XXX no authors for this record'
-            print('authors = ? # XXX no authors for this record', file=outfile)
+            # print >>outfile, 'authors = ? # XXX no authors for this record'
+            print("authors = ? # XXX no authors for this record", file=outfile)
 
-        if 'wl_mypos' in rec:
-            _write_with_wrapping (outfile, 'mypos', rec['wl_mypos'])
+        if "wl_mypos" in rec:
+            _write_with_wrapping(outfile, "mypos", rec["wl_mypos"])
         else:
-            #print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
-            print('mypos = 0 # XXX cannot determine "mypos" for this record', file=outfile)
+            # print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
+            print(
+                'mypos = 0 # XXX cannot determine "mypos" for this record',
+                file=outfile,
+            )
 
-        if 'year' in rec and 'month' in rec:
-            _write_with_wrapping (outfile, 'pubdate',
-                                  rec['year'] + '/' +
-                                  _bib_months.get (rec['month'].lower (),
-                                                   rec['month']))
-        elif 'year' in rec:
-            #print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
-            print('pubdate = %s/01 # XXX actual month unknown' % rec['year'], file=outfile)
+        if "year" in rec and "month" in rec:
+            _write_with_wrapping(
+                outfile,
+                "pubdate",
+                rec["year"]
+                + "/"
+                + _bib_months.get(rec["month"].lower(), rec["month"]),
+            )
+        elif "year" in rec:
+            # print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
+            print(
+                "pubdate = %s/01 # XXX actual month unknown" % rec["year"],
+                file=outfile,
+            )
         else:
-            #print >>outfile, 'pubdate = ? # XXX no year and month for this record'
-            print('pubdate = ? # XXX no year and month for this record', file=outfile)
+            # print >>outfile, 'pubdate = ? # XXX no year and month for this record'
+            print(
+                "pubdate = ? # XXX no year and month for this record",
+                file=outfile,
+            )
 
-        #if 'id' in rec:
-        if 'ID' in rec:
-            _write_with_wrapping (outfile, 'bibcode', rec['ID'])
+        # if 'id' in rec:
+        if "ID" in rec:
+            _write_with_wrapping(outfile, "bibcode", rec["ID"])
 
-        if 'eprint' in rec:
-            _write_with_wrapping (outfile, 'arxiv', rec['eprint'])
+        if "eprint" in rec:
+            _write_with_wrapping(outfile, "arxiv", rec["eprint"])
 
-        if 'doi' in rec:
-            _write_with_wrapping (outfile, 'doi', rec['doi'])
+        if "doi" in rec:
+            _write_with_wrapping(outfile, "doi", rec["doi"])
 
         # refereed = 'journal' in rec
         # if 'journal' in rec:
@@ -2539,33 +2690,34 @@ def bootstrap_bibtex(bibfile, outdir, mysurname):
         # #print >>outfile, 'refereed = %s' % 'ny'[refereed]
         # print('refereed = %s' % 'ny'[refereed], file=outfile)
 
-
-        refereed = 'journal' in rec
-        if 'journal' in rec:
-            notarxiv = ((rec.get ('journal').lower() != u'arxiv e-prints') & \
-                    (rec.get ('journal').lower() != u'none') )
+        refereed = "journal" in rec
+        if "journal" in rec:
+            notarxiv = (rec.get("journal").lower() != "arxiv e-prints") & (
+                rec.get("journal").lower() != "none"
+            )
             if notarxiv:
-                print('refereed = %s' % 'ny'[refereed], file=outfile)
+                print("refereed = %s" % "ny"[refereed], file=outfile)
             else:
-                print('refereed = n', file=outfile)
-                print('refpreprint = y', file=outfile)
+                print("refereed = n", file=outfile)
+                print("refpreprint = y", file=outfile)
         else:
-            print('refereed = %s' % 'ny'[refereed], file=outfile)
+            print("refereed = %s" % "ny"[refereed], file=outfile)
 
-        cite = _bib_cite (rec)
+        cite = _bib_cite(rec)
 
         if cite is not None:
-            _write_with_wrapping (outfile, 'cite', cite)
+            _write_with_wrapping(outfile, "cite", cite)
         else:
-            #print >>outfile, 'cite = ? # XXX cannot infer citation text'
-            print('cite = ? # XXX cannot infer citation text', file=outfile)
+            # print >>outfile, 'cite = ? # XXX cannot infer citation text'
+            print("cite = ? # XXX cannot infer citation text", file=outfile)
 
-    #for f in byyear.itervalues ():
+    # for f in byyear.itervalues ():
     for f in iter(byyear.values()):
-        f.close ()
+        f.close()
+
 
 #
-def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
+def bootstrap_bibtex_alphabetical(bibfile, outdir, mysurname):
     import os.path
 
     # XXX we assume heavily that we're dealing with ADS bibtex.
@@ -2605,21 +2757,28 @@ def bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname):
             _write_with_wrapping(outfile, "mypos", rec["wl_mypos"])
         else:
             print(
-                'mypos = 0 # XXX cannot determine "mypos" for this record', file=outfile
+                'mypos = 0 # XXX cannot determine "mypos" for this record',
+                file=outfile,
             )
 
         if "year" in rec and "month" in rec:
             _write_with_wrapping(
                 outfile,
                 "pubdate",
-                rec["year"] + "/" + _bib_months.get(rec["month"].lower(), rec["month"]),
+                rec["year"]
+                + "/"
+                + _bib_months.get(rec["month"].lower(), rec["month"]),
             )
         elif "year" in rec:
             print(
-                "pubdate = %s/01 # XXX actual month unknown" % rec["year"], file=outfile
+                "pubdate = %s/01 # XXX actual month unknown" % rec["year"],
+                file=outfile,
             )
         else:
-            print("pubdate = ? # XXX no year and month for this record", file=outfile)
+            print(
+                "pubdate = ? # XXX no year and month for this record",
+                file=outfile,
+            )
 
         if "id" in rec:
             _write_with_wrapping(outfile, "bibcode", rec["id"])
