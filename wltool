@@ -70,42 +70,48 @@ def cli_bootstrap_bibtex(argv):
     with open(bibpath) as bibfile:
         bootstrap_bibtex(bibfile, outdir, mysurname)
 
+
 #
-def cli_bootstrap_bibtex_alphabetical (argv):
+def cli_bootstrap_bibtex_alphabetical(argv):
     """usage: wltool bootstrap-bibtex-alphabetical <bibtex-file> <your-surname> <output-dir>
 
-Create a new set of worklog files, seeding them with publication information
-gathered from from <bibtex-file>. Specify <your-surname> to assist in guessing
-of the "mypos" field (your position in the author list). The output directory
-<output-dir> must not exist when you run the program; this is to avoid
-accidental overwriting of existing files.
+    Create a new set of worklog files, seeding them with publication information
+    gathered from from <bibtex-file>. Specify <your-surname> to assist in guessing
+    of the "mypos" field (your position in the author list). The output directory
+    <output-dir> must not exist when you run the program; this is to avoid
+    accidental overwriting of existing files.
 
-Search the output files for "XXX" to find issues that need manual attention.
+    Search the output files for "XXX" to find issues that need manual attention.
 
-WARNING: the current implementation assumes that the file is one from ADS.
-Parsing files from other origins will probably fail."""
+    WARNING: the current implementation assumes that the file is one from ADS.
+    Parsing files from other origins will probably fail."""
 
     import os.path
 
     # note: we'll leave the output directory lying around if we die. I figure
     # that could be helpful for debugging.
 
-    if len (argv) != 4 or '--help' in argv:
+    if len(argv) != 4 or "--help" in argv:
         print(cli_bootstrap_bibtex_alphabetical.__doc__)
-        raise SystemExit (1)
+        raise SystemExit(1)
 
     bibpath = argv[1]
     mysurname = argv[2]
     outdir = argv[3]
 
     try:
-        os.mkdir (outdir)
+        os.mkdir(outdir)
     except Exception as e:
-        die ('cannot create output directory "%s": %s (%s)', outdir,
-             e, e.__class__.__name__)
+        die(
+            'cannot create output directory "%s": %s (%s)',
+            outdir,
+            e,
+            e.__class__.__name__,
+        )
 
-    with open (bibpath) as bibfile:
-        bootstrap_bibtex_alphabetical (bibfile, outdir, mysurname)
+    with open(bibpath) as bibfile:
+        bootstrap_bibtex_alphabetical(bibfile, outdir, mysurname)
+
 
 def cli_extract(argv):
     """usage: wltool extract <section-name> [datadir]
@@ -113,7 +119,8 @@ def cli_extract(argv):
     Print out all records with the given section name. If not specified, the data
     directory is assumed to be the current directory.
 
-    See the README.md that came with this package for more detailed information."""
+    See the README.md that came with this package for more detailed information.
+    """
 
     from inifile import write
     import sys
@@ -272,7 +279,8 @@ def _cli_render(argv):
     If not specified, the data directory is assumed to be the current
     directory.
 
-    See the README.md that came with this package for more detailed information."""
+    See the README.md that came with this package for more detailed information.
+    """
 
     fmtname = argv[0]
 
@@ -291,7 +299,7 @@ def _cli_render(argv):
         render = render_latex
     elif fmtname == "html":
         render = render_html
-    elif fmtname == 'markdown':
+    elif fmtname == "markdown":
         render = render_markdown
     else:
         die('unknown output format "%s"', fmtname)
@@ -307,13 +315,15 @@ cli_latex = _cli_render
 cli_html = _cli_render
 cli_markdown = _cli_render
 
+
 def cli_summarize(argv):
     """usage: wltool summarize [datadir]
 
     Print out a summary of the different kinds of records in the log file. If not
     specified, the data directory is assumed to be the current directory.
 
-    See the README.md that came with this package for more detailed information."""
+    See the README.md that came with this package for more detailed information.
+    """
 
     if len(argv) not in (1, 2) or "--help" in argv:
         print(cli_summarize.__doc__)
@@ -335,8 +345,8 @@ def cli_summarize(argv):
         print("% *s: %d" % (maxsectlen, section, count))
 
 
-_update_minwait = 7 * 24 * 3600  # 1 week
-# _update_minwait = 0
+# _update_minwait = 7 * 24 * 3600  # 1 week
+_update_minwait = 0
 
 
 def cli_update_cites(argv):
@@ -345,7 +355,8 @@ def cli_update_cites(argv):
     Fetch citation counts from NASA ADS and insert them into the log files.
     Prints out a summary of new citations by bibcode.
 
-    See the README.md that came with this package for more detailed information."""
+    See the README.md that came with this package for more detailed information.
+    """
 
     if len(argv) not in (1, 2) or "--help" in argv:
         print(cli_update_cites.__doc__)

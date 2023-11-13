@@ -1271,6 +1271,8 @@ def compute_cite_stats(pubs):
     stats.firstauthcites = 0
     stats.secauth = 0
     stats.secauthcites = 0
+    stats.contribauth = 0
+    stats.contribauthcites = 0
     cites = []
     dates = []
 
@@ -1280,6 +1282,8 @@ def compute_cite_stats(pubs):
             stats.firstauth += 1
         elif int(pub.mypos) == 2:
             stats.secauth += 1
+        else:
+            stats.contribauth += 1
         if pub.refereed == "y":
             stats.refpubs += 1
             if int(pub.mypos) == 1:
@@ -1309,6 +1313,8 @@ def compute_cite_stats(pubs):
             stats.firstauthcites += citeinfo.cites
         elif int(pub.mypos) == 2:
             stats.secauthcites += citeinfo.cites
+        else:
+            stats.contribauthcites += citeinfo.cites
 
     if not len(cites):
         stats.meddate = 0
