@@ -12,7 +12,14 @@ Shared routines for my worklog tools.
 
 from __future__ import absolute_import, division, print_function
 from six import string_types, text_type
-from six.moves import map, range, zip
+from six.moves import map, range
+
+# Infrastructure
+
+from inifile import Holder
+
+from unicode_to_latex import unicode_to_latex_string
+
 
 __all__ = str(
     """
@@ -26,7 +33,7 @@ slurp_template
 process_template
 list_data_files
 load
-unicode_to_latex
+unicode_to_latex_string
 html_escape
 Markup
 MupText
@@ -55,11 +62,6 @@ bootstrap_bibtex"""
 
 nbsp = "\u00a0"
 months = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
-
-
-# Infrastructure
-
-from inifile import Holder
 
 
 def die(fmt, *args):
@@ -188,8 +190,6 @@ def load(datadir="."):
 # worrisome, and some constructs just don't work well in that model (e.g.
 # tables). So we do this silliness instead.
 
-from unicode_to_latex import unicode_to_latex, unicode_to_latex_string
-
 
 def html_escape(text):
     """Escape special characters for our dumb subset of HTML."""
@@ -219,9 +219,6 @@ class Markup(object):
 
     def html(self):
         return "".join(self._html())
-
-    def markdown(self):
-        return "".join(self._markdown())
 
     def markdown(self):
         return "".join(self._markdown())
@@ -376,9 +373,6 @@ class MupText(Markup):
 
         return arr
 
-    # def _html(self):
-    #     return [html_escape(self.text)]
-
     def _html(self):
         arr = [html_escape(self.text)]
 
@@ -412,11 +406,11 @@ class MupText(Markup):
                 for j in range(len(tmp)):
                     if j < len(tmp) - 1:
                         subs = tmp[j + 1].split("}")[0]
-                        #''.join(tmp[j+1].split("}"))
+                        # ''.join(tmp[j+1].split("}"))
                         out += pre + r"<sub>" + subs + r"</sub>"
                         try:
                             pre = "}".join(tmp[j + 1].split("}")[1:])
-                        except:
+                        except ValueError:
                             pre = ""
                     else:
                         out += pre
@@ -429,14 +423,13 @@ class MupText(Markup):
                 out = "\u03B1".join(tmp)
                 arr[i] = out
                 t = out
-            #
+
             if r"{\lesssim}" in t:
                 tmp = t.split(r"{\lesssim}")
                 out = "\u2272".join(tmp)
                 arr[i] = out
                 t = out
-                #
-            #
+
             if r"--" in t:
                 tmp = t.split(r"--")
                 out = r"-".join(tmp)
@@ -455,11 +448,6 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
 
-            # if r"sim" in t:
-            #     tmp = t.split(r"sim")
-            #     out = r"~".join(tmp)
-            #     arr[i] = out
-            #     t = out
             if r"{\tilde}" in t:
                 tmp = t.split(r"{\tilde}")
                 out = r"~".join(tmp)
@@ -501,31 +489,29 @@ class MupText(Markup):
                 for j in range(len(tmp)):
                     if j < len(tmp) - 1:
                         subs = tmp[j + 1].split("}")[0]
-                        #''.join(tmp[j+1].split("}"))
+                        # ''.join(tmp[j+1].split("}"))
                         out += pre + r"<sub>" + subs + r"</sub>"
                         try:
                             pre = "}".join(tmp[j + 1].split("}")[1:])
-                        except:
+                        except ValueError:
                             pre = ""
                     else:
                         out += pre
                 arr[i] = out
                 t = out
-            #
-            #
+
             if r"{\alpha}" in t:
                 tmp = t.split(r"{\alpha}")
                 out = "\u03B1".join(tmp)
                 arr[i] = out
                 t = out
-            #
+
             if r"{\lesssim}" in t:
                 tmp = t.split(r"{\lesssim}")
                 out = "\u2272".join(tmp)
                 arr[i] = out
                 t = out
-                #
-            #
+
             if r"--" in t:
                 tmp = t.split(r"--")
                 out = r"-".join(tmp)
@@ -544,11 +530,6 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
 
-            # if r"sim" in t:
-            #     tmp = t.split(r"sim")
-            #     out = r"~".join(tmp)
-            #     arr[i] = out
-            #     t = out
             if r"{\tilde}" in t:
                 tmp = t.split(r"{\tilde}")
                 out = r"~".join(tmp)
@@ -566,7 +547,6 @@ class MupText(Markup):
                 t = out
 
         return arr
-        # return [html_escape (self.text)]
 
     def _markdown(self):
         return self._html()
@@ -615,8 +595,8 @@ class MupBoldUnderline(Markup):
     def _markdown(self):
         return ["<ins>"] + ["**"] + self.inner._html() + ["**"] + ["</ins>"]
 
-    def _markdown(self):
-        return self._html()
+    # def _markdown(self):
+    #     return self._html()
 
 
 class MupAsterisk(Markup):
@@ -625,11 +605,9 @@ class MupAsterisk(Markup):
 
     def _latex(self):
         return ["$^{\dag}$"] + self.inner._latex() + [""]
-        # return ["\\textit{*"] + self.inner._latex() + ["}"]
 
     def _html(self):
         return ["<sup>&#8224;</sup>"] + self.inner._html() + [""]
-        # return ["<i>&#8224;"] + self.inner._html() + ["</i>"]
 
     def _markdown(self):
         return self._html()
@@ -677,20 +655,20 @@ class MupLink(Markup):
         )
 
 
-class MupBoldUnderline(Markup):
-    def __init__(self, inner):
-        self.inner = _maybe_wrap_text(inner)
+# class MupBoldUnderline(Markup):
+#     def __init__(self, inner):
+#         self.inner = _maybe_wrap_text(inner)
 
-    def _latex(self):
-        return (
-            ["\\underline{\\smash{\\textbf{"] + self.inner._latex() + ["}}}"]
-        )
+#     def _latex(self):
+#         return (
+#             ["\\underline{\\smash{\\textbf{"] + self.inner._latex() + ["}}}"]
+#         )
 
-    def _html(self):
-        return ["<u>"] + ["<b>"] + self.inner._html() + ["</b>"] + ["</u>"]
+#     def _html(self):
+#         return ["<u>"] + ["<b>"] + self.inner._html() + ["</b>"] + ["</u>"]
 
-    def _markdown(self):
-        return ["<ins>"] + ["**"] + self.inner._html() + ["**"] + ["</ins>"]
+#     def _markdown(self):
+#         return ["<ins>"] + ["**"] + self.inner._html() + ["**"] + ["</ins>"]
 
 
 class MupJoin(Markup):
@@ -814,18 +792,7 @@ class MupList(Markup):
         return res
 
     def _markdown(self):
-        for i in self.items:
-            if self.ordered:
-                res.append("\n1. ")
-            else:
-                res.append("\n+ ")
-            res += i._html()
-
-        res.append("\n")
-
-        return res
-
-    def _markdown(self):
+        res = []
         for i in self.items:
             if self.ordered:
                 res.append("\n1. ")
@@ -860,20 +827,6 @@ def render_html(value):
     if isinstance(value, Markup):
         return value.html()
     raise ValueError("don't know how to render %r into HTML" % value)
-
-
-def render_markdown(value):
-    if isinstance(value, int):
-        return str(value)
-    if isinstance(value, str):
-        rend = MupText(value)
-        return rend.markdown()
-    if isinstance(value, bytes):
-        rend = MupText(str(value))
-        return rend.markdown()
-    if isinstance(value, Markup):
-        return value.markdown()
-    raise ValueError("don't know how to render %r into MARKDOWN" % value)
 
 
 def render_markdown(value):
@@ -971,9 +924,9 @@ def parse_ads_cites(pub):
 
 
 def canonicalize_name(name):
-    """Convert a name into "canonical" form, by which I mean something like "PKG
-    Williams". The returned string uses a nonbreaking space between the two
-    pieces.
+    """Convert a name into "canonical" form, by which I mean something like
+    "PKG Williams". The returned string uses a nonbreaking space between the
+    two pieces.
 
     I handle spaces in surnames by replacing them with underscores. Hopefully
     none of my coauthors will ever have an underscore in their names.
@@ -1036,8 +989,8 @@ def best_url(item):
 
 
 def cite_info(oitem, context):
-    """Create a Holder with citation text from a publication item. This can then
-    be fed into a template however one wants. The various computed fields are
+    """Create a Holder with citation text from a publication item. This can
+    then be fed into a template however one wants. The various computed fields
     are Unicode or Markups.
 
     `oitem` = original item; not to be modified
@@ -1126,7 +1079,8 @@ def cite_info(oitem, context):
 
     # --------------------------------------------------------------
 
-    # Short list of authors, for IN PREP PUBLICATIONS: possibly abbreviating my name.
+    # Short list of authors, for IN PREP PUBLICATIONS: possibly abbreviating
+    # my name.
     sprepauths = [surname(a) for a in oitem.authors.split(";")]
     if context.my_abbrev_name is not None:
         sprepauths[myidx] = context.my_abbrev_name
@@ -1366,7 +1320,7 @@ def partition_pubs(pubs):
         try:
             prep = pub.get("prep", "n") == "y"
             prepsub = pub.get("prepsub", "n") == "y"
-        except:
+        except ValueError:
             prep = False
             prepsub = False
 
@@ -1661,8 +1615,8 @@ def compute_time_allocations(props):
 
 
 def prop_info(oitem, context):
-    """Create a Holder with citation text from a publication item. This can then
-    be fed into a template however one wants. The various computed fields are
+    """Create a Holder with citation text from a publication item. This can
+    then be fed into a template however one wants. The various computed fields
     are Unicode or Markups.
 
     `oitem` = original item; not to be modified
@@ -1673,13 +1627,13 @@ def prop_info(oitem, context):
     try:
         # Fix name:
         aitem.name = MupText(aitem.name)
-    except:
+    except AttributeError:
         pass
 
     try:
         # Fix propIDs:
         aitem.propID = MupText(aitem.propID)
-    except:
+    except AttributeError:
         pass
 
     # Canonicalized authors with bolding of self and underlining of advisees.
@@ -1702,7 +1656,7 @@ def prop_info(oitem, context):
             cois_front = "PI: "
         aitem.coIs_str = MupPrepend(cois_front, aitem.coIs)
 
-    except:
+    except AttributeError:
         aitem.coIs = ""
         aitem.coIs_str = ""
 
@@ -1714,7 +1668,7 @@ def prop_info(oitem, context):
         )
         # words_title = aitem.quotable_title.split(' ')
         # aitem.quotable_title = MupJoin (' ', words_title)
-    except:
+    except AttributeError:
         aitem.quotable_title = ""
 
     return aitem
@@ -1806,7 +1760,10 @@ def summarize_talks(talks):
 
 def summarize_engagement(items):
     info = {}
-    count = lambda c: len([i for i in items if i.get("class", "?") == c])
+    # count = lambda c: len([i for i in items if i.get("class", "?") == c])
+
+    def count(c):
+        return len([i for i in items if i.get("class", "?") == c])
 
     info["n_interviews"] = count("interview")
     info["n_outreach_events"] = count("outreach_event")
@@ -1983,38 +1940,6 @@ def cmd_split_talloc_list(context, *split_template):
         yield context.cur_formatter(info)
 
 
-# def _rev_misc_list(context, sections, gate):
-#     if context.cur_formatter is None:
-#         die("cannot use RMISCLIST* command before using FORMAT")
-
-#     sections = frozenset(sections.split(","))
-
-#     for item in context.items[::-1]:
-#         if item.section not in sections:
-#             continue
-#         if not gate(item):
-#             continue
-#         yield context.cur_formatter(item)
-
-
-def cmd_team_talk_list(context, sections):
-    if context.cur_formatter is None:
-        die("cannot use TEAMTALKLIST command before using FORMAT")
-
-    num = 0
-    for info in context.team_talks_counts:
-        num += 1
-
-    # num = 2
-    for i, info in enumerate(context.team_talks_counts):
-        if i < num - 1:
-            end = ";"
-        else:
-            end = ""
-        info.end = end
-        yield context.cur_formatter(info)
-
-
 def _rev_misc_list(context, sections, gate):
     if context.cur_formatter is None:
         die("cannot use RMISCLIST* command before using FORMAT")
@@ -2076,7 +2001,6 @@ def cmd_rev_repo_list(context, sections):
         yield context.cur_formatter(item)
 
 
-#
 def cmd_rev_prop_list(context, sections):
     return _rev_prop_list(context, sections, lambda i: True)
 
@@ -2130,16 +2054,6 @@ def cmd_today(context):
 
 
 # SHP addition
-def cmd_today_invert(context):
-    """No trailing period in the output, DD MM YYYY"""
-    from time import time, localtime
-
-    # This is a little bit gross.
-    yr, mo, dy = localtime(time())[:3]
-    text = "%d %s %d" % (dy, months[mo - 1], yr)
-    return context.render(text)
-
-
 def cmd_today_invert(context):
     """No trailing period in the output, DD MM YYYY"""
     from time import time, localtime
@@ -2284,60 +2198,11 @@ def get_ads_cite_count(bibcode):
 
     if count is None:
         raise ADSCountError(
-            "ADS Metrics API response does not include expected citation metric"
+            "ADS Metrics API response does not include expected "
+            "citation metric"
         )
 
     return count
-
-
-# #
-# def get_ads_cite_count (bibcode):
-
-#     import json
-#     import requests
-#     import os.path
-
-#     mod_path = os.path.abspath(os.path.dirname(__file__))
-#     token_file = os.path.join(mod_path, "adsabs_token.txt")
-#     with open(token_file) as f:
-#         token=f.readline()
-
-#     #import httplib
-#     import http.client
-#     #from urllib2 import urlopen, quote, URLError
-#     from urllib.request import urlopen
-#     from urllib.parse import quote
-#     from urllib.error import URLError
-#     url = _ads_url_tmpl % {'bibcode': quote (bibcode)}
-#     n_cites = None
-
-#     if bibcode != '':
-#         try:
-#             # to pass a dictionary in the request payload, convert it to a string first using the json package
-#             bibcode = {"bibcodes":[bibcode]}
-#             r = requests.post("https://api.adsabs.harvard.edu/v1/metrics", \
-#                              headers={"Authorization": "Bearer " + token, "Content-type": "application/json"}, \
-#                              data=json.dumps(bibcode))
-#             try:
-#                 n_cites = r.json()['citation stats']['total number of citations']
-#             except:
-#                 print(r.json())
-#                 #raise ValueError
-#                 n_cites = 0
-#         except URLError as e:
-#             raise ADSCountError (str (e))
-
-#         if n_cites is None:
-#             raise ADSCountError ('got only empty lines')
-
-#         try:
-#             count = int (n_cites)
-#         except Exception:
-#             raise ADSCountError ('got unexpected final line %r', n_cites)
-#     else:
-#         count = 0
-
-#     return count
 
 
 # Bootstrapping from a BibTeX file. This is currently aimed 100% at
@@ -2434,9 +2299,9 @@ _bib_months = {
 # }
 
 
-# _bib_journals = {'\\aap': r'A&Ap', '\\aa': r'A&A', '\\aj': 'AJ', '\\apj': 'ApJ',
-#                  '\\apjl': 'ApJL', '\\apjs': 'ApJS', '\\araa': r'ARA&A',
-#                  '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
+# _bib_journals = {'\\aap': r'A&Ap', '\\aa': r'A&A', '\\aj': 'AJ',
+#                  '\\apj': 'ApJ', '\\apjl': 'ApJL', '\\apjs': 'ApJS',
+#                  '\\araa': r'ARA&A', '\\mnras': 'MNRAS', '\\pasa': 'PASA'}
 _bib_journals_preprocess = {"\\aap": "\\anap", "\\aa": "\\ana"}
 _bib_journals = {
     "\\anap": r"A&Ap",
@@ -2487,7 +2352,9 @@ class BibCustomizer(object):
 
         # for key in list(rec.keys()):
         #     val = rec.get(key)
-        #     val = val.replace("{\\nbsp}", nbsp).replace("``", "“").replace("''", "”")
+        #     val = val.replace(
+        #               "{\\nbsp}", nbsp
+        #           ).replace("``", "“").replace("''", "”")
         #     val = (val
         #            .replace ('\\ensuremath', "")
         #            .replace ("\\raisebox{-0.5ex}\\textasciitilde", "\\sim")
@@ -2495,12 +2362,16 @@ class BibCustomizer(object):
         #     rec[key] = val
 
         # # if "journal" in rec:
-        # #     rec["journal"] = _bib_journals.get(rec["journal"].lower(), rec["journal"])
+        # #     rec["journal"] = _bib_journals.get(
+        #              rec["journal"].lower(), rec["journal"]
+        #               )
 
         # # Hack for journals with \aa* standard abbreviations
         # if 'journal' in rec:
-        #     rec['journal'] = _bib_journals_preprocess.get (rec['journal'].lower (),
-        #                                         rec['journal'])
+        #     rec['journal'] = _bib_journals_preprocess.get (
+        #                   rec['journal'].lower (),
+        #                   rec['journal']
+        #               )
 
         # rec = author(rec)
 
@@ -2518,7 +2389,8 @@ class BibCustomizer(object):
             reverse=True,
         )
 
-        # First strip ensuremaths, and the really dumb ADS "\raisebox{-0.5ex}\textasciitilde":
+        # First strip ensuremaths, and the really dumb ADS
+        # "\raisebox{-0.5ex}\textasciitilde":
         for key in rec.keys():
             val = rec.get(key)
             val = (
@@ -2628,32 +2500,26 @@ def bootstrap_bibtex(bibfile, outdir, mysurname):
         else:
             outfile = open(os.path.join(outdir, year + "p.txt"), "w")
             byyear[year] = outfile
-            # print >>outfile, '# -*- conf -*-'
-            # print >>outfile, '# XXX for all records, refereed status is guessed crudely'
             print("# -*- conf -*-", file=outfile)
             print(
                 "# XXX for all records, refereed status is guessed crudely",
                 file=outfile,
             )
-        # print >>outfile, '\n[pub]'
         print("\n[pub]", file=outfile)
 
         if "title" in rec:
             _write_with_wrapping(outfile, "title", rec["title"])
         else:
-            # print >>outfile, 'title = ? # XXX no title for this record'
             print("title = ? # XXX no title for this record", file=outfile)
 
         if "author" in rec:
             _write_with_wrapping(outfile, "authors", rec["author"])
         else:
-            # print >>outfile, 'authors = ? # XXX no authors for this record'
             print("authors = ? # XXX no authors for this record", file=outfile)
 
         if "wl_mypos" in rec:
             _write_with_wrapping(outfile, "mypos", rec["wl_mypos"])
         else:
-            # print >>outfile, 'mypos = 0 # XXX cannot determine "mypos" for this record'
             print(
                 'mypos = 0 # XXX cannot determine "mypos" for this record',
                 file=outfile,
@@ -2668,13 +2534,11 @@ def bootstrap_bibtex(bibfile, outdir, mysurname):
                 + _bib_months.get(rec["month"].lower(), rec["month"]),
             )
         elif "year" in rec:
-            # print >>outfile, 'pubdate = %s/01 # XXX actual month unknown' % rec['year']
             print(
                 "pubdate = %s/01 # XXX actual month unknown" % rec["year"],
                 file=outfile,
             )
         else:
-            # print >>outfile, 'pubdate = ? # XXX no year and month for this record'
             print(
                 "pubdate = ? # XXX no year and month for this record",
                 file=outfile,
@@ -2689,12 +2553,6 @@ def bootstrap_bibtex(bibfile, outdir, mysurname):
 
         if "doi" in rec:
             _write_with_wrapping(outfile, "doi", rec["doi"])
-
-        # refereed = 'journal' in rec
-        # if 'journal' in rec:
-        #     print(rec['journal'])
-        # #print >>outfile, 'refereed = %s' % 'ny'[refereed]
-        # print('refereed = %s' % 'ny'[refereed], file=outfile)
 
         refereed = "journal" in rec
         if "journal" in rec:
