@@ -1,0 +1,97 @@
+# -*- conf -*-
+
+
+[talk]
+date = 2015 Feb
+year = 2015
+month = Feb
+where = MOSDEF collaboration meeting
+place = Riverside, CA
+meeting_title = #
+type = Talk
+what = Gas kinematics and masses with MOSDEF
+invited = n
+extra = #
+collab = MOSDEF
+venue = team  # conf, sem, team
+
+[talk]
+date = 2015 Aug
+year = 2015
+month = Aug
+where = IAU Symposium 319
+place = Honololu, HI, USA
+meeting_title = Galaxies at High Redshift and Their Evolution over Cosmic Time
+what = The MOSDEF Survey: Masses and Kinematic Structures of Star-Forming Galaxies at 1.4≤z≤2.6
+type = Talk
+invited = n
+extra = #
+venue = conf  # conf, sem, team
+
+
+
+[talk]
+date = 2015 Sep
+year = 2015
+month = Sep
+where = MOSDEF collaboration meeting
+place = Riverside, CA, USA
+meeting_title = #
+type = Talk
+what = The MOSDEF Survey: Masses and Kinematic Structures of Star-Forming Galaxies at 1.4≤z≤2.6
+invited = n
+extra = #
+collab = MOSDEF
+venue = team  # conf, sem, team
+
+
+[talk]
+date = 2015 Nov
+year = 2015
+month = Nov
+type = Lunch talk
+where = UC Berkeley
+place = CA, USA
+what = The MOSDEF Survey: Masses and Kinematic Structures of Star-Forming Galaxies at 1.4≤z≤2.6
+meeting_title = #
+invited = n
+extra = #
+venue = sem  # conf, sem, team
+
+
+
+[obs]
+date = 2015/04/29
+pi = Alice Shapley / MOSDEF
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = MOSFIRE
+time = 3 nght
+
+[obs]
+date = 2015/12/31
+pi = Koo
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = MOSFIRE
+time = 0.5 nght
+
+[obs]
+date = 2015/12/31
+pi = Shapley / MOSDEF
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = MOSFIRE
+time = 0.5 nght
+
+
+
+
+
+
+#############################
+[collab]
+name = MOSDEF
+what = MOSFIRE Deep Evolution Field Survey, Keck Large Multi-Year Project
+PIs = A.E. Shapley, A.L. Coil, M. Kriek, B. Mobasher, N.A. Reddy, B. Siana
+#PIs = A.L. Coil, M. Kriek, B. Mobasher, N.A. Reddy, A.E. Shapley, B. Siana

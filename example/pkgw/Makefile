@@ -2,11 +2,11 @@
 
 # Basic settings
 
-toolsdir = ~/software_public/worklog-tools
+toolsdir = ..
 
 # `make` targets are:
 #
-#        all - the default; create {shprice-cv,shprice-pubs}.{pdf,html}
+#        all - the default; create {cv,pubs}.{pdf,html}
 #    summary - summarize entries
 # update-ads - update ADS citation counts
 #      clean - delete generated files
@@ -17,17 +17,20 @@ driver = $(toolsdir)/wltool
 infos = $(wildcard *.txt)
 
 # Rules:
-all: cv.pdf pubs.pdf pubs.html
 
-pubs.tex: $(driver) pubs.tmpl.tex $(infos)
-	python $< latex  pubs.tmpl.tex >$@.new && mv -f $@.new $@
+all: cv.pdf pubs.pdf cv.html pubs.html
 
 cv.tex: $(driver) cv.tmpl.tex $(infos)
-	python $< latex  cv.tmpl.tex >$@.new && mv -f $@.new $@
+	python $< latex cv.tmpl.tex >$@.new && mv -f $@.new $@
+
+pubs.tex: $(driver) pubs.tmpl.tex $(infos)
+	python $< latex pubs.tmpl.tex >$@.new && mv -f $@.new $@
+
+cv.html: $(driver) cv.tmpl.html $(infos)
+	python $< html cv.tmpl.html >$@.new && mv -f $@.new $@
 
 pubs.html: $(driver) pubs.tmpl.html $(infos)
 	python $< html pubs.tmpl.html >$@.new && mv -f $@.new $@
-
 
 summary: $(infos)
 	python $(driver) summarize
@@ -35,11 +38,8 @@ summary: $(infos)
 update-ads:
 	python $(driver) update-cites
 
-clean-tmp:
-	-rm -f *.aux *.log *.log2 *.out
-
 clean:
-	-rm -f *.aux *.log *.log2 *.out pubs.html cv.pdf cv.tex pubs.pdf pubs.tex
+	-rm -f *.aux *.log *.log2 *.out cv.html cv.pdf cv.tex pubs.html pubs.pdf pubs.tex
 
 %.pdf: %.tex
 	@echo + making $@ -- error messages are in $*.log2 if anything goes wrong

@@ -1,0 +1,319 @@
+
+
+
+
+##############################################
+# Jobs
+
+
+##############################################
+# Service
+
+
+
+
+[service]
+date = 2023 Sep
+what = Discussion leader
+what_desc = Astro group NSF GRFP application session
+where = University of Pittsburgh 
+
+[service]
+date = 2023-present
+what = Pittsburgh AstroLunch co-organizer
+what_desc = #
+where = University of Pittsburgh
+
+
+
+
+
+
+##############################################
+# Publications
+
+
+
+[pub]
+title = RC100: Rotation Curves of 100 Massive Star-forming Galaxies at z = 0.6-2.5
+  Reveal Little Dark Matter on Galactic Scales
+authors = A. Nestor_Shachar; S. H. Price; N. M. Förster_Schreiber; R. Genzel; T.
+  T. Shimizu; L. J. Tacconi; H. Übler; A. Burkert; R. I. Davies; A. Dekel; R. Herrera-Camus;
+  L. L. Lee; D. Liu; D. Lutz; T. Naab; R. Neri; A. Renzini; R. Saglia; K. F. Schuster;
+  A. Sternberg; E. Wisnioski; S. Wuyts
+mypos = 2
+advpos = 1
+pubdate = 2023/02
+bibcode = 2023ApJ...944...78N
+arxiv = 2209.12199
+doi = 10.3847/1538-4357/aca9cf
+refereed = y
+cite = ApJ 944 78
+adscites = 2023/11/15 6
+
+
+
+
+[pub]
+title = UNCOVER spectroscopy confirms a surprising ubiquity of AGN in red galaxies
+  at $z>5$
+authors = Jenny E. Greene; Ivo Labbe; Andy D. Goulding; Lukas J. Furtak; Iryna Chemerynska;
+  Vasily Kokorev; Pratika Dayal; Christina C. Williams; Bingjie Wang; David J. Setton;
+  Adam J. Burgasser; Rachel Bezanson; Hakim Atek; Gabriel Brammer; Sam E. Cutler;
+  Robert Feldmann; Seiji Fujimoto; Karl Glazebrook; Anna de_Graaff; Joel Leja; Danilo
+  Marchesini; Michael V. Maseda; Jorryt Matthee; Tim B. Miller; Rohan P. Naidu;
+  Themiya Nanayakkara; Pascal A. Oesch; Richard Pan; Casey Papovich; Sedona H. Price;
+  Pieter van_Dokkum; John R. Weaver; Katherine E. Whitaker; Adi Zitrin
+mypos = 30
+pubdate = 2023/09
+bibcode = 2023arXiv230905714G
+arxiv = 2309.05714
+doi = 10.48550/arXiv.2309.05714
+refereed = n
+refpreprint = y
+cite = arXiv:2309.05714
+adscites = 2023/11/15 10
+
+[pub]
+title = DUALZ -- Deep UNCOVER-ALMA Legacy High-$Z$ Survey
+authors = Seiji Fujimoto; Rachel Bezanson; Ivo Labbe; Gabriel Brammer; Sedona H.
+  Price; Bingjie Wang; John R. Weaver; Yoshinobu Fudamoto; Pascal A. Oesch; Christina
+  C. Williams; Pratika Dayal; Robert Feldmann; Jenny E. Greene; Joel Leja; Katherine
+  E. Whitaker; Adi Zitrin; Sam E. Cutler; Lukas J. Furtak; Richard Pan; Iryna Chemerynska;
+  Vasily Kokorev; Tim B. Miller; Hakim Atek; Pieter van_Dokkum; Stephanie Juneau;
+  Susan Kassin; Gourav Khullar; Danilo Marchesini; Michael Maseda; Erica J. Nelson;
+  David J. Setton; Renske Smit
+mypos = 5
+pubdate = 2023/09
+bibcode = 2023arXiv230907834F
+arxiv = 2309.07834
+doi = 10.48550/arXiv.2309.07834
+refereed = n
+refpreprint = y
+cite = arXiv:2309.07834
+adscites = 2023/11/15 5
+
+
+[pub]
+title = UNCOVER: The Growth of the First Massive Black Holes from JWST/NIRSpec-Spectroscopic
+  Redshift Confirmation of an X-Ray Luminous AGN at z = 10.1
+authors = Andy D. Goulding; Jenny E. Greene; David J. Setton; Ivo Labbe; Rachel
+  Bezanson; Tim B. Miller; Hakim Atek; Ákos Bogdán; Gabriel Brammer; Iryna Chemerynska;
+  Sam E. Cutler; Pratika Dayal; Yoshinobu Fudamoto; Seiji Fujimoto; Lukas J. Furtak;
+  Vasily Kokorev; Gourav Khullar; Joel Leja; Danilo Marchesini; Priyamvada Natarajan;
+  Erica Nelson; Pascal A. Oesch; Richard Pan; Casey Papovich; Sedona H. Price; Pieter
+  van_Dokkum; Bingjie Wang; John R. Weaver; Katherine E. Whitaker; Adi Zitrin
+mypos = 25
+pubdate = 2023/09
+bibcode = 2023ApJ...955L..24G
+arxiv = 2308.02750
+doi = 10.3847/2041-8213/acf7c5
+refereed = y
+cite = ApJL 955 L24
+adscites = 2023/11/15 25
+
+
+[pub]
+title = The UNCOVER Survey: A First-Look HST+JWST Catalog of Galaxy Redshifts and
+  Stellar Populations Properties Spanning 0.2{\lesssim}z{\lesssim}15
+authors = Bingjie Wang; Joel Leja; Ivo Labbé; Rachel Bezanson; Katherine E. Whitaker;
+  Gabriel Brammer; Lukas J. Furtak; John R. Weaver; Sedona H. Price; Adi Zitrin;
+  Hakim Atek; Dan Coe; Sam E. Cutler; Pratika Dayal; Pieter van_Dokkum; Robert Feldmann;
+  Danilo Marchesini; Marijn Franx; Natascha Förster_Schreiber; Seiji Fujimoto; Marla
+  Geha; Karl Glazebrook; Anna de_Graaff; Jenny E. Greene; Stéphanie Juneau; Susan
+  Kassin; Mariska Kriek; Gourav Khullar; Michael Maseda; Lamiya A. Mowla; Adam Muzzin;
+  Themiya Nanayakkara; Erica J. Nelson; Pascal A. Oesch; Camilla Pacifici; Richard
+  Pan; Casey Papovich; David J. Setton; Alice E. Shapley; Renske Smit; Mauro Stefanon;
+  Katherine A. Suess; Edward N. Taylor; Christina C. Williams
+mypos = 9
+pubdate = 2023/10
+bibcode = 2023arXiv231001276W
+arxiv = 2310.01276
+doi = 10.48550/arXiv.2310.01276
+refereed = n
+refpreprint = y
+cite = arXiv:2310.01276
+adscites = 2023/11/15 4
+
+
+[pub]
+title = UNCOVER: The rest ultraviolet to near infrared multiwavelength structures
+  and dust distributions of sub-millimeter-detected galaxies in Abell 2744
+authors = Sedona H. Price; Katherine A. Suess; Christina C. Williams; Rachel Bezanson;
+  Gourav Khullar; Erica J. Nelson; Bingjie Wang; John R. Weaver; Seiji Fujimoto;
+  Vasily Kokorev; Jenny E. Greene; Gabriel Brammer; Sam E. Cutler; Pratika Dayal;
+  Lukas J. Furtak; Ivo Labbe; Joel Leja; Tim B. Miller; Themiya Nanayakkara; Richard
+  Pan; Katherine E. Whitaker
+mypos = 1
+pubdate = 2023/10
+bibcode = 2023arXiv231002500P
+arxiv = 2310.02500
+doi = 10.48550/arXiv.2310.02500
+refereed = n
+refpreprint = y
+cite = arXiv:2310.02500
+adscites = 2023/11/15 0
+
+
+
+
+##############################################
+# Talks
+
+[talk]
+date = 2023 Feb
+year = 2023
+month = Feb
+where = University of Pittsburgh
+place = Pittsburgh, PA, USA
+meeting_title = #
+what = #
+type = AstroLunch seminar
+invited = y
+extra = #
+venue = sem  # conf, sem, team
+
+[talk]
+date = 2023 Mar
+year = 2023
+month = Mar
+where = KICC
+place = Cambridge, UK
+meeting_title = Early results from the James Webb Space Telescope
+what = Constraining the lead-up to quenching: Resolving structures, dynamics, feedback, and mass transport of massive SFGs at z~1-3
+type = Talk
+invited = n
+extra = #
+venue = conf  # conf, sem, team
+
+
+
+
+[talk]
+date = 2023 May
+year = 2023
+month = May
+where = CMU
+place = Pittsburgh, PA, USA
+what = #
+type = Talk, Impossible Problems: Astronomy and Statistics
+invited = n
+extra = #
+venue = sem  # conf, sem, team
+
+
+
+##############################################
+# Students
+[student]
+date = 2023-
+what = Morgana Iacocca
+what_desc = co-supervised, Pitt undergraduate/postbacc student
+where = Pitt 
+
+
+[student]
+date = 2023-
+what = Yunchong Zhang
+what_desc = co-supervised, Pitt graduate student
+where = Pitt 
+
+
+
+##############################
+[outreach]
+date = 2023 Apr
+what = Astronomy on Tap
+what_desc = Public Outreach talk
+where = Pittsburgh, PA, USA
+
+
+##############################
+[teaching]
+date = 2023 May
+year = 2023
+semester = May
+where = University of Pittsburgh
+what = AstroPGH Python Bootcamp
+what_desc = Module instructor
+
+
+##############################################
+# Proposals
+
+[prop]
+title = No PI proposal this year
+facil = Awesome Telescope
+inst = Instrument
+when = 2023
+propID = propID
+PIs = S. Price
+mepi = y
+request = 0 hrs
+
+[prop]
+title = How to Form a Compact Massive Galaxy: Spatially Resolved Maps of Pa-beta at z=2.3
+facil = JWST
+inst = NIRSpec
+when = Cycle 2
+propID = pndsign4196
+PIs = J. Gibson
+mepi = n
+request = 2.7 hrs
+
+[prop]
+title = Extremely massive galaxies in the early universe: a challenge to Lambda-CDM?
+facil = JWST
+inst = NIRSpec
+when = Cycle 2
+propID = pndsign4106
+PIs = E. Nelson, I. Labbé
+mepi = n
+request = 14 hrs
+
+[prop]
+title = Medium bands, Mega Science: spatially-resolved R~15 spectrophotometry of 50,000 sources at z=0.3-12
+facil = JWST
+inst = NIRCam
+when = Cycle 2
+propID = pndsign4111
+PIs = K. Suess
+mepi = n
+request = 50 hrs
+
+[prop]
+title = A joint ALMA and JWST public Legacy Field - Abell 2744
+facil = ALMA
+inst = #
+when = Cycle 10
+propID = 2023.1.00626.S
+PIs = V. Kokorev
+mepi = n
+request = 29.7 hrs
+
+
+[prop]
+title = Resolved [CII] Kinematics and ISM Properties of z > 6 Galaxies -- II: Pilot High-Resolution Mapping
+facil = IRAM/NOEMA
+inst = #
+when = W23
+propID = W23DA
+PIs = N.M. Förster Schreiber
+mepi = n
+request = 35 hrs
+
+##############################################
+# Collaborations
+
+
+
+##############################################
+# Grants
+
+[grant]
+date = 2023 Nov
+year = 2023
+month = Nov
+what = Alas no grants this year
+where = No funding agency
+#what_name = Discs in Galaxies

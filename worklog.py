@@ -20,6 +20,19 @@ from inifile import Holder
 
 from unicode_to_latex import unicode_to_latex_string
 
+try:
+    from custom_markdowns import custom_latex_md_dict
+except ImportError:
+    custom_latex_md_dict = None
+try:
+    from custom_markdowns import custom_html_md_dict
+except ImportError:
+    custom_html_md_dict = None
+try:
+    from custom_markdowns import custom_lastname_fix_dict
+except ImportError:
+    custom_lastname_fix_dict = None
+
 
 __all__ = str(
     """
@@ -240,22 +253,37 @@ class MupText(Markup):
     def _latex(self):
         arr = [unicode_to_latex_string(self.text)]
         for i, t in enumerate(arr):
-            if "KMOS3D" in t:
-                k3d_orig = "KMOS3D"
-                # k3d = r"KMOS$^{3D}$"
-                k3d = r"KMOS$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
-            if "NOEMA3D" in t:
-                k3d_orig = "NOEMA3D"
-                # k3d = r"KMOS$^{3D}$"
-                k3d = r"NOEMA$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
+            if custom_latex_md_dict is not None:
+                for key in custom_latex_md_dict.keys():
+                    if key in t:
+                        orig = key
+                        typeset = r"{}".format(custom_latex_md_dict[key])
+                        tmp = t.split(orig)
+                        out = typeset.join(tmp)
+                        arr[i] = out
+                        t = out
+
+            # if "KMOS3D" in t:
+            #     orig = "KMOS3D"
+            #     typeset = r"KMOS$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
+            #     tmp = t.split(orig)
+            #     out = typeset.join(tmp)
+            #     arr[i] = out
+            #     t = out
+            # if "NOEMA3D" in t:
+            #     orig = "NOEMA3D"
+            #     typeset = r"NOEMA$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
+            #     tmp = t.split(orig)
+            #     out = typeset.join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if "pndsign" in t:
+            #     tmp = t.split("pndsign")
+            #     out = r"\#".join(tmp)
+            #     arr[i] = out
+            #     t = out
+            # #
 
             if "\$" in t:
                 tmp = t.split("\$")
@@ -263,12 +291,12 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
 
-            if "pndsign" in t:
-                tmp = t.split("pndsign")
-                out = r"\#".join(tmp)
-                arr[i] = out
-                t = out
-            #
+            # if "pndsign" in t:
+            #     tmp = t.split("pndsign")
+            #     out = r"\#".join(tmp)
+            #     arr[i] = out
+            #     t = out
+            # #
             #
             if r"{\alpha}" in t:
                 tmp = t.split(r"{\alpha}")
@@ -305,7 +333,7 @@ class MupText(Markup):
                         out += pre + r"\ensuremath{_{\mathrm{" + subs + r"}}}"
                         try:
                             pre = "}".join(tmp[j + 1].split("\}")[1:])
-                        except:
+                        except ValueError:
                             pre = ""
                     else:
                         out += pre
@@ -377,28 +405,37 @@ class MupText(Markup):
         arr = [html_escape(self.text)]
 
         for i, t in enumerate(arr):
-            if r"KMOS3D" in t:
-                k3d_orig = "KMOS3D"
-                k3d = r"KMOS<sup>3D</sup>"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
+            if custom_html_md_dict is not None:
+                for key in custom_html_md_dict.keys():
+                    if key in t:
+                        orig = key
+                        typeset = r"{}".format(custom_html_md_dict[key])
+                        tmp = t.split(orig)
+                        out = typeset.join(tmp)
+                        arr[i] = out
+                        t = out
+            # if r"KMOS3D" in t:
+            #     k3d_orig = "KMOS3D"
+            #     k3d = r"KMOS<sup>3D</sup>"
+            #     tmp = t.split(k3d_orig)
+            #     out = k3d.join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"NOEMA3D" in t:
-                k3d_orig = "NOEMA3D"
-                k3d = r"NOEMA<sup>3D</sup>"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
-            if "pndsign" in t:
-                k3d_orig = "pndsign"
-                k3d = r"#"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
+            # if r"NOEMA3D" in t:
+            #     k3d_orig = "NOEMA3D"
+            #     k3d = r"NOEMA<sup>3D</sup>"
+            #     tmp = t.split(k3d_orig)
+            #     out = k3d.join(tmp)
+            #     arr[i] = out
+            #     t = out
+            # if "pndsign" in t:
+            #     k3d_orig = "pndsign"
+            #     k3d = r"#"
+            #     tmp = t.split(k3d_orig)
+            #     out = k3d.join(tmp)
+            #     arr[i] = out
+            #     t = out
             if r"_{" in t:
                 tmp = t.split(r"_{")
                 out = ""
@@ -418,88 +455,6 @@ class MupText(Markup):
                 t = out
             #
             #
-            if r"{\alpha}" in t:
-                tmp = t.split(r"{\alpha}")
-                out = "\u03B1".join(tmp)
-                arr[i] = out
-                t = out
-
-            if r"{\lesssim}" in t:
-                tmp = t.split(r"{\lesssim}")
-                out = "\u2272".join(tmp)
-                arr[i] = out
-                t = out
-
-            if r"--" in t:
-                tmp = t.split(r"--")
-                out = r"-".join(tmp)
-                arr[i] = out
-                t = out
-
-            if "$" in t:
-                tmp = t.split("$")
-                out = r"".join(tmp)
-                arr[i] = out
-                t = out
-
-            if r"\sim" in t:
-                tmp = t.split(r"\sim")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
-
-            if r"{\tilde}" in t:
-                tmp = t.split(r"{\tilde}")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
-            if r"\tilde" in t:
-                tmp = t.split(r"\tilde")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
-
-        for i, t in enumerate(arr):
-            if r"KMOS3D" in t:
-                k3d_orig = "KMOS3D"
-                k3d = r"KMOS<sup>3D</sup>"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
-
-            if r"NOEMA3D" in t:
-                k3d_orig = "NOEMA3D"
-                k3d = r"NOEMA<sup>3D</sup>"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
-            if "pndsign" in t:
-                k3d_orig = "pndsign"
-                k3d = r"#"
-                tmp = t.split(k3d_orig)
-                out = k3d.join(tmp)
-                arr[i] = out
-                t = out
-            if r"_{" in t:
-                tmp = t.split(r"_{")
-                out = ""
-                pre = tmp[0]
-                for j in range(len(tmp)):
-                    if j < len(tmp) - 1:
-                        subs = tmp[j + 1].split("}")[0]
-                        # ''.join(tmp[j+1].split("}"))
-                        out += pre + r"<sub>" + subs + r"</sub>"
-                        try:
-                            pre = "}".join(tmp[j + 1].split("}")[1:])
-                        except ValueError:
-                            pre = ""
-                    else:
-                        out += pre
-                arr[i] = out
-                t = out
-
             if r"{\alpha}" in t:
                 tmp = t.split(r"{\alpha}")
                 out = "\u03B1".join(tmp)
@@ -599,7 +554,7 @@ class MupBoldUnderline(Markup):
     #     return self._html()
 
 
-class MupAsterisk(Markup):
+class MupDagger(Markup):
     def __init__(self, inner):
         self.inner = _maybe_wrap_text(inner)
 
@@ -608,6 +563,20 @@ class MupAsterisk(Markup):
 
     def _html(self):
         return ["<sup>&#8224;</sup>"] + self.inner._html() + [""]
+
+    def _markdown(self):
+        return self._html()
+
+
+class MupAsterisk(Markup):
+    def __init__(self, inner):
+        self.inner = _maybe_wrap_text(inner)
+
+    def _latex(self):
+        return ["*"] + self.inner._latex() + [""]
+
+    def _html(self):
+        return ["*"] + self.inner._html() + [""]
 
     def _markdown(self):
         return self._html()
@@ -1016,7 +985,7 @@ def cite_info(oitem, context):
     if len(advposlist):
         for i in [int(x) - 1 for x in advposlist.split(",")]:
             # cauths[i] = MupUnderline(cauths[i])
-            cauths[i] = MupAsterisk(cauths[i])
+            cauths[i] = MupDagger(cauths[i])
 
     aitem.full_authors = MupJoin(", ", cauths)
 
@@ -1042,7 +1011,7 @@ def cite_info(oitem, context):
     if len(advposlist):
         for i in [int(x) - 1 for x in advposlist.split(",")]:
             # sauths[i] = MupUnderline(sauths[i])
-            sauths[i] = MupAsterisk(sauths[i])
+            sauths[i] = MupDagger(sauths[i])
 
     # if len(sauths) == 1:
     #     aitem.short_authors = sauths[0]
@@ -1088,7 +1057,7 @@ def cite_info(oitem, context):
     if len(advposlist):
         for i in [int(x) - 1 for x in advposlist.split(",")]:
             # sprepauths[i] = MupUnderline (sprepauths[i])
-            sprepauths[i] = MupAsterisk(sprepauths[i])
+            sprepauths[i] = MupDagger(sprepauths[i])
 
     # Like canonicalized name scheme instead:
     if len(sprepauths) == 1:
@@ -1135,7 +1104,7 @@ def cite_info(oitem, context):
     if myidx == 0:
         aitem.bold_if_first_title = MupBold(oitem.title)
     else:
-        aitem.bold_if_first_title = oitem.title
+        aitem.bold_if_first_title = MupText(oitem.title)
 
     # Pub year and nicely-formatted date
     aitem.year, aitem.month = list(map(int, oitem.pubdate.split("/")))
@@ -1163,7 +1132,7 @@ def cite_info(oitem, context):
     # SHP addition:
     # Title with link
     if url is None:
-        aitem.title_link = aitem.title
+        aitem.title_link = MupText(aitem.title)
     else:
         aitem.title_link = MupLink(url, aitem.title)
 
@@ -1320,7 +1289,7 @@ def partition_pubs(pubs):
         try:
             prep = pub.get("prep", "n") == "y"
             prepsub = pub.get("prepsub", "n") == "y"
-        except ValueError:
+        except AttributeError:
             prep = False
             prepsub = False
 
@@ -1614,7 +1583,7 @@ def compute_time_allocations(props):
 # Utilities for dealing with proposals:
 
 
-def prop_info(oitem, context):
+def prop_info(oitem):
     """Create a Holder with citation text from a publication item. This can
     then be fed into a template however one wants. The various computed fields
     are Unicode or Markups.
@@ -1870,6 +1839,70 @@ def cmd_rev_misc_list_switch(context, sections, gatefield, case):
 # ---------------------
 
 
+def cmd_talk_list_switch(context, sections, gatefield, case):
+    """Same a RMISCLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_talk_list(
+        context, sections, lambda i: i.get(gatefield, "n") == case
+    )
+
+
+def _rev_talk_list(context, sections, gate):
+    if context.cur_formatter is None:
+        die("cannot use TALKLIST* command before using FORMAT")
+
+    sections = frozenset(sections.split(","))
+
+    for item in context.items[::-1]:
+        if item.section not in sections:
+            continue
+        if not gate(item):
+            continue
+
+        info = talk_info(item)
+
+        if context.format_alt_flag_check is not None:
+            if info.__dict__[context.format_alt_flag_check].strip() == "":
+                yield context.cur_formatter_alt(info)
+            else:
+                if context.format_alt2_flag_check is not None:
+                    if (
+                        info.__dict__[context.format_alt2_flag_check].strip()
+                        == ""
+                    ):
+                        yield context.cur_formatter_alt2(info)
+                    else:
+                        yield context.cur_formatter(info)
+                else:
+                    yield context.cur_formatter(info)
+        else:
+            yield context.cur_formatter(info)
+
+
+def talk_info(oitem):
+    """Create a Holder with citation text from a talk item. This can
+    then be fed into a template however one wants. The various computed fields
+    are Unicode or Markups.
+
+    `oitem` = original item; not to be modified
+    `aitem` = augmented item; = oitem + new fields
+    """
+
+    aitem = oitem.copy()
+    try:
+        if aitem.get("invited", "n") == "y":
+            # Fix type:
+            aitem.type = MupAsterisk(aitem.type)
+    except AttributeError:
+        pass
+
+    return aitem
+
+
+# ---------------------
+
+
 def cmd_my_abbrev_name(context, *text):
     context.my_abbrev_name = " ".join(text)
     return ""
@@ -2032,7 +2065,7 @@ def _rev_prop_list(context, sections, gate):
         if not gate(item):
             continue
 
-        info = prop_info(item, context)
+        info = prop_info(item)
 
         if context.format_alt_flag_check is not None:
             if item.__dict__[context.format_alt_flag_check].strip() == "":
@@ -2127,6 +2160,7 @@ def setup_processing(render, datadir):
     commands["FORMAT_ALT2"] = cmd_format_alt2
     commands["FORMAT_ALT2_FLAG_CHECK"] = cmd_format_alt2_flag_check
     commands["RMISCLIST_CASE"] = cmd_rev_misc_list_switch
+    commands["TALKLIST_CASE"] = cmd_talk_list_switch
     commands["OBSEXPLIST"] = cmd_obsexp_list
     commands["TEAMTALKLIST"] = cmd_team_talk_list
     commands["PROPLIST"] = cmd_rev_prop_list
@@ -2451,12 +2485,24 @@ class BibCustomizer(object):
                 for item in firsts:
                     if item in ["ben", "van", "der", "de", "la", "le"]:
                         last = firsts.pop() + " " + last
-                    elif (item in ["Forster", "Förster", "Foerster"]) and (
-                        last == "Schreiber"
-                    ):
-                        # NMFS exception
-                        _ = firsts.pop()
-                        last = "Förster " + last
+
+                    elif custom_lastname_fix_dict is not None:
+                        for key in custom_lastname_fix_dict.keys():
+                            if (
+                                item in custom_lastname_fix_dict[key]["list"]
+                            ) & (
+                                last
+                                == custom_lastname_fix_dict[key]["last_match"]
+                            ):
+                                # Custom exceptions exception
+                                _ = firsts.pop()
+                                last = (
+                                    custom_lastname_fix_dict[key][
+                                        "last_replace"
+                                    ]
+                                    + " "
+                                    + last
+                                )
 
                 # -------------
 

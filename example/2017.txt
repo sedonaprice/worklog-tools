@@ -1,0 +1,78 @@
+# -*- conf -*-
+
+
+[job]
+date = 2011-2017
+where = UC Berkeley, CA, USA
+what = Graduate Student
+
+
+[outreach]
+date = 2014-2017
+what = Mentoring Group
+what_desc = Society of Women in Physical Sciences
+where = UC Berkeley
+
+[outreach]
+date = 2012-2017
+what = Annual Cal Day
+what_desc = Astronomy Department exposition
+where = UC Berkeley
+
+[outreach]
+date = 2017 Apr
+what = Solar Activities
+what_desc = Marin Elementary STEAM day
+where = UC Berkeley
+
+
+
+
+
+# Observing experience
+
+[obs]
+date = 2017/01/03
+pi = Kriek
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = LRIS
+time = 0.5 nght
+
+
+[obs]
+date = 2017/01/19
+pi = Kriek
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = OSIRIS
+time = 2 nght
+
+
+[obs]
+date = 2017/03/14
+pi = Kriek
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = MOSFIRE
+time = 1 nght
+
+[obs]
+date = 2017/04/04
+pi = Kriek
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = MOSFIRE
+time = 0.5 nght
+
+[obs]
+date = 2017/04/05
+pi = Kriek
+facil =  W. M. Keck Observatory
+facil_desc = Keck I 10 m telescope
+inst = MOSFIRE
+time = 0.5 nght
+
+
+
+

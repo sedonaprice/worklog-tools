@@ -1,173 +1,389 @@
-% Peter Williams' LaTeX CV template.
-% This work is dedicated to the public domain.
-
-\documentclass[letterpaper,11pt]{article}
-
-% Basic settings for your convenience!
-
-\newcommand{\myname}{Peter K. G. Williams}
-\newcommand{\myaffil}{Harvard-Smithsonian Center for Astrophysics}
-\newcommand{\myemail}{pwilliams@cfa.harvard.edu}
-\newcommand{\mypostlineone}{60 Garden St. MS-20}
-\newcommand{\mypostlinetwo}{Cambridge, MA 02138}
-\newcommand{\mysite}{http://newton/cx/~peter/}
-\newcommand{\mymobile}{+1 617 922 2689}
-
-% Here begins a ton of boilerplate to set up the document to look nice.
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% margins
-\usepackage[margin=0.5in,bottom=0.75in]{geometry}
-
-% nice links
-\usepackage[colorlinks,urlcolor=blue]{hyperref}
-\urlstyle{sf}
-
-% needed for the fancy footer
-\usepackage{fancyhdr,lastpage}
-
-% I find that things look better this way.
-\linespread{0.85}
-
-% Layout. Very little comes in bare paragraphs. Most of the content is in
-% lists, and we use enumitem to control the spacing.
-
+\documentclass[line,10pt]{article}
+\usepackage[margin=1in, bottom=0.8in, headsep=16pt]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage[none]{hyphenat}
 \usepackage{enumitem}
+\usepackage{etaremune}
+\usepackage{stix}
+\usepackage{soul}
+\usepackage{lastpage}
 
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+% nice links
+\usepackage[colorlinks,urlcolor=Navy]{hyperref}
+\urlstyle{rm}
+
+% \usepackage{showframe}
+
+\def\namefont{\fontsize{15pt}{0pt}\bf\scshape}
+\def\sectionfont{\fontsize{11pt}{0pt}\bf}
+
+
+
+\newlength{\mainindent} \setlength{\mainindent}{15pt}
+
+\newlength{\mainnegindent} \setlength{\mainnegindent}{-20pt}
+\newlength{\mainextraindent} \setlength{\mainextraindent}{35pt}
+
+\newlength{\pubindent} \setlength{\pubindent}{1ex}
+\newlength{\contentindent} \setlength{\contentindent}{17ex}
+
+
+\textwidth = 6.5in
+
+
+\setlength{\headwidth}{\textwidth}
+
+\newlength{\entrywidth} \setlength{\entrywidth}{\dimexpr\textwidth-\mainextraindent\relax}
+\newlength{\pubwidth} \setlength{\pubwidth}{\dimexpr\textwidth-\pubindent\relax}
+
+
+
+
+
+
+\newcommand{\myname}{Sedona Price} % Sedona H. Price
+\newcommand{\myaffil}{Department of Physics and Astronomy and PITT PACC, University of Pittsburgh}
+\newcommand{\myemail}{sedona.price@pitt.edu}
+\newcommand{\mypostlineone}{Department of Physics and Astronomy and PITT PACC, Allen Hall 302}
+\newcommand{\mypostlinetwo}{University of Pittsburgh}
+\newcommand{\mypostlinethree}{Pittsburgh, PA, USA}
+\newcommand{\mysite}{https://sedonaprice.github.io}
+\newcommand{\myorcid}{http://orcid.org/0000-0002-0108-4176}
+
+
+
+\pagestyle{fancy}
+\pagenumbering{arabic}
+\lhead{\myname}
+\chead{Curriculum Vit\ae}
+\rhead{\thepage{} of \pageref*{LastPage}}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+
+\renewcommand{\headrule}{
+  % \hglue -.5in
+\begin{minipage}{\textwidth}
+  \vglue -0.15in 
+\hrule width \hsize height 0.4pt
+\end{minipage}\par}%
+
+
+\fancypagestyle{firststyle}
+{
+\pagestyle{fancy}
+\pagenumbering{arabic}
+\lhead{{\namefont\myname}}
+\chead{Curriculum Vit\ae}
+\rhead{\thepage{} of \pageref*{LastPage}}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+}
+
+
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.0pt}
+
+
+
+\newcommand{\aubf}[1]{{\bf{#1}}}
+
+
+%%%%
+
+\newskip\sectionskip
+\newskip\sectionafterskip
+\sectionskip=-4pt
+\sectionafterskip=-10pt
+
+
+\makeatletter
+\let\origsection\section
+\renewcommand\section{\starsection}
+
+\newcommand\starsection[1]
+{\sectionprelude\origsection*{\sectionfont#1}\sectionpostlude}
+
+\newcommand\sectionprelude{%
+  \vspace{\sectionskip}
+}
+
+\newcommand\sectionpostlude{%
+  \vspace{\sectionafterskip}
+}
+\makeatother
+
+\setlength{\parskip}{0pt}
 \setlength{\parindent}{0pt}
-\newlength{\mainindent} \setlength{\mainindent}{12pt}
-\newlength{\contentindent} \setlength{\contentindent}{19ex}
 
-% "nosep" is shorthand here, but may have compatibility issues.
-\setlist[itemize]{topsep=0pt,partopsep=0pt,parsep=0pt,itemsep=0pt}
 
-\newenvironment{datelist}{
+
+
+\newenvironment{publist}{
   \begingroup
   \raggedright
-  \begin{description}[labelindent=\mainindent,leftmargin=\contentindent,
+  \begin{description}[labelindent=\mainindent, leftmargin=\pubindent,
       style=sameline,font=\normalfont,topsep=0pt,partopsep=0pt,parsep=0pt,
       itemsep=4pt]
 }{
   \end{description}
   \endgroup
 }
+\setlist[itemize]{topsep=0pt,partopsep=1pt,parsep=0pt,itemsep=0pt}
 
-% Customize font / spacing of section titles
-\usepackage[nobottomtitles*]{titlesec}
-\renewcommand{\bottomtitlespace}{0.1\textheight}
-\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{1em}{}
-\titlespacing*{\section}{0pt}{2.5ex plus 1ex minus 0.2ex}{1ex plus 0.2ex}
+\newenvironment{datelist}{
+  \begingroup
+  \raggedright
+  \begin{description}[labelindent=\mainindent,leftmargin=\contentindent,
+      style=sameline,font=\normalfont,topsep=0pt,partopsep=1pt, 
+      parsep=0pt,
+      itemsep=0pt]
+}{
+  \end{description}
+  \endgroup
+}
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% That's the end of the boilerplate. Now come some things that don't involve
-% any templating.
+
+
+MYABBREVNAME SHP
+
 
 \begin{document}
 
-% running footer
-\pagestyle{fancy}
-\lhead{} \chead{} \rhead{} \renewcommand{\headrule}{\relax}
-\lfoot{\textsc{Curriculum Vit\ae}}
-\cfoot{\thepage/\pageref*{LastPage}}
-\rfoot{\textsc{\myname}}
 
-% title
-\begin{center}
-\textbf{\Large \myname} \\
-{\large Curriculum Vit\ae}
-\end{center}
+\begin{minipage}{\textwidth}
+  \vglue -10pt
+  \hspace{-8.5pt}
+    \begin{tabular}{l}    
+        \mypostlineone\\
+        \mypostlinetwo\\
+        % $\ $
+        \mypostlinethree
+    \end{tabular}
+    \hfill \hspace{12pt} 
+    \begin{tabular}{r}
+        \href{mailto:\myemail}{\myemail}\\
+        \url{\mysite}\\
+        \url{\myorcid}
+    \end{tabular}
+    % }
+  \end{minipage}
 
-\medskip
 
-% contact info, TeXified as a table
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
-\myaffil &
- \textsf{\href{mailto:\myemail}{\myemail}} \\
-\mypostlineone &
- \url{\mysite} \\
-\mypostlinetwo &
- Mobile: \mymobile
-\end{tabular*}
 
-\medskip
+\thispagestyle{firststyle}
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Here's where we actually start using the templates.
 
-Updated % note: must have this awkward newline for the simpleminded templater:
-TODAY.
-The latest version of this document is online at the website listed above.
+\vspace{12pt}
 
-\section*{Education}
+This is an incomplete example CV demonstrating some aspects of 
+Peter Williams' \texttt{worklog-tools} package, with 
+additional functionality added in my fork.
+For example: 
+the ability to do alternative formatting for lists eg for talks; 
+decorated invited talks with asterisks; showing first two authors not just 
+first author.  
+
+
+\vspace{2pt} 
+See \url{https://github.com/sedonaprice/worklog-tools/blob/main/README.md} 
+for more detailed usage notes (on PKGW's original code; my hacks are \ldots
+underdocumented).
+
+\section{Research Interests}
+
+\begin{itemize}[label={}, leftmargin=\mainindent]
+  \item Galaxy formation and evolution,  high redshift galaxies, galaxy structures,  
+  gas and stellar kinematics, \\
+  dynamical modeling, galaxy quenching
+\end{itemize}
+
+
+\section{Education}
 \begin{datelist}
 % This is entered manually to get the extra PhD info. It's not like this list
 % is expected to change ...
-\item[2012]
-  \emph{University of California, Berkeley} \\
-  Ph.D. (Astrophysics) \\
-  Dissertation: \href{http://newton.cx/~peter/dissertation/}{``Exploring the
-    Dynamic Radio Sky with the Allen Telescope Array''} \\
-  Adviser: Geoff Bower
-\item[2008]
-  \emph{University of California, Berkeley} \\
-  M.A. (Astrophysics)
-\item[2006]
-  \emph{Harvard College} \\
-  B.A. (Astronomy \& Astrophysics and Physics) with honors, magna cum laude
+\item[2017]
+  \textbf{Ph.D. Astrophysics}, \emph{University of California, Berkeley} \\
+  \emph{Dissertation:} Galaxies in the Young Universe: Structures, Masses, and Composition\\
+  \hskip 2cm of Star-Forming Galaxies at $z\sim1.5-3$\\
+  \emph{Advisor:} Mariska Kriek
+\item[2013]
+  \textbf{M.A. Astrophysics}, \emph{University of California, Berkeley}
+\item[2011]
+  \textbf{B.S. Physics}, \emph{with honors}, \emph{California Institute of Technology}
 \end{datelist}
 
-FORMAT \item[|date|] \emph{|where|} \\ |what|
 
-\section*{Employment}
+
+FORMAT \item[|date|] |what|, |where|
+
+\section{Research Positions}
 \begin{datelist}
 RMISCLIST job
 \end{datelist}
 
-\section*{Fellowships and Awards}
+
+\section{Fellowships \& Awards}
 \begin{datelist}
 RMISCLIST award
 \end{datelist}
 
-\section*{Research Interests}
-\begin{itemize}
-\item Magnetic activity of low-mass stars and brown dwarfs
-\item The dynamic radio sky: overall properties, known and potential sources,
-    surveys
-\item Radio interferometric software, analysis and techniques
+
+FORMAT \item |name|, \emph{|what|} \emph{(|PIs_str|)}
+\section{Large Surveys and Collaborations}
+\begin{itemize}[label={},itemindent=\mainnegindent,leftmargin=\mainextraindent,partopsep=1pt]  % \mainindent
+PROPLIST collab
 \end{itemize}
 
-\section*{Observing Experience}
-\begin{itemize}
-\item Centimeter radio interferometry (Allen Telescope Array, VLA)
-\item X-ray and UV imaging (\textit{Chandra}, \textit{Swift})
-\item Optical imaging and spectroscopy (CTIO/Blanco~4m, Lick/Shane~3m,
-    Lick/Nickel~1m, Lick/CAT~1m)
+
+FORMAT \parbox{\entrywidth}{\item |facil|, |inst|, |when|, |propID|, ``|title|'', |request| \emph{(|PIs_str|)}}\vskip 3.5pt
+FORMAT_ALT \parbox{\entrywidth}{\item |facil|, |when|, |propID|, ``|title|'', |request| \emph{(|PIs_str|)}}\vskip 3.5pt
+FORMAT_ALT_FLAG_CHECK inst
+\section{Approved Observing Proposals as PI}
+
+% \vskip 2pt
+\begin{itemize}[label={},itemindent=\mainnegindent,leftmargin=\mainextraindent,partopsep=1pt]
+PROPLIST_IF prop mepi
 \end{itemize}
 
-FORMAT \item[|date|] \emph{|where|} \\ ``|what|''
 
-\section*{Professional Talks --- Invited}
-\begin{datelist}
-RMISCLIST_IF talk invited
-\end{datelist}
 
-\section*{Professional Talks --- Other}
-\begin{datelist}
-RMISCLIST_IF_NOT talk invited
-\end{datelist}
+FORMAT \parbox{\entrywidth}{\item |facil|, |inst|, |when|, |propID|, ``|title|'', |request| \emph{(|PIs_str|)}}\vskip 3.5pt
+FORMAT_ALT \parbox{\entrywidth}{\item |facil|, |when|, |propID|, ``|title|'', |request| \emph{(|PIs_str|)}}\vskip 3.5pt
+FORMAT_ALT_FLAG_CHECK inst
+\section{Approved Observing Proposals as Co-I}
 
-FORMAT \item[|date|] \emph{|where|} \\ |what|
+\vskip 2pt
+\begin{itemize}[label={},itemindent=\mainnegindent,leftmargin=\mainextraindent,partopsep=1pt]
+PROPLIST_IF_NOT prop mepi
+\end{itemize}
 
-\section*{Teaching}
+
+FORMAT \item |facil|, |facil_desc|, |inst_list|
+\section{Observing Experience}
+\begin{itemize}[label={},leftmargin=\mainindent,partopsep=1pt]
+OBSEXPLIST obs
+\end{itemize}
+
+
+
+
+FORMAT \item[|year| |semester|] |what|, \emph{|what_desc|}, |where|
+FORMAT_ALT \item[|year|] |what|, \emph{|what_desc|}, |where|
+FORMAT_ALT_FLAG_CHECK semester
+
+\section{Teaching}
 \begin{datelist}
 RMISCLIST teaching
 \end{datelist}
 
-FORMAT \item[|date|] |what|
 
-\section*{Outreach}
+
+\section{Student supervision \& research mentoring}
+\begin{itemize}[label={},itemindent=\mainnegindent,leftmargin=\mainextraindent,partopsep=1pt]  
+  FORMAT \item |what| \emph{(|what_desc|, |date|)}
+  RMISCLIST student
+\end{itemize}
+
+
+
+
+
+\section{Presentations}
+
+% \vspace{-4pt}
+
+FORMAT \item[|year| |month|] |type|, |where|, |place| \emph{|extra|}
+FORMAT_ALT \item[|year| |month|] |type|, |where|, |place|
+FORMAT_ALT_FLAG_CHECK extra
+
+{\color{gray}\emph{Colloquia \& Seminars:}}
+\vskip 1pt
+\begin{datelist}
+  RMISCLIST_CASE talk venue sem
+\end{datelist}
+
+
+% \vskip 6pt
+
+FORMAT \item[|year| |month|] |type|, |where|, \emph{|meeting_title|}, |place| \emph{|extra|}
+FORMAT_ALT \item[|year| |month|] |type|, |where|, |place| \emph{|extra|}
+FORMAT_ALT_FLAG_CHECK meeting_title
+FORMAT_ALT2 \item[|year| |month|] |type|, \emph{|meeting_title|}, |place| \emph{|extra|}
+FORMAT_ALT2_FLAG_CHECK where
+
+
+% TALKLIST_CASE puts an asterisk on invited, but RMISCLIST_CASE does not. 
+% Using RMISCLIST_CASE for Colloquia and seminars because all those are 
+% effectively invited. 
+{\color{gray}\emph{Conferences \& Workshops:}}
+\vskip 1pt
+\begin{datelist}
+TALKLIST_CASE talk venue conf
+\end{datelist}
+
+
+
+% \vskip 8pt
+{\color{gray}\emph{Collaborative Meetings:}}
+\vskip 2pt
+FORMAT |total| |unit| at |collab| collaboration |collab_meet_unit||end|
+\hglue \mainindent
+TEAMTALKLIST teamtalk
+
+
+% ALTERNATIVE:
+
+FORMAT \item[|year| |month|] |type|, |where|, |place|
+\begin{datelist}
+TALKLIST_CASE talk venue team
+\end{datelist}
+
+  
+
+
+
+FORMAT \item[|date|] |what|, \emph{|what_desc|}, |where|
+\section{Outreach}
 \begin{datelist}
 RMISCLIST outreach
 \end{datelist}
+
+
+\section{Service}
+\begin{datelist}
+FORMAT \item[------] |what|, \emph{|what_desc|}
+RMISCLIST profserviceNoDate
+FORMAT \item[|date|] |what|, \emph{|what_desc|}, |where|
+FORMAT_ALT \item[|date|] |what|, |where|
+FORMAT_ALT_FLAG_CHECK what_desc
+RMISCLIST service
+\end{datelist}
+
+
+
+
+
+
+
+
+FORMAT \item[|year|] |what|, |where|
+
+\section{Grants}
+\begin{datelist}
+RMISCLIST grant
+\end{datelist}
+
+
 
 \end{document}

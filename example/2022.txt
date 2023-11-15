@@ -1,0 +1,124 @@
+
+
+
+##############################################
+# Jobs
+
+[job]
+date = 2017-2022
+where = Max-Planck-Institut für extraterrestrische Physik, Garching, Germany
+what = Postdoctoral Scholar
+
+
+
+[job]
+date = 2022-present
+where = University of Pittsburgh, PA, USA
+what = Samuel P. Langley PITT PACC Fellow
+
+
+
+##############################################
+# Service
+
+
+##############################################
+# Awards
+
+[award]
+date = 2022
+where = University of Pittsburgh
+what = Samuel P. Langley PITT PACC Fellowship
+
+
+#############################
+# Collaborations 
+
+[collab]
+name = UNCOVER
+what = JWST Cycle 1 Treasury program; Survey Manager
+PIs = I. Labbé, R. Bezanson
+
+
+
+
+##############################################
+# Observing time proposals
+
+
+
+##############################################
+# Talks
+
+
+[talk]
+date = 2022 Jun
+year = 2022
+month = Jun
+where = MPE
+place = Garching, Germany
+meeting_title = #
+what = Deep Resolved Studies of Galaxy Kinematics and Structures at the Peak of Cosmic Star Formation
+type = Scientific Advisory Board talk
+invited = y
+extra = #
+venue = sem  # conf, sem, team
+
+
+
+[talk]
+date = 2022 Jun
+year = 2022
+month = Jun
+where = #
+place = Bruges, Belgium
+meeting_title = LEGA-C Collaboration workshop
+what = Deep Resolved Studies of Galaxy Kinematics and Structures at the Peak of Cosmic Star Formation
+type = Talk
+invited = n
+extra = #
+venue = conf  # conf, sem, team
+
+
+
+[talk]
+date = 2022 Jul
+year = 2022
+month = Jul
+where = Ringberg
+place = Ringberg, Germany
+meeting_title = In Situ View of Galaxy Formation 2
+what = Deep Resolved Studies of Galaxy Kinematics and Structures at the Peak of Cosmic Star Formation
+type = Invited participant
+invited = y
+extra = #
+venue = conf  # conf, sem, team
+
+
+[talk]
+date = 2022 Sep
+year = 2022
+month = Sep
+where = KICC
+place = Cambridge, UK
+meeting_title = Epoch of Galaxy Quenching 2022
+what = Constraining the lead-up to quenching: Resolving structures, dynamics, feedback, and mass transport of massive SFGs at z~1-3
+type = Talk
+invited = n
+extra = #
+venue = conf  # conf, sem, team
+
+
+
+[talk]
+date = 2022 Oct
+year = 2022
+month = Oct
+where = Penn State University
+place = State College, PA, USA
+meeting_title = #
+what = #
+type = Colloquium
+invited = y
+extra = #
+venue = sem  # conf, sem, team

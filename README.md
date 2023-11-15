@@ -1,6 +1,23 @@
 worklog-tools
 =============
 
+This is a fork of Peter William's original [worklog-tools](https://github.com/pkgw/worklog-tools) 
+package, with some added functionality and other hacks. 
+For example: 
+adding the ability to do alternative formatting for lists eg for talks; 
+decorated invited talks with asterisks; showing first two authors not just 
+first author; hard coding some hacks to handle common failures of bootstrap-bibtex 
+with names beginning with eg "van" or "le"; adding some custom handling 
+markdown and name fixes in ``custom_markdowns.py`` (which can be extended 
+following the dictionary framework therein). 
+
+My hacks are .... underdocumented, but see the [workflow overview tutorial](example) 
+and the [example directory](example). 
+
+------------------------------------------------------------------------------
+
+## Original README: 
+
 This software is part of a system for recording academic output and reporting
 it in documents like CVs or publication lists.
 
@@ -58,18 +75,18 @@ The worklog system has three pieces:
 * Software to fill the latter using data gathered from the former
 
 The software is in the same directory as this file — the [wltool](wltool)
-script drives everything from the command line. The [example](example)
+script drives everything from the command line. The [example/pkgw](example/pkgw)
 subdirectory contains sample copies of templates (in `*.tmpl.*`) and log files
-(in [2012.txt](example/2012.txt), [2013.txt](example/2013.txt)).
+(in [2012.txt](example/pkgw/2012.txt), [2013.txt](example/pkgw/2013.txt)).
 
 To get started, first check out this repository if you haven’t done so
-already. Go into the [example](example) directory and type `make`. This will
+already. Go into the [example/pkgw](example/pkgw) directory and type `make`. This will
 create the outputs: a CV and publication list in PDF and HTML formats.
 (Assuming nothing breaks … the scripts are in Python and have few
 dependencies, so they should be widely portable.) The HTML results have not
 been particularly beautified, but I've tried to make the PDFs come out nicely.
 
-Now check out [example/2013.txt](example/2013.txt). Log files are in a basic
+Now check out [example/pkgw/2013.txt](example/pkgw/2013.txt). Log files are in a basic
 [“ini file”][inifile] format, with records coming in paragraphs headed by a
 word encased in square brackets. A typical record is:
 
@@ -119,7 +136,7 @@ corresponding values from each record. (The precise functionalities of the
 various directives are also [defined among the “Technical
 details”](#technical-details-template-directives) below.)
 
-Finally, the [Makefile](example/Makefile) in the [example](example) directory
+Finally, the [Makefile](example/pkgw/Makefile) in the [example/pkgw](example/pkgw) directory
 wires up commands to automatically create or update the output files using the
 standard `make` command.
 
@@ -129,7 +146,7 @@ Using the tools for your own documents
 
 To get started using this system for yourself, you should copy the script code
 and example files. You can put them all in the same directory and just edit
-the [Makefile](example/Makefile) to change `toolsdir` to `.` rather than `..`.
+the [Makefile](example/pkgw/Makefile) to change `toolsdir` to `.` rather than `..`.
 Then there are two things to work on: customizing the templates, and entering
 your previous accomplishments into log files. You’ll probably edit these
 hand-in-hand as you decide what things to include in your CV and how you want

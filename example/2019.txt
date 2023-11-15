@@ -1,0 +1,15 @@
+# -*- conf -*-
+
+
+
+##############################
+# Observing experience
+[obs]
+date = 2019/01/12
+pi = Förster Schreiber
+facil =  European Southern Observatory #ESO
+facil_desc = VLT
+inst = SINFONI
+time = 3 nght
+# 6 half nights
+
