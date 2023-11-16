@@ -3,6 +3,9 @@
 
 example/ads-token.secret
 
+example/bibtex_output/
+example/bibtex_output/*
+
 example/*.aux
 example/*.out
 example/*.log*
