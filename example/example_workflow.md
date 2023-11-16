@@ -22,6 +22,17 @@ documentation in the [README](../README.md) and his original
 > Copy the example template and log files, tweak to make your own changes, 
 > and don't forget to edit the ``Makefile`` with any changed/new filenames!
 
+
+## Installing ``worklog-tools``
+
+Clone this repo into a folder of your choosing (sorry no fancy conda/pip 
+installs here): 
+```
+cd $PATH_ABOVE_WLTOOLS
+git clone https://github.com/sedonaprice/worklog-tools.git
+```
+Most requirements should be included in a standard python installation. 
+
 ## Workflow for updating CV & Publications
 
 ### 1. Adding entries to the yearly INI log files 
