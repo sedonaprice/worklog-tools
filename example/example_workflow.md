@@ -3,7 +3,7 @@
 
 I'm eternally grateful to [Peter Williams](http://newton.cx/~peter/) for 
 writing ``worklog-tools``! This package was an absolute game changer for me 
-in my CV + publication list management --- see the  
+in my CV + publication list management --- see the 
 [publications list](https://sedonaprice.github.io/publications.html) 
 and [CV](https://sedonaprice.github.io/shprice-cv-web.pdf)
 on my webpage for examples of my typical usage! 
