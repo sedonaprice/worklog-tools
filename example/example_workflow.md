@@ -159,7 +159,7 @@ within the directory with my log files.
 
 
 You'll need to edit your ```Makefile``` with instructions 
-on how to build an new files from the template. 
+on how to build new files from the template. 
 The existing examples are a great starting place (note the 
 _html_ or _latex_ are the parsing formats, which can also 
 support _markdown_). 
