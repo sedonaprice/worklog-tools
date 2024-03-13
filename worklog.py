@@ -2053,6 +2053,58 @@ def cmd_rev_prop_list_if_not(context, sections, gatefield):
     )
 
 
+def cmd_rev_prop_list_if_if(context, sections, gatefield, gatefield2):
+    """Same a PROPLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_prop_list(
+        context,
+        sections,
+        lambda i: (
+            (i.get(gatefield, "n") == "y") & (i.get(gatefield2, "n") == "y")
+        ),
+    )
+
+
+def cmd_rev_prop_list_if_not_if(context, sections, gatefield, gatefield2):
+    """Same a PROPLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_prop_list(
+        context,
+        sections,
+        lambda i: (
+            (i.get(gatefield, "n") != "y") & (i.get(gatefield2, "n") == "y")
+        ),
+    )
+
+
+def cmd_rev_prop_list_if_if_not(context, sections, gatefield, gatefield2):
+    """Same a PROPLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_prop_list(
+        context,
+        sections,
+        lambda i: (
+            (i.get(gatefield, "n") == "y") & (i.get(gatefield2, "n") != "y")
+        ),
+    )
+
+
+def cmd_rev_prop_list_if_not_if_not(context, sections, gatefield, gatefield2):
+    """Same a PROPLIST, but only shows items where a certain item
+    is True. XXX: this kind of approach could get out of hand
+    quickly."""
+    return _rev_prop_list(
+        context,
+        sections,
+        lambda i: (
+            (i.get(gatefield, "n") != "y") & (i.get(gatefield2, "n") != "y")
+        ),
+    )
+
+
 def _rev_prop_list(context, sections, gate):
     if context.cur_formatter is None:
         die("cannot use PROPLIST* command before using FORMAT")
@@ -2071,7 +2123,16 @@ def _rev_prop_list(context, sections, gate):
             if item.__dict__[context.format_alt_flag_check].strip() == "":
                 yield context.cur_formatter_alt(info)
             else:
-                yield context.cur_formatter(info)
+                if context.format_alt2_flag_check is not None:
+                    if (
+                        item.__dict__[context.format_alt2_flag_check].strip()
+                        == ""
+                    ):
+                        yield context.cur_formatter_alt2(info)
+                    else:
+                        yield context.cur_formatter(info)
+                else:
+                    yield context.cur_formatter(info)
         else:
             yield context.cur_formatter(info)
 
@@ -2166,6 +2227,10 @@ def setup_processing(render, datadir):
     commands["PROPLIST"] = cmd_rev_prop_list
     commands["PROPLIST_IF"] = cmd_rev_prop_list_if
     commands["PROPLIST_IF_NOT"] = cmd_rev_prop_list_if_not
+    commands["PROPLIST_IF_IF"] = cmd_rev_prop_list_if_if
+    commands["PROPLIST_IF_NOT_IF"] = cmd_rev_prop_list_if_not_if
+    commands["PROPLIST_IF_IF_NOT"] = cmd_rev_prop_list_if_if_not
+    commands["PROPLIST_IF_NOT_IF_NOT"] = cmd_rev_prop_list_if_not_if_not
     commands["TODAY"] = cmd_today_invert
 
     return context, commands
