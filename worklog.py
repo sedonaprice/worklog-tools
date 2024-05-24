@@ -2412,6 +2412,8 @@ _bib_journals = {
     "\\araa": r"ARA&A",
     "\\mnras": "MNRAS",
     "\\pasa": "PASA",
+    "\\nat": "Nature",
+    "\\sci": "Science",
 }
 
 
