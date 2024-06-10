@@ -1013,15 +1013,6 @@ def cite_info(oitem, context):
             # sauths[i] = MupUnderline(sauths[i])
             sauths[i] = MupDagger(sauths[i])
 
-    # if len(sauths) == 1:
-    #     aitem.short_authors = sauths[0]
-    # elif len(sauths) == 2:
-    #     aitem.short_authors = MupJoin(" & ", sauths)
-    # elif len(sauths) == 3:
-    #     aitem.short_authors = MupJoin(", ", sauths)
-    # else:
-    #     aitem.short_authors = MupJoin(" ", [sauths[0], "et" + nbsp + "al."])
-
     # --------------------------------------------------------------
     # Like canonicalized name scheme instead:
     if len(sauths) == 1:
@@ -1045,6 +1036,86 @@ def cite_info(oitem, context):
             aitem.short_authors = MupJoin(", ", [sauthsstr, "including "])
             sauthsstr = aitem.short_authors
             aitem.short_authors = MupJoin(" ", [sauthsstr, sauths[myidx]])
+
+    # --------------------------------------------------------------
+
+    # Short list of authors, for IN PREP PUBLICATIONS: possibly abbreviating
+    # my name.
+    sprepauths = [surname(a) for a in oitem.authors.split(";")]
+    if context.my_abbrev_name is not None:
+        sprepauths[myidx] = context.my_abbrev_name
+
+    if len(advposlist):
+        for i in [int(x) - 1 for x in advposlist.split(",")]:
+            # sprepauths[i] = MupUnderline (sprepauths[i])
+            sprepauths[i] = MupDagger(sprepauths[i])
+
+    # Like canonicalized name scheme instead:
+    if len(sprepauths) == 1:
+        sprepauthsstr = cauths[0]
+        aitem.short_prep_authors = MupJoin(
+            ", ", [sprepauthsstr, "et" + nbsp + "al."]
+        )
+    elif len(sprepauths) == 2:
+        sprepauthsstr = MupJoin(", ", cauths[0:2])
+        aitem.short_prep_authors = MupJoin(
+            ", ", [sprepauthsstr, "et" + nbsp + "al."]
+        )
+    elif len(sprepauths) >= 3:
+        sprepauthsstr = MupJoin(", ", cauths[0:3])
+        aitem.short_prep_authors = MupJoin(
+            ", ", [sprepauthsstr, "et" + nbsp + "al."]
+        )
+
+        if (context.my_abbrev_name is not None) & (myidx > 2):
+            sprepauths[myidx] = MupBold(sprepauths[myidx])
+            sprepauthsstr = aitem.short_prep_authors
+            aitem.short_prep_authors = MupJoin(
+                ", ", [sprepauthsstr, "including "]
+            )
+            sprepauthsstr = aitem.short_prep_authors
+            aitem.short_prep_authors = MupJoin(
+                " ", [sprepauthsstr, sauths[myidx]]
+            )
+
+    # !!!!!!!!!!!!
+    # !!!!
+
+    # --------------------------------------------------------------
+
+    # Medium list of authors, possibly abbreviating my name.
+    mauths = [surname(a) for a in oitem.authors.split(";")]
+    if context.my_abbrev_name is not None:
+        mauths[myidx] = context.my_abbrev_name
+
+    if len(advposlist):
+        for i in [int(x) - 1 for x in advposlist.split(",")]:
+            mauths[i] = MupDagger(mauths[i])
+
+    # --------------------------------------------------------------
+    # Like canonicalized name scheme instead:
+    if len(mauths) == 1:
+        aitem.medium_authors = cauths[0]  # sauths[0]
+    elif len(mauths) == 2:
+        aitem.medium_authors = MupJoin(" & ", cauths)  # sauths)
+    elif (len(mauths) >= 3) & (len(mauths) <= context.num_med_trunc_auths):
+        aitem.medium_authors = MupJoin(", ", cauths[:-1])  # sauths)
+        aitem.medium_authors = MupJoin(
+            ", & ", [aitem.medium_authors, cauths[-1]]
+        )
+    else:
+        mauthsstr = MupJoin(", ", cauths[0 : context.num_med_trunc_auths])
+        aitem.medium_authors = MupJoin(", ", [mauthsstr, "et" + nbsp + "al."])
+
+        if (context.my_abbrev_name is not None) & (
+            myidx > context.num_med_trunc_auths - 1
+        ):
+            # mauths[myidx] = MupBold(sauths[myidx])
+            mauths[myidx] = MupBoldUnderline(mauths[myidx])
+            mauthsstr = aitem.medium_authors
+            aitem.medium_authors = MupJoin(", ", [mauthsstr, "including "])
+            mauthsstr = aitem.medium_authors
+            aitem.medium_authors = MupJoin(" ", [mauthsstr, mauths[myidx]])
 
     # --------------------------------------------------------------
 
@@ -1908,6 +1979,11 @@ def cmd_my_abbrev_name(context, *text):
     return ""
 
 
+def cmd_num_med_trunc_auths(context, *text):
+    context.num_med_trunc_auths = int("".join(text))
+    return ""
+
+
 def cmd_pub_list(context, group):
     if context.cur_formatter is None:
         die("cannot use PUBLIST command before using FORMAT")
@@ -2216,6 +2292,7 @@ def setup_processing(render, datadir):
     commands["TODAY."] = cmd_today
 
     # SHP additions
+    commands["NUMMEDTRUNCAUTHS"] = cmd_num_med_trunc_auths
     commands["FORMAT_ALT"] = cmd_format_alt
     commands["FORMAT_ALT_FLAG_CHECK"] = cmd_format_alt_flag_check
     commands["FORMAT_ALT2"] = cmd_format_alt2
