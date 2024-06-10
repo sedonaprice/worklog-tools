@@ -160,6 +160,10 @@ within the directory with my log files.
 
 You'll need to edit your ```Makefile``` with instructions 
 on how to build new files from the template. 
+
+> [!WARNING]  
+> **This includes editing the path `toolsdir` at the top of the file.**
+
 The existing examples are a great starting place (note the 
 _html_ or _latex_ are the parsing formats, which can also 
 support _markdown_). 
