@@ -9,7 +9,6 @@ Shared routines for my worklog tools.
 # import sys
 # sys.stdout.reconfigure(encoding='utf-8')
 
-
 from __future__ import absolute_import, division, print_function
 from six import string_types, text_type
 from six.moves import map, range
@@ -110,9 +109,7 @@ def open_template(stem):
     try:
         return open(join(dirname(__file__), "templates", stem))
     except Exception as e:
-        die(
-            'cannot open template "%s": %s (%s)', stem, e, e.__class__.__name__
-        )
+        die('cannot open template "%s": %s (%s)', stem, e, e.__class__.__name__)
 
 
 def slurp_template(stem):
@@ -457,7 +454,7 @@ class MupText(Markup):
             #
             if r"{\alpha}" in t:
                 tmp = t.split(r"{\alpha}")
-                out = "\u03B1".join(tmp)
+                out = "\u03b1".join(tmp)
                 arr[i] = out
                 t = out
 
@@ -540,9 +537,7 @@ class MupBoldUnderline(Markup):
         self.inner = _maybe_wrap_text(inner)
 
     def _latex(self):
-        return (
-            ["\\underline{\\smash{\\textbf{"] + self.inner._latex() + ["}}}"]
-        )
+        return ["\\underline{\\smash{\\textbf{"] + self.inner._latex() + ["}}}"]
 
     def _html(self):
         return ["<u>"] + ["<b>"] + self.inner._html() + ["</b>"] + ["</u>"]
@@ -610,18 +605,11 @@ class MupLink(Markup):
 
     def _html(self):
         return (
-            ['<a href="', html_escape(self.url), '">']
-            + self.inner._html()
-            + ["</a>"]
+            ['<a href="', html_escape(self.url), '">'] + self.inner._html() + ["</a>"]
         )
 
     def _markdown(self):
-        return (
-            ["["]
-            + self.inner._html()
-            + ["]"]
-            + ["(", html_escape(self.url), ")"]
-        )
+        return ["["] + self.inner._html() + ["]"] + ["(", html_escape(self.url), ")"]
 
 
 # class MupBoldUnderline(Markup):
@@ -861,10 +849,9 @@ class Formatter(object):
             return self.renderer(thing)
         except ValueError as e:
             raise ValueError(
-                (
-                    'while rendering field "%s" of item %s: %s'
-                    % (text, item, e)
-                ).encode("utf-8")
+                ('while rendering field "%s" of item %s: %s' % (text, item, e)).encode(
+                    "utf-8"
+                )
             )
 
     def __call__(self, item):
@@ -997,9 +984,7 @@ def cite_info(oitem, context):
         aitem.full_authors_semi = MupJoin(" & ", cauths)
     else:
         aitem.full_authors_semi = MupJoin("; ", cauths[:-1])
-        aitem.full_authors_semi = MupJoin(
-            "; & ", [aitem.full_authors_semi, cauths[-1]]
-        )
+        aitem.full_authors_semi = MupJoin("; & ", [aitem.full_authors_semi, cauths[-1]])
 
     # --------------------------------------------------------------
 
@@ -1021,9 +1006,7 @@ def cite_info(oitem, context):
         aitem.short_authors = MupJoin(" & ", cauths)  # sauths)
     elif (len(sauths) >= 3) & (len(sauths) <= 5):
         aitem.short_authors = MupJoin(", ", cauths[:-1])  # sauths)
-        aitem.short_authors = MupJoin(
-            ", & ", [aitem.short_authors, cauths[-1]]
-        )
+        aitem.short_authors = MupJoin(", & ", [aitem.short_authors, cauths[-1]])
     else:
         # aitem.short_authors = MupJoin (' ', [sauths[0], 'et' + nbsp + 'al.'])
         sauthsstr = MupJoin(", ", cauths[0:3])
@@ -1053,30 +1036,20 @@ def cite_info(oitem, context):
     # Like canonicalized name scheme instead:
     if len(sprepauths) == 1:
         sprepauthsstr = cauths[0]
-        aitem.short_prep_authors = MupJoin(
-            ", ", [sprepauthsstr, "et" + nbsp + "al."]
-        )
+        aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "et" + nbsp + "al."])
     elif len(sprepauths) == 2:
         sprepauthsstr = MupJoin(", ", cauths[0:2])
-        aitem.short_prep_authors = MupJoin(
-            ", ", [sprepauthsstr, "et" + nbsp + "al."]
-        )
+        aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "et" + nbsp + "al."])
     elif len(sprepauths) >= 3:
         sprepauthsstr = MupJoin(", ", cauths[0:3])
-        aitem.short_prep_authors = MupJoin(
-            ", ", [sprepauthsstr, "et" + nbsp + "al."]
-        )
+        aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "et" + nbsp + "al."])
 
         if (context.my_abbrev_name is not None) & (myidx > 2):
             sprepauths[myidx] = MupBold(sprepauths[myidx])
             sprepauthsstr = aitem.short_prep_authors
-            aitem.short_prep_authors = MupJoin(
-                ", ", [sprepauthsstr, "including "]
-            )
+            aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "including "])
             sprepauthsstr = aitem.short_prep_authors
-            aitem.short_prep_authors = MupJoin(
-                " ", [sprepauthsstr, sauths[myidx]]
-            )
+            aitem.short_prep_authors = MupJoin(" ", [sprepauthsstr, sauths[myidx]])
 
     # !!!!!!!!!!!!
     # !!!!
@@ -1100,9 +1073,7 @@ def cite_info(oitem, context):
         aitem.medium_authors = MupJoin(" & ", cauths)  # sauths)
     elif (len(mauths) >= 3) & (len(mauths) <= context.num_med_trunc_auths):
         aitem.medium_authors = MupJoin(", ", cauths[:-1])  # sauths)
-        aitem.medium_authors = MupJoin(
-            ", & ", [aitem.medium_authors, cauths[-1]]
-        )
+        aitem.medium_authors = MupJoin(", & ", [aitem.medium_authors, cauths[-1]])
     else:
         mauthsstr = MupJoin(", ", cauths[0 : context.num_med_trunc_auths])
         aitem.medium_authors = MupJoin(", ", [mauthsstr, "et" + nbsp + "al."])
@@ -1133,30 +1104,20 @@ def cite_info(oitem, context):
     # Like canonicalized name scheme instead:
     if len(sprepauths) == 1:
         sprepauthsstr = cauths[0]
-        aitem.short_prep_authors = MupJoin(
-            ", ", [sprepauthsstr, "et" + nbsp + "al."]
-        )
+        aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "et" + nbsp + "al."])
     elif len(sprepauths) == 2:
         sprepauthsstr = MupJoin(", ", cauths[0:2])
-        aitem.short_prep_authors = MupJoin(
-            ", ", [sprepauthsstr, "et" + nbsp + "al."]
-        )
+        aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "et" + nbsp + "al."])
     elif len(sprepauths) >= 3:
         sprepauthsstr = MupJoin(", ", cauths[0:3])
-        aitem.short_prep_authors = MupJoin(
-            ", ", [sprepauthsstr, "et" + nbsp + "al."]
-        )
+        aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "et" + nbsp + "al."])
 
         if (context.my_abbrev_name is not None) & (myidx > 2):
             sprepauths[myidx] = MupBold(sprepauths[myidx])
             sprepauthsstr = aitem.short_prep_authors
-            aitem.short_prep_authors = MupJoin(
-                ", ", [sprepauthsstr, "including "]
-            )
+            aitem.short_prep_authors = MupJoin(", ", [sprepauthsstr, "including "])
             sprepauthsstr = aitem.short_prep_authors
-            aitem.short_prep_authors = MupJoin(
-                " ", [sprepauthsstr, sauths[myidx]]
-            )
+            aitem.short_prep_authors = MupJoin(" ", [sprepauthsstr, sauths[myidx]])
 
     # --------------------------------------------------------------
 
@@ -1168,9 +1129,7 @@ def cite_info(oitem, context):
     # # Title with replaced quotes, for nesting in double-quotes, and
     # # optionally-bolded for first authorship.
     # aitem.quotable_title = oitem.title.replace("“", "‘").replace("”", "’")
-    aitem.quotable_title = MupText(
-        oitem.title.replace("“", "‘").replace("”", "’")
-    )
+    aitem.quotable_title = MupText(oitem.title.replace("“", "‘").replace("”", "’"))
 
     if myidx == 0:
         aitem.bold_if_first_title = MupBold(oitem.title)
@@ -1373,9 +1332,7 @@ def partition_pubs(pubs):
         if first & (not prep) & (not prepsub) & (refereed | refpreprint):
             # print "is first"
             groups.first.append(pub)
-        elif (
-            (not first) & (not prep) & (not prepsub) & (refereed | refpreprint)
-        ):
+        elif (not first) & (not prep) & (not prepsub) & (refereed | refpreprint):
             # print "is contrib"
             groups.contrib.append(pub)
         elif prep:
@@ -1386,12 +1343,7 @@ def partition_pubs(pubs):
         if firstfew & (not prep) & (not prepsub) & (refereed | refpreprint):
             # print "is firstfew"
             groups.firstfew.append(pub)
-        elif (
-            (not firstfew)
-            & (not prep)
-            & (not prepsub)
-            & (refereed | refpreprint)
-        ):
+        elif (not firstfew) & (not prep) & (not prepsub) & (refereed | refpreprint):
             # print "is contribfew"
             groups.contribfew.append(pub)
 
@@ -1703,9 +1655,7 @@ def prop_info(oitem):
     try:
         # Title with replaced quotes, for nesting in double-quotes, and
         # optionally-bolded for first authorship.
-        aitem.quotable_title = MupText(
-            oitem.title.replace("“", "‘").replace("”", "’")
-        )
+        aitem.quotable_title = MupText(oitem.title.replace("“", "‘").replace("”", "’"))
         # words_title = aitem.quotable_title.split(' ')
         # aitem.quotable_title = MupJoin (' ', words_title)
     except AttributeError:
@@ -1736,15 +1686,11 @@ def process_repositories(items):
         repos.append(repo)
 
         if i.service == "github":
-            repo.linkname = MupLink(
-                "https://github.com/" + urlquote(i.name), i.name
-            )
+            repo.linkname = MupLink("https://github.com/" + urlquote(i.name), i.name)
         else:
             repo.linkname = i.name
 
-        repo.commit_frac = "%.0f%%" % (
-            100.0 * int(i.usercommits) / int(i.allcommits)
-        )
+        repo.commit_frac = "%.0f%%" % (100.0 * int(i.usercommits) / int(i.allcommits))
         if repo.commit_frac == "0%":
             repo.commit_frac = "<1%"
 
@@ -1752,9 +1698,7 @@ def process_repositories(items):
             int(x) for x in i.lastusercommit.split("/")
         ]
         repo.date = "%04d %s" % (repo.luc_year, months[repo.luc_month - 1])
-        repo._datekey = (
-            repo.luc_year * 10000 + repo.luc_month * 100 + repo.luc_day
-        )
+        repo._datekey = repo.luc_year * 10000 + repo.luc_month * 100 + repo.luc_day
 
     return sorted(repos, key=lambda r: r._datekey)
 
@@ -1789,9 +1733,7 @@ def summarize_talks(talks):
     info = {}
     info["n_total"] = len(talks)
     info["n_invited"] = len([t for t in talks if t.get("invited", "n") == "y"])
-    info["n_conference"] = len(
-        [t for t in talks if t.get("conference", "n") == "y"]
-    )
+    info["n_conference"] = len([t for t in talks if t.get("conference", "n") == "y"])
     return info
 
 
@@ -1857,9 +1799,7 @@ def cmd_format(context, *inline_template):
 # SHP added
 def cmd_format_alt(context, *inline_template):
     inline_template = " ".join(inline_template)
-    context.cur_formatter_alt = Formatter(
-        context.render, True, inline_template
-    )
+    context.cur_formatter_alt = Formatter(context.render, True, inline_template)
 
     if inline_template.strip() == "None":
         context.cur_formatter_alt = None
@@ -1878,9 +1818,7 @@ def cmd_format_alt_flag_check(context, flag_to_check):
 
 def cmd_format_alt2(context, *inline_template):
     inline_template = " ".join(inline_template)
-    context.cur_formatter_alt2 = Formatter(
-        context.render, True, inline_template
-    )
+    context.cur_formatter_alt2 = Formatter(context.render, True, inline_template)
 
     if inline_template.strip() == "None":
         context.cur_formatter_alt2 = None
@@ -1902,9 +1840,7 @@ def cmd_rev_misc_list_switch(context, sections, gatefield, case):
     """Same a RMISCLIST, but only shows items where a certain item
     is True. XXX: this kind of approach could get out of hand
     quickly."""
-    return _rev_misc_list(
-        context, sections, lambda i: i.get(gatefield, "n") == case
-    )
+    return _rev_misc_list(context, sections, lambda i: i.get(gatefield, "n") == case)
 
 
 # ---------------------
@@ -1914,9 +1850,7 @@ def cmd_talk_list_switch(context, sections, gatefield, case):
     """Same a RMISCLIST, but only shows items where a certain item
     is True. XXX: this kind of approach could get out of hand
     quickly."""
-    return _rev_talk_list(
-        context, sections, lambda i: i.get(gatefield, "n") == case
-    )
+    return _rev_talk_list(context, sections, lambda i: i.get(gatefield, "n") == case)
 
 
 def _rev_talk_list(context, sections, gate):
@@ -1938,10 +1872,7 @@ def _rev_talk_list(context, sections, gate):
                 yield context.cur_formatter_alt(info)
             else:
                 if context.format_alt2_flag_check is not None:
-                    if (
-                        info.__dict__[context.format_alt2_flag_check].strip()
-                        == ""
-                    ):
+                    if info.__dict__[context.format_alt2_flag_check].strip() == "":
                         yield context.cur_formatter_alt2(info)
                     else:
                         yield context.cur_formatter(info)
@@ -2066,10 +1997,7 @@ def _rev_misc_list(context, sections, gate):
                 yield context.cur_formatter_alt(item)
             else:
                 if context.format_alt2_flag_check is not None:
-                    if (
-                        item.__dict__[context.format_alt2_flag_check].strip()
-                        == ""
-                    ):
+                    if item.__dict__[context.format_alt2_flag_check].strip() == "":
                         yield context.cur_formatter_alt2(item)
                     else:
                         yield context.cur_formatter(item)
@@ -2087,15 +2015,11 @@ def cmd_rev_misc_list_if(context, sections, gatefield):
     """Same a RMISCLIST, but only shows items where a certain item
     is True. XXX: this kind of approach could get out of hand
     quickly."""
-    return _rev_misc_list(
-        context, sections, lambda i: i.get(gatefield, "n") == "y"
-    )
+    return _rev_misc_list(context, sections, lambda i: i.get(gatefield, "n") == "y")
 
 
 def cmd_rev_misc_list_if_not(context, sections, gatefield):
-    return _rev_misc_list(
-        context, sections, lambda i: i.get(gatefield, "n") != "y"
-    )
+    return _rev_misc_list(context, sections, lambda i: i.get(gatefield, "n") != "y")
 
 
 def cmd_rev_repo_list(context, sections):
@@ -2118,15 +2042,11 @@ def cmd_rev_prop_list_if(context, sections, gatefield):
     """Same a PROPLIST, but only shows items where a certain item
     is True. XXX: this kind of approach could get out of hand
     quickly."""
-    return _rev_prop_list(
-        context, sections, lambda i: i.get(gatefield, "n") == "y"
-    )
+    return _rev_prop_list(context, sections, lambda i: i.get(gatefield, "n") == "y")
 
 
 def cmd_rev_prop_list_if_not(context, sections, gatefield):
-    return _rev_prop_list(
-        context, sections, lambda i: i.get(gatefield, "n") != "y"
-    )
+    return _rev_prop_list(context, sections, lambda i: i.get(gatefield, "n") != "y")
 
 
 def cmd_rev_prop_list_if_if(context, sections, gatefield, gatefield2):
@@ -2136,9 +2056,7 @@ def cmd_rev_prop_list_if_if(context, sections, gatefield, gatefield2):
     return _rev_prop_list(
         context,
         sections,
-        lambda i: (
-            (i.get(gatefield, "n") == "y") & (i.get(gatefield2, "n") == "y")
-        ),
+        lambda i: ((i.get(gatefield, "n") == "y") & (i.get(gatefield2, "n") == "y")),
     )
 
 
@@ -2149,9 +2067,7 @@ def cmd_rev_prop_list_if_not_if(context, sections, gatefield, gatefield2):
     return _rev_prop_list(
         context,
         sections,
-        lambda i: (
-            (i.get(gatefield, "n") != "y") & (i.get(gatefield2, "n") == "y")
-        ),
+        lambda i: ((i.get(gatefield, "n") != "y") & (i.get(gatefield2, "n") == "y")),
     )
 
 
@@ -2162,9 +2078,7 @@ def cmd_rev_prop_list_if_if_not(context, sections, gatefield, gatefield2):
     return _rev_prop_list(
         context,
         sections,
-        lambda i: (
-            (i.get(gatefield, "n") == "y") & (i.get(gatefield2, "n") != "y")
-        ),
+        lambda i: ((i.get(gatefield, "n") == "y") & (i.get(gatefield2, "n") != "y")),
     )
 
 
@@ -2175,9 +2089,7 @@ def cmd_rev_prop_list_if_not_if_not(context, sections, gatefield, gatefield2):
     return _rev_prop_list(
         context,
         sections,
-        lambda i: (
-            (i.get(gatefield, "n") != "y") & (i.get(gatefield2, "n") != "y")
-        ),
+        lambda i: ((i.get(gatefield, "n") != "y") & (i.get(gatefield2, "n") != "y")),
     )
 
 
@@ -2200,10 +2112,7 @@ def _rev_prop_list(context, sections, gate):
                 yield context.cur_formatter_alt(info)
             else:
                 if context.format_alt2_flag_check is not None:
-                    if (
-                        item.__dict__[context.format_alt2_flag_check].strip()
-                        == ""
-                    ):
+                    if item.__dict__[context.format_alt2_flag_check].strip() == "":
                         yield context.cur_formatter_alt2(info)
                     else:
                         yield context.cur_formatter(info)
@@ -2275,6 +2184,8 @@ def setup_processing(render, datadir):
     context.format_alt_flag_check = None
     context.cur_formatter_alt2 = None
     context.format_alt2_flag_check = None
+
+    context.num_med_trunc_auths = 10  # DEFAULT for medium truncation
     # ------------------------
 
     commands = {}
@@ -2361,9 +2272,7 @@ def get_ads_cite_count(bibcode):
     structured = json.loads(resp.text)
 
     if "Error" in structured:
-        raise ADSCountError(
-            structured.get("Error Info", "unknown ADS API error")
-        )
+        raise ADSCountError(structured.get("Error Info", "unknown ADS API error"))
 
     # NB, the "citation stats refereed" structure is all zeros for items that
     # are not themselves refereed.
@@ -2374,8 +2283,7 @@ def get_ads_cite_count(bibcode):
 
     if count is None:
         raise ADSCountError(
-            "ADS Metrics API response does not include expected "
-            "citation metric"
+            "ADS Metrics API response does not include expected " "citation metric"
         )
 
     return count
@@ -2501,11 +2409,7 @@ def _bib_cite(rec):
     if "series" in rec and "volume" in rec and "pages" in rec:
         return " ".join((rec["series"], rec["volume"], rec["pages"]))
 
-    if (
-        rec.get("type") == "inproceedings"
-        and "booktitle" in rec
-        and "pages" in rec
-    ):
+    if rec.get("type") == "inproceedings" and "booktitle" in rec and "pages" in rec:
         return "proceedings of “%s”, %s" % (rec["booktitle"], rec["pages"])
 
     if rec.get("journal") is not None:
@@ -2588,17 +2492,11 @@ class BibCustomizer(object):
 
         for key in rec.keys():
             val = rec.get(key)
-            val = (
-                val.replace("{\\nbsp}", nbsp)
-                .replace("``", "“")
-                .replace("''", "”")
-            )
+            val = val.replace("{\\nbsp}", nbsp).replace("``", "“").replace("''", "”")
             rec[key] = val
 
         if "journal" in rec:
-            rec["journal"] = _bib_journals.get(
-                rec["journal"].lower(), rec["journal"]
-            )
+            rec["journal"] = _bib_journals.get(rec["journal"].lower(), rec["journal"])
 
         rec = author(rec)
 
@@ -2632,18 +2530,13 @@ class BibCustomizer(object):
 
                     elif custom_lastname_fix_dict is not None:
                         for key in custom_lastname_fix_dict.keys():
-                            if (
-                                item in custom_lastname_fix_dict[key]["list"]
-                            ) & (
-                                last
-                                == custom_lastname_fix_dict[key]["last_match"]
+                            if (item in custom_lastname_fix_dict[key]["list"]) & (
+                                last == custom_lastname_fix_dict[key]["last_match"]
                             ):
                                 # Custom exceptions exception
                                 _ = firsts.pop()
                                 last = (
-                                    custom_lastname_fix_dict[key][
-                                        "last_replace"
-                                    ]
+                                    custom_lastname_fix_dict[key]["last_replace"]
                                     + " "
                                     + last
                                 )
@@ -2668,9 +2561,7 @@ def bootstrap_bibtex(bibfile, outdir, mysurname):
 
     # bp = BibTexParser (bibfile, customization=BibCustomizer (mysurname))
 
-    bp = BibTexParser(
-        common_strings=True, customization=BibCustomizer(mysurname)
-    )
+    bp = BibTexParser(common_strings=True, customization=BibCustomizer(mysurname))
     bdb = bibtexparser.load(bibfile, parser=bp)
 
     bp_entries = bdb.entries
@@ -2719,9 +2610,7 @@ def bootstrap_bibtex(bibfile, outdir, mysurname):
             _write_with_wrapping(
                 outfile,
                 "pubdate",
-                rec["year"]
-                + "/"
-                + _bib_months.get(rec["month"].lower(), rec["month"]),
+                rec["year"] + "/" + _bib_months.get(rec["month"].lower(), rec["month"]),
             )
         elif "year" in rec:
             print(
@@ -2819,9 +2708,7 @@ def bootstrap_bibtex_alphabetical(bibfile, outdir, mysurname):
             _write_with_wrapping(
                 outfile,
                 "pubdate",
-                rec["year"]
-                + "/"
-                + _bib_months.get(rec["month"].lower(), rec["month"]),
+                rec["year"] + "/" + _bib_months.get(rec["month"].lower(), rec["month"]),
             )
         elif "year" in rec:
             print(
