@@ -28,6 +28,10 @@ try:
 except ImportError:
     custom_html_md_dict = None
 try:
+    from custom_markdowns import custom_markdown_md_dict
+except ImportError:
+    custom_markdown_md_dict = None
+try:
     from custom_markdowns import custom_lastname_fix_dict
 except ImportError:
     custom_lastname_fix_dict = None
@@ -262,65 +266,36 @@ class MupText(Markup):
                         arr[i] = out
                         t = out
 
-            # if "KMOS3D" in t:
-            #     orig = "KMOS3D"
-            #     typeset = r"KMOS$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
-            #     tmp = t.split(orig)
-            #     out = typeset.join(tmp)
-            #     arr[i] = out
-            #     t = out
-            # if "NOEMA3D" in t:
-            #     orig = "NOEMA3D"
-            #     typeset = r"NOEMA$^{\hbox{\textit{{\scriptsize{3D}}}}}$"
-            #     tmp = t.split(orig)
-            #     out = typeset.join(tmp)
+            # if "\$" in t:
+            #     tmp = t.split("\$")
+            #     out = r"$".join(tmp)
             #     arr[i] = out
             #     t = out
 
-            # if "pndsign" in t:
-            #     tmp = t.split("pndsign")
-            #     out = r"\#".join(tmp)
+            # if r"{\alpha}" in t:
+            #     tmp = t.split(r"{\alpha}")
+            #     out = r"{\ensuremath{\alpha}}".join(tmp)
             #     arr[i] = out
             #     t = out
             # #
-
-            if "\$" in t:
-                tmp = t.split("\$")
-                out = r"$".join(tmp)
-                arr[i] = out
-                t = out
-
-            # if "pndsign" in t:
-            #     tmp = t.split("pndsign")
-            #     out = r"\#".join(tmp)
+            # #
+            # if r"\{\textbackslash{}alpha\}" in t:
+            #     tmp = t.split(r"\{\textbackslash{}alpha\}")
+            #     out = r"{\ensuremath{\alpha}}".join(tmp)
             #     arr[i] = out
             #     t = out
             # #
-            #
-            if r"{\alpha}" in t:
-                tmp = t.split(r"{\alpha}")
-                out = r"{\ensuremath{\alpha}}".join(tmp)
-                arr[i] = out
-                t = out
-            #
-            #
-            if r"\{\textbackslash{}alpha\}" in t:
-                tmp = t.split(r"\{\textbackslash{}alpha\}")
-                out = r"{\ensuremath{\alpha}}".join(tmp)
-                arr[i] = out
-                t = out
-            #
-            if r"{\lesssim}" in t:
-                tmp = t.split(r"{\lesssim}")
-                out = r"{\ensuremath{\lesssim}}".join(tmp)
-                arr[i] = out
-                t = out
-            #
-            if r"\{\textbackslash{}lesssim\}" in t:
-                tmp = t.split(r"\{\textbackslash{}lesssim\}")
-                out = r"{\ensuremath{\lesssim}}".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"{\lesssim}" in t:
+            #     tmp = t.split(r"{\lesssim}")
+            #     out = r"{\ensuremath{\lesssim}}".join(tmp)
+            #     arr[i] = out
+            #     t = out
+            # #
+            # if r"\{\textbackslash{}lesssim\}" in t:
+            #     tmp = t.split(r"\{\textbackslash{}lesssim\}")
+            #     out = r"{\ensuremath{\lesssim}}".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
             if r"\_\{" in t:
                 tmp = t.split(r"\_\{")
@@ -339,64 +314,58 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
 
-            if "\~" in t:
-                tmp = t.split("\~")
-                out = r"\ensuremath{\sim}".join(tmp)
-                arr[i] = out
-                t = out
-
-            if r"\textbackslash{}sim" in t:
-                tmp = t.split(r"\textbackslash{}sim")
-                out = r"\ensuremath{\sim}".join(tmp)
-                arr[i] = out
-                t = out
-
-            if "\{sim\}" in t:
-                tmp = t.split("\{sim\}")
-                out = r"\ensuremath{\sim}".join(tmp)
-                arr[i] = out
-                t = out
-
-            if " sim " in t:
-                tmp = t.split(" sim ")
-                out = r"\ensuremath{\sim}".join(tmp)
-                arr[i] = out
-                t = out
-
-            if r"\{\textbackslash{}tilde\}" in t:
-                tmp = t.split(r"\{\textbackslash{}tilde\}")
-                out = r"\ensuremath{\sim}".join(tmp)
-                arr[i] = out
-                t = out
-
-            # if "\\approx\{\}" in t:
-            #     tmp = t.split("\\approx\{\}")
-            #     out = r"\ensuremath{\approx{}}".join(tmp)
+            # if "\~" in t:
+            #     tmp = t.split("\~")
+            #     out = r"\ensuremath{\sim}".join(tmp)
             #     arr[i] = out
             #     t = out
 
-            if "\\approx" in t:
-                tmp = t.split("\\approx")
-                out = r"\ensuremath{\approx}".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"\textbackslash{}sim" in t:
+            #     tmp = t.split(r"\textbackslash{}sim")
+            #     out = r"\ensuremath{\sim}".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"\textbackslash{}tilde" in t:
-                tmp = t.split(r"\textbackslash{}tilde")
-                out = r"\ensuremath{\sim}".join(tmp)
-                arr[i] = out
-                t = out
+            # if "\{sim\}" in t:
+            #     tmp = t.split("\{sim\}")
+            #     out = r"\ensuremath{\sim}".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"{\ensuremath{\sim}}" in t:
-                tmp = t.split(r"{\ensuremath{\sim}}")
-                out = r"\ensuremath{\sim}".join(tmp)
-                arr[i] = out
-                t = out
+            # if " sim " in t:
+            #     tmp = t.split(" sim ")
+            #     out = r"\ensuremath{\sim}".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"\{\}" in t:
-                out = "".join(t.split(r"\{\}"))
-                arr[i] = out
-                t = out
+            # if r"\{\textbackslash{}tilde\}" in t:
+            #     tmp = t.split(r"\{\textbackslash{}tilde\}")
+            #     out = r"\ensuremath{\sim}".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if "\\approx" in t:
+            #     tmp = t.split("\\approx")
+            #     out = r"\ensuremath{\approx}".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"\textbackslash{}tilde" in t:
+            #     tmp = t.split(r"\textbackslash{}tilde")
+            #     out = r"\ensuremath{\sim}".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"{\ensuremath{\sim}}" in t:
+            #     tmp = t.split(r"{\ensuremath{\sim}}")
+            #     out = r"\ensuremath{\sim}".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"\{\}" in t:
+            #     out = "".join(t.split(r"\{\}"))
+            #     arr[i] = out
+            #     t = out
 
         return arr
 
@@ -413,28 +382,6 @@ class MupText(Markup):
                         out = typeset.join(tmp)
                         arr[i] = out
                         t = out
-            # if r"KMOS3D" in t:
-            #     k3d_orig = "KMOS3D"
-            #     k3d = r"KMOS<sup>3D</sup>"
-            #     tmp = t.split(k3d_orig)
-            #     out = k3d.join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if r"NOEMA3D" in t:
-            #     k3d_orig = "NOEMA3D"
-            #     k3d = r"NOEMA<sup>3D</sup>"
-            #     tmp = t.split(k3d_orig)
-            #     out = k3d.join(tmp)
-            #     arr[i] = out
-            #     t = out
-            # if "pndsign" in t:
-            #     k3d_orig = "pndsign"
-            #     k3d = r"#"
-            #     tmp = t.split(k3d_orig)
-            #     out = k3d.join(tmp)
-            #     arr[i] = out
-            #     t = out
             if r"_{" in t:
                 tmp = t.split(r"_{")
                 out = ""
@@ -442,7 +389,6 @@ class MupText(Markup):
                 for j in range(len(tmp)):
                     if j < len(tmp) - 1:
                         subs = tmp[j + 1].split("}")[0]
-                        # ''.join(tmp[j+1].split("}"))
                         out += pre + r"<sub>" + subs + r"</sub>"
                         try:
                             pre = "}".join(tmp[j + 1].split("}")[1:])
@@ -453,57 +399,133 @@ class MupText(Markup):
                 arr[i] = out
                 t = out
             #
-            #
-            if r"{\alpha}" in t:
-                tmp = t.split(r"{\alpha}")
-                out = "\u03b1".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"{\alpha}" in t:
+            #     tmp = t.split(r"{\alpha}")
+            #     out = "\u03b1".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"{\lesssim}" in t:
-                tmp = t.split(r"{\lesssim}")
-                out = "\u2272".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"{\lesssim}" in t:
+            #     tmp = t.split(r"{\lesssim}")
+            #     out = "\u2272".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"--" in t:
-                tmp = t.split(r"--")
-                out = r"-".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"--" in t:
+            #     tmp = t.split(r"--")
+            #     out = r"-".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if "$" in t:
-                tmp = t.split("$")
-                out = r"".join(tmp)
-                arr[i] = out
-                t = out
+            # if "$" in t:
+            #     tmp = t.split("$")
+            #     out = r"".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"\sim" in t:
-                tmp = t.split(r"\sim")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"\sim" in t:
+            #     tmp = t.split(r"\sim")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"{\tilde}" in t:
-                tmp = t.split(r"{\tilde}")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
-            if r"\tilde" in t:
-                tmp = t.split(r"\tilde")
-                out = r"~".join(tmp)
-                arr[i] = out
-                t = out
+            # if r"{\tilde}" in t:
+            #     tmp = t.split(r"{\tilde}")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
+            # if r"\tilde" in t:
+            #     tmp = t.split(r"\tilde")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
 
-            if r"{}" in t:
-                out = "".join(t.split(r"{}"))
-                arr[i] = out
-                t = out
+            # if r"{}" in t:
+            #     out = "".join(t.split(r"{}"))
+            #     arr[i] = out
+            #     t = out
 
         return arr
 
     def _markdown(self):
-        return self._html()
+        # return self._html()
+
+        arr = [html_escape(self.text)]
+
+        for i, t in enumerate(arr):
+            if custom_markdown_md_dict is not None:
+                for key in custom_markdown_md_dict.keys():
+                    if key in t:
+                        orig = key
+                        typeset = r"{}".format(custom_markdown_md_dict[key])
+                        tmp = t.split(orig)
+                        out = typeset.join(tmp)
+                        arr[i] = out
+                        t = out
+            if r"_{" in t:
+                tmp = t.split(r"_{")
+                out = ""
+                pre = tmp[0]
+                for j in range(len(tmp)):
+                    if j < len(tmp) - 1:
+                        subs = tmp[j + 1].split("}")[0]
+                        out += pre + r"<sub>" + subs + r"</sub>"
+                        try:
+                            pre = "}".join(tmp[j + 1].split("}")[1:])
+                        except ValueError:
+                            pre = ""
+                    else:
+                        out += pre
+                arr[i] = out
+                t = out
+            #
+            # if r"{\alpha}" in t:
+            #     tmp = t.split(r"{\alpha}")
+            #     out = "\u03b1".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"{\lesssim}" in t:
+            #     tmp = t.split(r"{\lesssim}")
+            #     out = "\u2272".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"--" in t:
+            #     tmp = t.split(r"--")
+            #     out = r"-".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if "$" in t:
+            #     tmp = t.split("$")
+            #     out = r"".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"\sim" in t:
+            #     tmp = t.split(r"\sim")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"{\tilde}" in t:
+            #     tmp = t.split(r"{\tilde}")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
+            # if r"\tilde" in t:
+            #     tmp = t.split(r"\tilde")
+            #     out = r"~".join(tmp)
+            #     arr[i] = out
+            #     t = out
+
+            # if r"{}" in t:
+            #     out = "".join(t.split(r"{}"))
+            #     arr[i] = out
+            #     t = out
+
+        return arr
 
 
 class MupItalics(Markup):
@@ -548,9 +570,6 @@ class MupBoldUnderline(Markup):
 
     def _markdown(self):
         return ["<ins>"] + ["**"] + self.inner._html() + ["**"] + ["</ins>"]
-
-    # def _markdown(self):
-    #     return self._html()
 
 
 class MupDagger(Markup):
@@ -621,22 +640,6 @@ class MupLink(Markup):
             + ["]"]
             + ["(", html_escape(self.url), ")"]
         )
-
-
-# class MupBoldUnderline(Markup):
-#     def __init__(self, inner):
-#         self.inner = _maybe_wrap_text(inner)
-
-#     def _latex(self):
-#         return (
-#             ["\\underline{\\smash{\\textbf{"] + self.inner._latex() + ["}}}"]
-#         )
-
-#     def _html(self):
-#         return ["<u>"] + ["<b>"] + self.inner._html() + ["</b>"] + ["</u>"]
-
-#     def _markdown(self):
-#         return ["<ins>"] + ["**"] + self.inner._html() + ["**"] + ["</ins>"]
 
 
 class MupJoin(Markup):
