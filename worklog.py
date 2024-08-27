@@ -18,6 +18,7 @@ from six.moves import map, range
 from inifile import Holder
 
 from unicode_to_latex import unicode_to_latex_string
+# , latex_to_unicode_string
 
 try:
     from custom_markdowns import custom_latex_md_dict
@@ -121,6 +122,16 @@ def open_template(stem):
 def slurp_template(stem):
     with open_template(stem) as f:
         return f.read().decode("utf8")
+
+
+def _get_studentfirstauth(pub):
+    advposlist = pub.get("advpos", "")
+    studentfirstauth = False
+    if len(advposlist):
+        for i in [int(x) - 1 for x in advposlist.split(",")]:
+            if i == 0:
+                studentfirstauth = True
+    return studentfirstauth
 
 
 class MultilineHandler(object):
@@ -266,37 +277,6 @@ class MupText(Markup):
                         arr[i] = out
                         t = out
 
-            # if "\$" in t:
-            #     tmp = t.split("\$")
-            #     out = r"$".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if r"{\alpha}" in t:
-            #     tmp = t.split(r"{\alpha}")
-            #     out = r"{\ensuremath{\alpha}}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-            # #
-            # #
-            # if r"\{\textbackslash{}alpha\}" in t:
-            #     tmp = t.split(r"\{\textbackslash{}alpha\}")
-            #     out = r"{\ensuremath{\alpha}}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-            # #
-            # if r"{\lesssim}" in t:
-            #     tmp = t.split(r"{\lesssim}")
-            #     out = r"{\ensuremath{\lesssim}}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-            # #
-            # if r"\{\textbackslash{}lesssim\}" in t:
-            #     tmp = t.split(r"\{\textbackslash{}lesssim\}")
-            #     out = r"{\ensuremath{\lesssim}}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
             if r"\_\{" in t:
                 tmp = t.split(r"\_\{")
                 out = ""
@@ -313,59 +293,6 @@ class MupText(Markup):
                         out += pre
                 arr[i] = out
                 t = out
-
-            # if "\~" in t:
-            #     tmp = t.split("\~")
-            #     out = r"\ensuremath{\sim}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if r"\textbackslash{}sim" in t:
-            #     tmp = t.split(r"\textbackslash{}sim")
-            #     out = r"\ensuremath{\sim}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if "\{sim\}" in t:
-            #     tmp = t.split("\{sim\}")
-            #     out = r"\ensuremath{\sim}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if " sim " in t:
-            #     tmp = t.split(" sim ")
-            #     out = r"\ensuremath{\sim}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if r"\{\textbackslash{}tilde\}" in t:
-            #     tmp = t.split(r"\{\textbackslash{}tilde\}")
-            #     out = r"\ensuremath{\sim}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if "\\approx" in t:
-            #     tmp = t.split("\\approx")
-            #     out = r"\ensuremath{\approx}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if r"\textbackslash{}tilde" in t:
-            #     tmp = t.split(r"\textbackslash{}tilde")
-            #     out = r"\ensuremath{\sim}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if r"{\ensuremath{\sim}}" in t:
-            #     tmp = t.split(r"{\ensuremath{\sim}}")
-            #     out = r"\ensuremath{\sim}".join(tmp)
-            #     arr[i] = out
-            #     t = out
-
-            # if r"\{\}" in t:
-            #     out = "".join(t.split(r"\{\}"))
-            #     arr[i] = out
-            #     t = out
 
         return arr
 
@@ -1261,12 +1188,16 @@ def compute_cite_stats(pubs):
     stats.reffirstauthcites = 0
     stats.refsecauth = 0
     stats.refsecauthcites = 0
+    stats.refsecauthstudent = 0
+    stats.refsecauthstudentcites = 0
     stats.pubs = 0
     stats.cites = 0
     stats.firstauth = 0
     stats.firstauthcites = 0
     stats.secauth = 0
     stats.secauthcites = 0
+    stats.secauthstudent = 0
+    stats.secauthstudentcites = 0
     stats.contribauth = 0
     stats.contribauthcites = 0
     cites = []
@@ -1274,10 +1205,15 @@ def compute_cite_stats(pubs):
 
     for pub in pubs:
         stats.pubs += 1
+
+        studentfirstauth = _get_studentfirstauth(pub)
         if int(pub.mypos) == 1:
             stats.firstauth += 1
         elif int(pub.mypos) == 2:
             stats.secauth += 1
+            stats.secauthstudent += 1
+        elif studentfirstauth:
+            stats.secauthstudent += 1
         else:
             stats.contribauth += 1
         if pub.refereed == "y":
@@ -1286,6 +1222,7 @@ def compute_cite_stats(pubs):
                 stats.reffirstauth += 1
             elif int(pub.mypos) == 2:
                 stats.refsecauth += 1
+                stats.refsecauthstudent += 1
 
         citeinfo = parse_ads_cites(pub)
         if citeinfo is None:
@@ -1303,12 +1240,18 @@ def compute_cite_stats(pubs):
                 stats.reffirstauthcites += citeinfo.cites
             elif int(pub.mypos) == 2:
                 stats.refsecauthcites += citeinfo.cites
+                stats.refsecauthstudentcites += citeinfo.cites
+            elif studentfirstauth:
+                stats.refsecauthstudentcites += citeinfo.cites
 
         stats.cites += citeinfo.cites
         if int(pub.mypos) == 1:
             stats.firstauthcites += citeinfo.cites
         elif int(pub.mypos) == 2:
             stats.secauthcites += citeinfo.cites
+            stats.secauthstudentcites += citeinfo.cites
+        elif studentfirstauth:
+            stats.secauthstudentcites += citeinfo.cites
         else:
             stats.contribauthcites += citeinfo.cites
 
@@ -1369,12 +1312,7 @@ def partition_pubs(pubs):
 
         first = pub.mypos == "1"
         if groups.few_include_student_led:
-            advposlist = pub.get("advpos", "")
-            studentfirstauth = False
-            if len(advposlist):
-                for i in [int(x) - 1 for x in advposlist.split(",")]:
-                    if i == 0:
-                        studentfirstauth = True
+            studentfirstauth = _get_studentfirstauth(pub)
 
             firstfew = (int(pub.mypos) <= groups.fewsplit) | (studentfirstauth)
         else:

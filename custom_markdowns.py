@@ -18,6 +18,8 @@ custom_latex_md_dict = {
     r"\textbackslash{}tilde": r"\ensuremath{\sim}",
     r"{\ensuremath{\sim}}": r"\ensuremath{\sim}",
     r"\{\}": "",
+    # FIX MISTAKES ADDED FROM THE ABOVE FOR AUTHOR NAMES:
+    r"\ensuremath{\sim}{n}": r"\~{n}",
 }
 
 

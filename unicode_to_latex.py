@@ -2375,6 +2375,11 @@ unicode_to_latex_table_base = {
     "\ud7ff": r"\mathtt{9}",
 }
 
+latex_to_unicode_table_base = {}
+for key in unicode_to_latex_table_base.keys():
+    keyinv = unicode_to_latex_table_base[key]
+    latex_to_unicode_table_base[keyinv] = key
+
 # Some multi-character items in the source dataset that we can't
 # translate. This is probably not exhaustive.
 #    u"\u2009\u200A\u200A": r"\;",
@@ -2418,3 +2423,14 @@ unicode_to_latex_string = lambda u: normalize("NFKC", u).translate(
 unicode_to_latex = lambda u: normalize("NFKC", u).translate(
     unicode_to_latex_table
 )
+
+
+# latex_to_unicode_table = dict(
+#     (ord(k), text_type(v)) for k, v in unicode_to_latex_table_base.items()
+# )
+# latex_to_unicode_string = lambda u: normalize("NFKC", u).translate(
+#     latex_to_unicode_table
+# )
+# latex_to_unicode = lambda u: normalize("NFKC", u).translate(
+#     latex_to_unicode_table
+# )
