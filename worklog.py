@@ -2147,14 +2147,31 @@ def _rev_prop_list(context, sections, gate):
         info = prop_info(item)
 
         if context.format_alt_flag_check is not None:
-            if item.__dict__[context.format_alt_flag_check].strip() == "":
+            _doalt = False
+            if context.format_alt_flag_check in item.__dict__.keys():
+                if item.__dict__[context.format_alt_flag_check].strip() == "":
+                    _doalt = True
+            else:
+                _doalt = True
+
+            if _doalt:
                 yield context.cur_formatter_alt(info)
+
             else:
                 if context.format_alt2_flag_check is not None:
-                    if (
-                        item.__dict__[context.format_alt2_flag_check].strip()
-                        == ""
-                    ):
+                    _doalt2 = False
+                    if context.format_alt2_flag_check in item.__dict__.keys():
+                        if (
+                            item.__dict__[
+                                context.format_alt2_flag_check
+                            ].strip()
+                            == ""
+                        ):
+                            _doalt2 = True
+                    else:
+                        _doalt2 = True
+
+                    if _doalt2:
                         yield context.cur_formatter_alt2(info)
                     else:
                         yield context.cur_formatter(info)
