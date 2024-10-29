@@ -1884,20 +1884,40 @@ def _rev_talk_list(context, sections, gate):
 
         info = talk_info(item)
 
+        doalt = False
         if context.format_alt_flag_check is not None:
-            if info.__dict__[context.format_alt_flag_check].strip() == "":
+            if context.format_alt_flag_check in item.__dict__.keys():
+                if (
+                    item.__dict__[context.format_alt_flag_check].strip() == ""
+                ) | (item.__dict__[context.format_alt_flag_check] is None):
+                    doalt = True
+            else:
+                doalt = True
+
+            if doalt:
                 yield context.cur_formatter_alt(info)
             else:
+                doalt2 = False
                 if context.format_alt2_flag_check is not None:
-                    if (
-                        info.__dict__[context.format_alt2_flag_check].strip()
-                        == ""
-                    ):
-                        yield context.cur_formatter_alt2(info)
+                    if context.format_alt_flag_check in item.__dict__.keys():
+                        if (
+                            item.__dict__[
+                                context.format_alt2_flag_check
+                            ].strip()
+                            == ""
+                        ) | (
+                            item.__dict__[context.format_alt2_flag_check]
+                            is None
+                        ):
+                            doalt2 = True
                     else:
-                        yield context.cur_formatter(info)
+                        doalt = True
+
+                if doalt2:
+                    yield context.cur_formatter_alt2(info)
                 else:
                     yield context.cur_formatter(info)
+
         else:
             yield context.cur_formatter(info)
 
@@ -2012,22 +2032,44 @@ def _rev_misc_list(context, sections, gate):
         if not gate(item):
             continue
 
+        info = item
+
+        doalt = False
         if context.format_alt_flag_check is not None:
-            if item.__dict__[context.format_alt_flag_check].strip() == "":
-                yield context.cur_formatter_alt(item)
+            if context.format_alt_flag_check in item.__dict__.keys():
+                if (
+                    item.__dict__[context.format_alt_flag_check].strip() == ""
+                ) | (item.__dict__[context.format_alt_flag_check] is None):
+                    doalt = True
             else:
+                doalt = True
+
+            if doalt:
+                yield context.cur_formatter_alt(info)
+            else:
+                doalt2 = False
                 if context.format_alt2_flag_check is not None:
-                    if (
-                        item.__dict__[context.format_alt2_flag_check].strip()
-                        == ""
-                    ):
-                        yield context.cur_formatter_alt2(item)
+                    if context.format_alt_flag_check in item.__dict__.keys():
+                        if (
+                            item.__dict__[
+                                context.format_alt2_flag_check
+                            ].strip()
+                            == ""
+                        ) | (
+                            item.__dict__[context.format_alt2_flag_check]
+                            is None
+                        ):
+                            doalt2 = True
                     else:
-                        yield context.cur_formatter(item)
+                        doalt = True
+
+                if doalt2:
+                    yield context.cur_formatter_alt2(info)
                 else:
-                    yield context.cur_formatter(item)
+                    yield context.cur_formatter(info)
+
         else:
-            yield context.cur_formatter(item)
+            yield context.cur_formatter(info)
 
 
 def cmd_rev_misc_list(context, sections):
@@ -2146,37 +2188,38 @@ def _rev_prop_list(context, sections, gate):
 
         info = prop_info(item)
 
+        doalt = False
         if context.format_alt_flag_check is not None:
-            _doalt = False
             if context.format_alt_flag_check in item.__dict__.keys():
-                if item.__dict__[context.format_alt_flag_check].strip() == "":
-                    _doalt = True
+                if (
+                    item.__dict__[context.format_alt_flag_check].strip() == ""
+                ) | (item.__dict__[context.format_alt_flag_check] is None):
+                    doalt = True
             else:
-                _doalt = True
-
-            if _doalt:
+                doalt = True
+            if doalt:
                 yield context.cur_formatter_alt(info)
-
             else:
+                doalt2 = False
                 if context.format_alt2_flag_check is not None:
-                    _doalt2 = False
                     if context.format_alt2_flag_check in item.__dict__.keys():
                         if (
                             item.__dict__[
                                 context.format_alt2_flag_check
                             ].strip()
                             == ""
+                        ) | (
+                            item.__dict__[context.format_alt2_flag_check]
+                            is None
                         ):
-                            _doalt2 = True
+                            doalt2 = True
                     else:
-                        _doalt2 = True
-
-                    if _doalt2:
-                        yield context.cur_formatter_alt2(info)
-                    else:
-                        yield context.cur_formatter(info)
+                        doalt2 = True
+                if doalt2:
+                    yield context.cur_formatter_alt2(info)
                 else:
                     yield context.cur_formatter(info)
+
         else:
             yield context.cur_formatter(info)
 
