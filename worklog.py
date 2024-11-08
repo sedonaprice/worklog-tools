@@ -142,6 +142,43 @@ class MultilineHandler(object):
         raise NotImplementedError()
 
 
+def preprocess_template(stream, commands, context):
+    """Read through a template line-by-line to get ahead-of-time
+    variables.
+    `commands` is a dictionary of strings to callables;
+    if the first word in a line is in `commands`, the
+    callable is invoked, with `context` and the remaining words in the line as
+    arguments. Its return value is either a string or an iterable, with each
+    iterate being yielded to the caller in the latter case."""
+
+    # current_multiline_handler = None
+
+    for line in stream:
+        line = line.decode("utf8").rstrip()
+
+        # if current_multiline_handler is not None:
+        #     if line != "END":
+        #         # current_multiline_handler.handle_line(context, line)
+        #         parse_ads_cites
+        #     else:
+        #         # result = current_multiline_handler.handle_end_span(context)
+        #         # if isinstance(result, string_types):
+        #         #     yield result
+        #         # else:
+        #         #     for subline in result:
+        #         #         yield subline
+        #         pass
+        #         current_multiline_handler = None
+        # else:
+        a = line.split()
+
+        if len(a) > 0:
+            if a[0] in commands:
+                context = commands[a[0]](context, *a[1:])
+
+    return context
+
+
 def process_template(stream, commands, context):
     """Read through a template line-by-line and replace special lines. Each
     regular line is yielded to the caller. `commands` is a dictionary of
@@ -1177,7 +1214,7 @@ def cite_info(oitem, context):
     return aitem
 
 
-def compute_cite_stats(pubs):
+def compute_cite_stats(pubs, fewsplit=2):
     """Compute an h-index and other stats from the known publications."""
     from time import gmtime
 
@@ -1189,7 +1226,9 @@ def compute_cite_stats(pubs):
     stats.refsecauth = 0
     stats.refsecauthcites = 0
     stats.refsecauthstudent = 0
+    stats.refstudent = 0
     stats.refsecauthstudentcites = 0
+    stats.refstudentcites = 0
     stats.pubs = 0
     stats.cites = 0
     stats.firstauth = 0
@@ -1198,10 +1237,14 @@ def compute_cite_stats(pubs):
     stats.secauthcites = 0
     stats.secauthstudent = 0
     stats.secauthstudentcites = 0
+    stats.student = 0
+    stats.studentcites = 0
     stats.contribauth = 0
     stats.contribauthcites = 0
     cites = []
     dates = []
+
+    # fewsplit = 2
 
     for pub in pubs:
         stats.pubs += 1
@@ -1214,8 +1257,19 @@ def compute_cite_stats(pubs):
             stats.secauthstudent += 1
         elif studentfirstauth:
             stats.secauthstudent += 1
-        else:
+        # else:
+
+        # # if int(pub.mypos) > fewsplit:
+        # #     stats.contribauth += 1
+
+        # if (int(pub.mypos) > fewsplit) & (not studentfirstauth):
+        #     stats.contribauth += 1
+
+        if studentfirstauth:
+            stats.student += 1
+        elif int(pub.mypos) > fewsplit:
             stats.contribauth += 1
+
         if pub.refereed == "y":
             stats.refpubs += 1
             if int(pub.mypos) == 1:
@@ -1223,6 +1277,11 @@ def compute_cite_stats(pubs):
             elif int(pub.mypos) == 2:
                 stats.refsecauth += 1
                 stats.refsecauthstudent += 1
+            elif studentfirstauth:
+                stats.refsecauthstudent += 1
+
+            if studentfirstauth:
+                stats.refstudent += 1
 
         citeinfo = parse_ads_cites(pub)
         if citeinfo is None:
@@ -1244,6 +1303,9 @@ def compute_cite_stats(pubs):
             elif studentfirstauth:
                 stats.refsecauthstudentcites += citeinfo.cites
 
+            if studentfirstauth:
+                stats.refstudentcites += citeinfo.cites
+
         stats.cites += citeinfo.cites
         if int(pub.mypos) == 1:
             stats.firstauthcites += citeinfo.cites
@@ -1252,7 +1314,19 @@ def compute_cite_stats(pubs):
             stats.secauthstudentcites += citeinfo.cites
         elif studentfirstauth:
             stats.secauthstudentcites += citeinfo.cites
-        else:
+        # else:
+        # if int(pub.mypos) > fewsplit:
+        #     stats.contribauthcites += citeinfo.cites
+
+        # if (int(pub.mypos) > fewsplit) & (not studentfirstauth):
+        #     stats.contribauthcites += citeinfo.cites
+
+        # if studentfirstauth:
+        #     stats.studentcites += citeinfo.cites
+
+        if studentfirstauth:
+            stats.studentcites += citeinfo.cites
+        elif int(pub.mypos) > fewsplit:
             stats.contribauthcites += citeinfo.cites
 
     if not len(cites):
@@ -1277,7 +1351,7 @@ def compute_cite_stats(pubs):
     return stats
 
 
-def partition_pubs(pubs):
+def partition_pubs(pubs, fewsplit=2):
     groups = Holder()
     groups.all = []
     groups.refereed = []
@@ -1293,7 +1367,7 @@ def partition_pubs(pubs):
 
     groups.firstfew = []
     groups.contribfew = []
-    groups.fewsplit = 2  # <= goes to firstfew, > goes to contribfew
+    groups.fewsplit = fewsplit  # <= goes to firstfew, > goes to contribfew
     groups.few_include_student_led = True
 
     for pub in pubs:
@@ -1781,7 +1855,9 @@ class MultilineSubstHandler(MultilineHandler):
 
 #
 def cmd_cite_stats_tex(context, template):
-    info = compute_cite_stats(context.pubgroups.all_formal)
+    info = compute_cite_stats(
+        context.pubgroups.all_formal, fewsplit=context.fewsplit
+    )
     return Formatter(context.render, True, slurp_template(template))(info)
 
 
@@ -1947,6 +2023,17 @@ def talk_info(oitem):
 
 def cmd_my_abbrev_name(context, *text):
     context.my_abbrev_name = " ".join(text)
+    return ""
+
+
+# FEWSPLIT
+def cmd_fewsplit_preprocess(context, *text):
+    context.fewsplit = int(" ".join(text))
+    return context
+
+
+def cmd_fewsplit(context, *text):
+    context.fewsplit = int(" ".join(text))
     return ""
 
 
@@ -2245,16 +2332,22 @@ def cmd_today_invert(context):
     return context.render(text)
 
 
-def setup_processing(render, datadir):
+def setup_processing(render, datadir, fewsplit=2):
     context = Holder()
     context.render = render
     context.items = list(load(datadir))
+
+    context.fewsplit = fewsplit
+
     context.pubs = [i for i in context.items if i.section == "pub"]
-    context.pubgroups = partition_pubs(context.pubs)
+
+    context.pubgroups = partition_pubs(context.pubs, fewsplit=context.fewsplit)
     context.props = [i for i in context.items if i.section == "prop"]
     context.time_allocs = compute_time_allocations(context.props)
     context.repos = process_repositories(context.items)
-    context.cite_stats = compute_cite_stats(context.pubgroups.all_formal)
+    context.cite_stats = compute_cite_stats(
+        context.pubgroups.all_formal, fewsplit=context.fewsplit
+    )
     context.repo_stats = compute_repo_stats(context.repos)
     context.talk_stats = summarize_talks(
         [i for i in context.items if i.section == "talk"]
@@ -2322,6 +2415,8 @@ def setup_processing(render, datadir):
     commands["PROPLIST_IF_IF_NOT"] = cmd_rev_prop_list_if_if_not
     commands["PROPLIST_IF_NOT_IF_NOT"] = cmd_rev_prop_list_if_not_if_not
     commands["TODAY"] = cmd_today_invert
+
+    commands["FEWSPLIT"] = cmd_fewsplit
 
     return context, commands
 

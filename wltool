@@ -29,6 +29,8 @@ import sys
 
 from worklog import *
 
+from worklog import cmd_fewsplit_preprocess, preprocess_template
+
 
 def cli_bootstrap_bibtex(argv):
     """usage: wltool bootstrap-bibtex <bibtex-file> <your-surname> <output-dir>
@@ -304,7 +306,18 @@ def _cli_render(argv):
     else:
         die('unknown output format "%s"', fmtname)
 
-    context, commands = setup_processing(render, datadir)
+    context_pre = Holder()
+    context_pre.fewsplit = (
+        2  # Default: split at first or second author & all others
+    )
+    commands_preprocess = {}
+    commands_preprocess["FEWSPLIT"] = cmd_fewsplit_preprocess
+    with io.open(tmpl, "rb") as f:
+        context_pre = preprocess_template(f, commands_preprocess, context_pre)
+
+    context, commands = setup_processing(
+        render, datadir, fewsplit=context_pre.fewsplit
+    )
 
     with io.open(tmpl, "rb") as f:
         for outline in process_template(f, commands, context):
