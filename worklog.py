@@ -134,6 +134,22 @@ def _get_studentfirstauth(pub):
     return studentfirstauth
 
 
+def _quant_to_num_prettify(quantity, units):
+    nums = quantity.split("/")
+    qarr = []
+    for i in range(len(nums)):
+        num = float(nums[i])
+
+        if (num - int(num)) < 1e-10:
+            num = int(num)
+
+        qarr.append(format(num, ","))
+
+    amount = MupJoin("/", qarr)
+
+    return MupJoin(" ", [amount, units])
+
+
 class MultilineHandler(object):
     def handle_line(self, context, line):
         raise NotImplementedError()
@@ -1735,6 +1751,20 @@ def prop_info(oitem):
         # aitem.quotable_title = MupJoin (' ', words_title)
     except AttributeError:
         aitem.quotable_title = ""
+
+    # Test: "prettify" request + award to have commas:
+    try:
+        amount = aitem.request
+        quantity, units = amount.split()
+        aitem.request = _quant_to_num_prettify(quantity, units)
+    except AttributeError:
+        aitem.request = ""
+    try:
+        amount = aitem.award
+        quantity, units = amount.split()
+        aitem.award = _quant_to_num_prettify(quantity, units)
+    except AttributeError:
+        aitem.award = ""
 
     return aitem
 
