@@ -1401,9 +1401,9 @@ def partition_pubs(pubs, fewsplit=2):
             prepsub = False
 
         first = pub.mypos == "1"
+
         if groups.few_include_student_led:
             studentfirstauth = _get_studentfirstauth(pub)
-
             firstfew = (int(pub.mypos) <= groups.fewsplit) | (studentfirstauth)
         else:
             firstfew = int(pub.mypos) <= groups.fewsplit
@@ -2094,6 +2094,14 @@ def cmd_obsexp_list(context, sections):
         yield context.cur_formatter(info)
 
 
+def cmd_obsexp_rev_list(context, sections):
+    if context.cur_formatter is None:
+        die("cannot use OBSEXPLISTREV command before using FORMAT")
+
+    for info in context.obs_exp[::-1]:
+        yield context.cur_formatter(info)
+
+
 def cmd_team_talk_list(context, sections):
     if context.cur_formatter is None:
         die("cannot use TEAMTALKLIST command before using FORMAT")
@@ -2436,6 +2444,7 @@ def setup_processing(render, datadir, fewsplit=2):
     commands["RMISCLIST_CASE"] = cmd_rev_misc_list_switch
     commands["TALKLIST_CASE"] = cmd_talk_list_switch
     commands["OBSEXPLIST"] = cmd_obsexp_list
+    commands["OBSEXPLISTREV"] = cmd_obsexp_rev_list
     commands["TEAMTALKLIST"] = cmd_team_talk_list
     commands["PROPLIST"] = cmd_rev_prop_list
     commands["PROPLIST_IF"] = cmd_rev_prop_list_if
